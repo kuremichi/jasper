@@ -1,6 +1,6 @@
 import { JasperEngineRecipe } from './recipe';
 import { Observable, empty, of, from, forkJoin, throwError } from 'rxjs';
-import { switchMap, tap, toArray, share, catchError, shareReplay, mapTo, map, switchMapTo } from 'rxjs/operators';
+import { switchMap, tap, toArray, share, catchError, shareReplay } from 'rxjs/operators';
 import {
     JasperRule,
     ExecutionContext,

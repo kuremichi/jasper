@@ -1,4 +1,4 @@
-import { JasperRule, ExecutionContext, Operator } from './rule.config'
+import { JasperRule, Operator } from './rule.config'
 import { of } from 'rxjs'
 import _ from 'lodash'
 import { tap } from 'rxjs/operators'
@@ -7,7 +7,7 @@ const store: JasperRule[] = [
     {
         name: 'test rule 1',
         description: '',
-        beforeAction: (o) => {
+        beforeAction: () => {
             console.log('preprocessing rule 1')
         },
         action: async () => {
@@ -19,7 +19,7 @@ const store: JasperRule[] = [
     {
         name: 'test rule 2',
         description: '',
-        beforeAction: (o) => {
+        beforeAction: () => {
             console.log('preprocessing rule 2')
         },
         action: () => {
@@ -30,7 +30,7 @@ const store: JasperRule[] = [
     {
         name: 'test rule 3',
         description: '',
-        beforeAction: async (context: ExecutionContext) => {
+        beforeAction: async () => {
             console.log('preprocessing rule 3')
         },
         action: of('processing 3').pipe(
@@ -66,7 +66,7 @@ const store: JasperRule[] = [
     {
         name: 'test rule 4',
         description: '',
-        beforeAction: (o) => {
+        beforeAction: () => {
             console.log('preprocessing rule 4')
         },
         action: '"processing rule 4"',
