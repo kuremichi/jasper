@@ -14,7 +14,7 @@ import jsonata from 'jsonata';
 import hash from 'object-hash';
 import _ from 'lodash';
 import { StaticRuleStore } from './test.rule.store';
-import { ExecutionResponse, CompoundDependencyExecutionResponse, SimpleDependencyExecutionResponse } from './execution.response';
+import { ExecutionResponse, CompoundDependencyExecutionResponse, SimpleDependencyExecutionResponse, isCompoundDependencyExecutionResponse } from './execution.response';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const AsyncFunction = (async () => {}).constructor;
@@ -89,7 +89,7 @@ export class JasperEngine {
         return of([]);
     }
 
-    private processCompoundDependency(context: ExecutionContext, compoundDependency: CompoundDependency): Observable<any> {
+    private processCompoundDependency(context: ExecutionContext, compoundDependency: CompoundDependency): Observable<CompoundDependencyExecutionResponse> {
         const operator = compoundDependency.operator || Operator.AND;
 
         const response: CompoundDependencyExecutionResponse = {
@@ -141,7 +141,22 @@ export class JasperEngine {
                     acc[rule.name] = task;
                 } else if (isCompoundDependency(rule)) {
                     const childCompoundDependency = rule as CompoundDependency;
-                    acc[rule.name] = this.processCompoundDependency(context, childCompoundDependency);
+                    const compoundDependencyResponse: CompoundDependencyExecutionResponse = {
+                        name: childCompoundDependency.name,
+                        hasError: false,
+                        isSuccessful: false,
+                        operator,
+                        rules: [],
+                    };
+
+                    acc[rule.name] = this.processCompoundDependency(context, childCompoundDependency).pipe(
+                        switchMap((r: CompoundDependencyExecutionResponse) => {
+                            compoundDependencyResponse.isSuccessful = r.isSuccessful;
+                            compoundDependencyResponse.rules = r.rules;
+
+                            return of(compoundDependencyResponse);
+                        }),
+                    );
                 }
                 return acc;
             },
@@ -149,31 +164,19 @@ export class JasperEngine {
         );
 
         return forkJoin(tasks).pipe(
-            switchMap((results: Record<string, ExecutionResponse>) => {
+            switchMap((results: Record<string, SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>) => {
                 const entries = _.entries(results);
 
-                response.hasError = _.some(entries, ([, result]: [string, ExecutionResponse]) => {
+                response.hasError = _.some(entries, ([, result]: [string, SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse]) => {
                     return result.hasError;
                 });
 
                 response.isSuccessful =
                     operator === Operator.AND
-                        ? _.every(entries, ([, result]: [string, ExecutionResponse]) => result.isSuccessful)
-                        : _.some(entries, ([, result]: [string, ExecutionResponse]) => result.isSuccessful);
+                        ? _.every(entries, ([, result]: [string, SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse]) => result.isSuccessful)
+                        : _.some(entries, ([, result]: [string, SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse]) => result.isSuccessful);
 
-                response.rules = _.map(entries, ([name, result]: [string, ExecutionResponse]) => {
-                    return {
-                        name,
-                        isSkipped: false,
-                        rule: result.rule,
-                        hasError: result.hasError,
-                        error: result.error,
-                        isSuccessful: result.isSuccessful,
-                        result: result.result,
-                        dependencies: result.dependencies,
-                    };
-                });
-
+                response.rules = _.map(entries, ([, result]: [string, SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse]) => result);
                 return of(response);
             }),
         );

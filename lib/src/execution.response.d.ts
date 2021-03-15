@@ -18,3 +18,4 @@ export interface CompoundDependencyExecutionResponse {
     operator: Operator;
     rules: (SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[];
 }
+export declare function isCompoundDependencyExecutionResponse(object: any): object is CompoundDependencyExecutionResponse;

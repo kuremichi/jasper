@@ -21,3 +21,7 @@ export interface CompoundDependencyExecutionResponse {
     operator: Operator;
     rules: (SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[]
 }
+
+export function isCompoundDependencyExecutionResponse(object: any): object is CompoundDependencyExecutionResponse {
+    return 'operator' in object && 'rules' in object;
+}
