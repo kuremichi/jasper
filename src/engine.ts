@@ -13,8 +13,7 @@ import {
 import jsonata from 'jsonata';
 import hash from 'object-hash';
 import _ from 'lodash';
-import { StaticRuleStore } from './test.rule.store';
-import { ExecutionResponse, CompoundDependencyExecutionResponse, SimpleDependencyExecutionResponse, isCompoundDependencyExecutionResponse } from './execution.response';
+import { ExecutionResponse, CompoundDependencyExecutionResponse, SimpleDependencyExecutionResponse } from './execution.response';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const AsyncFunction = (async () => {}).constructor;
@@ -24,14 +23,14 @@ const GeneratorFunction = function* () {
 }.constructor;
 
 export class JasperEngine {
-    contextStore: Record<string, ExecutionContext>;
-    ruleStore: Record<string, JasperRule>;
-    options: EngineOptions;
+    private contextStore: Record<string, ExecutionContext>;
+    private ruleStore: Record<string, JasperRule>;
+    private options: EngineOptions;
 
-    constructor(options: EngineOptions = DefaultEngineOptions) {
+    constructor(ruleStore: Record<string, JasperRule>, options: EngineOptions = DefaultEngineOptions) {
         this.options = options;
         this.contextStore = {};
-        this.ruleStore = StaticRuleStore;
+        this.ruleStore = ruleStore;
     }
 
     private executeAction({
@@ -188,7 +187,7 @@ export class JasperEngine {
      * @param params.ruleName the rule name to evaluate against
      * @param params.parentExecutionContext [parent execution context] the parent context of current context
      */
-    execute(params: {
+    private execute(params: {
         root: any;
         ruleName: string;
         parentExecutionContext?: ExecutionContext;
@@ -315,6 +314,18 @@ export class JasperEngine {
         }
 
         return context.process;
+    }
+
+    /**
+     * @param params
+     * @param params.root the object to evaluate
+     * @param params.ruleName the rule name to evaluate against
+     */
+    run(params: {
+        root: any;
+        ruleName: string;
+    }): Observable<ExecutionResponse> {
+        return this.execute(params)
     }
 }
 

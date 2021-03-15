@@ -1,12 +1,12 @@
 import { JasperEngineRecipe } from './recipe';
 import { Observable } from 'rxjs';
-import { JasperRule, ExecutionContext } from './rule.config';
+import { JasperRule } from './rule.config';
 import { ExecutionResponse } from './execution.response';
 export declare class JasperEngine {
-    contextStore: Record<string, ExecutionContext>;
-    ruleStore: Record<string, JasperRule>;
-    options: EngineOptions;
-    constructor(options?: EngineOptions);
+    private contextStore;
+    private ruleStore;
+    private options;
+    constructor(ruleStore: Record<string, JasperRule>, options?: EngineOptions);
     private executeAction;
     private processPath;
     private processCompoundDependency;
@@ -16,10 +16,15 @@ export declare class JasperEngine {
      * @param params.ruleName the rule name to evaluate against
      * @param params.parentExecutionContext [parent execution context] the parent context of current context
      */
-    execute(params: {
+    private execute;
+    /**
+     * @param params
+     * @param params.root the object to evaluate
+     * @param params.ruleName the rule name to evaluate against
+     */
+    run(params: {
         root: any;
         ruleName: string;
-        parentExecutionContext?: ExecutionContext;
     }): Observable<ExecutionResponse>;
 }
 export interface EngineOptions {
