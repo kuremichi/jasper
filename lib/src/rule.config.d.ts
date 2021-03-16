@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { JasperEngineRecipe } from './recipe';
 declare type ArrayOneOrMore<T> = {
     0: T;
 } & Array<T>;
@@ -83,16 +84,22 @@ export declare enum Operator {
     OR = "OR"
 }
 export declare enum ExecutionOrder {
-    Sequential = 0,
-    Parallel = 1
+    Sequential = "Sequential",
+    Parallel = "Parallel"
 }
 export interface ExecutionContext {
     contextId: string;
     root: any;
+    options: EngineOptions;
     rule: JasperRule;
     parentContext?: ExecutionContext;
     childrenContexts?: Record<string, ExecutionContext>;
     process: Observable<any>;
     complete: boolean;
 }
+export interface EngineOptions {
+    suppressDuplicateTasks: boolean;
+    recipe: JasperEngineRecipe;
+}
+export declare const DefaultEngineOptions: EngineOptions;
 export {};

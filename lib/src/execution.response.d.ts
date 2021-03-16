@@ -6,6 +6,8 @@ export interface ExecutionResponse {
     isSuccessful: boolean;
     result: any;
     dependencies?: CompoundDependencyExecutionResponse | undefined;
+    startDateTime?: Date;
+    completedTime?: Date;
 }
 export interface SimpleDependencyExecutionResponse extends ExecutionResponse {
     name: string;
@@ -17,5 +19,7 @@ export interface CompoundDependencyExecutionResponse {
     isSuccessful: boolean;
     operator: Operator;
     rules: (SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[];
+    startDateTime?: Date;
+    completedTime?: Date;
 }
 export declare function isCompoundDependencyExecutionResponse(object: any): object is CompoundDependencyExecutionResponse;

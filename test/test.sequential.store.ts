@@ -1,4 +1,4 @@
-import { JasperRule, Operator } from './rule.config';
+import { JasperRule, Operator, ExecutionOrder } from '../src/rule.config';
 import { of } from 'rxjs';
 import _ from 'lodash';
 import { tap } from 'rxjs/operators';
@@ -40,26 +40,22 @@ const store: JasperRule[] = [
                 {
                     name: 'dependency rule 3 - 1',
                     path: '$',
-                    rule: 'test rule 2',
+                    rule: 'test rule 1',
                 },
                 {
                     name: 'dependency rule 3 - 2',
-                    path: '$',
-                    rule: 'test rule 4',
-                },
-                {
-                    name: 'dependency rule 3 - 3',
+                    executionOrder: ExecutionOrder.Parallel,
                     operator: Operator.AND,
                     rules: [
                         {
-                            name: 'dependency rule 3 - 3 - 1',
+                            name: 'dependency rule 3 - 2 - 1',
                             path: '$',
                             rule: 'test rule 2',
                         },
                         {
-                            name: 'dependency rule 3 - 3 - 2',
+                            name: 'dependency rule 3 - 2 - 2',
                             path: '$',
-                            rule: 'test rule 1',
+                            rule: 'test rule 4',
                         },
                     ],
                 },
@@ -73,22 +69,6 @@ const store: JasperRule[] = [
             console.log('preprocessing rule 4');
         },
         action: '"processing rule 4"',
-        dependencies: {
-            name: 'dependencies of rule 4',
-            operator: Operator.OR,
-            rules: [
-                {
-                    name: 'dependency rule 4 - 1',
-                    path: '$',
-                    rule: 'test rule 2',
-                },
-                {
-                    name: 'dependency rule 4 - 2',
-                    path: '$',
-                    rule: 'test rule 1',
-                },
-            ],
-        },
     },
 ];
 

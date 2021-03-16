@@ -1,4 +1,5 @@
 import {Observable} from 'rxjs';
+import { JasperEngineRecipe } from './recipe';
 
 type ArrayOneOrMore<T> = {
     0: T
@@ -117,16 +118,27 @@ export enum Operator {
 }
 
 export enum ExecutionOrder {
-    Sequential,
-    Parallel,
+    Sequential = 'Sequential',
+    Parallel = 'Parallel',
 }
 
 export interface ExecutionContext {
     contextId: string;
     root: any;
+    options: EngineOptions;
     rule: JasperRule,
     parentContext?: ExecutionContext;
     childrenContexts?: Record<string, ExecutionContext>;
     process: Observable<any>;
     complete: boolean;
 }
+
+export interface EngineOptions {
+    suppressDuplicateTasks: boolean;
+    recipe: JasperEngineRecipe;
+}
+
+export const DefaultEngineOptions: EngineOptions = {
+    suppressDuplicateTasks: true,
+    recipe: JasperEngineRecipe.ValidationRuleEngine,
+};
