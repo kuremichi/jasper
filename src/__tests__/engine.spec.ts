@@ -75,18 +75,20 @@ describe('processPath', () => {
             complete: false,
         };
 
+        const mock = jest.fn().mockReturnValue(_.get(context.root, 'children'));
         const pathFunction = (context: ExecutionContext) => {
-            return _.get(context.root, 'children');
+            return mock();
         };
 
         const ob: Observable<any[]> = (engine as any).processPath(pathFunction, context);
 
-        const subscription = ob.subscribe({
+        ob.subscribe({
             next: (pahtObjects: any[]) => {
                 expect(pahtObjects).toHaveLength(2);
             },
             complete: () => {
                 expect(processPathSpy).toBeCalledTimes(1);
+                expect(mock).toBeCalledTimes(1);
                 done();
             }
         });
@@ -104,12 +106,9 @@ describe('processPath', () => {
             complete: false,
         };
 
+        const mock = jest.fn().mockResolvedValue(_.get(context.root, 'children'));
         const asyncPathFunction = async (context: ExecutionContext) => {
-            return new Promise((resolve,) => {
-                setTimeout(() => {
-                    resolve(_.get(context.root, 'children'));
-                }, 100);
-            });
+            return mock();
         };
 
         const ob: Observable<any[]> = (engine as any).processPath(asyncPathFunction, context);
@@ -120,6 +119,7 @@ describe('processPath', () => {
             },
             complete: () => {
                 expect(processPathSpy).toBeCalledTimes(1);
+                expect(mock).toBeCalledTimes(1);
                 done();
             }
         });
@@ -271,12 +271,10 @@ describe('executeAction', () => {
             complete: false,
         };
 
+        const mock = jest.fn().mockResolvedValue(123);
+
         const action = async () => {
-            return new Promise((resolve) => {
-                setTimeout(() =>{
-                    resolve(123);
-                }, 50);
-            })
+            return mock();
         }
 
         const ob: Observable<any> = (engine as any).executeAction({action, context});
@@ -287,6 +285,7 @@ describe('executeAction', () => {
             },
             complete: () => {
                 expect(executeActionSpy).toBeCalledTimes(1);
+                expect(mock).toBeCalledTimes(1);
                 done();
             }
         });
@@ -309,8 +308,9 @@ describe('executeAction', () => {
             complete: false,
         };
 
+        const mock = jest.fn().mockReturnValue(123);
         const action = () => {
-            return 123;
+            return mock();
         }
 
         const ob: Observable<any> = (engine as any).executeAction({action, context});
@@ -321,6 +321,7 @@ describe('executeAction', () => {
             },
             complete: () => {
                 expect(executeActionSpy).toBeCalledTimes(1);
+                expect(mock).toBeCalledTimes(1);
                 done();
             }
         });
@@ -329,23 +330,9 @@ describe('executeAction', () => {
     it('should return null if invalid expression passed', done => {
         const engine = new JasperEngine({});
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
-        const context: ExecutionContext = {
-            contextId: '1',
-            root: { 
-                children: [
-                    { id: 1, text: 'child1' }, 
-                    { id: 2, text: 'child2' }
-                ]
-            },
-            options: DefaultEngineOptions,
-            rule: mockRule,
-            process: empty(),
-            complete: false,
-        };
 
         const action = 1;
-
-        const ob: Observable<any> = (engine as any).executeAction({action, context});
+        const ob: Observable<any> = (engine as any).executeAction({action, context: {}});
         
         ob.subscribe({
             next: (result: any) => {

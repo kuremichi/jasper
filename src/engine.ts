@@ -78,7 +78,7 @@ export class JasperEngine {
         }
 
         if (params.action instanceof Function) {
-            return of(action(context.root));
+            return of(params.action(params.context.root));
         }
 
         return of(null);
