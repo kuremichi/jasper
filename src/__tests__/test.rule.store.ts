@@ -1,7 +1,7 @@
-import { JasperRule, Operator } from '../src/rule.config';
-import { of, throwError } from 'rxjs';
+import { JasperRule, Operator } from '../rule.config';
+import { of } from 'rxjs';
 import _ from 'lodash';
-import { tap, delay, switchMapTo } from 'rxjs/operators';
+import { tap, delay } from 'rxjs/operators';
 
 const store: JasperRule[] = [
     {

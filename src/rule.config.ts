@@ -1,10 +1,9 @@
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 import { JasperEngineRecipe } from './recipe';
 
 type ArrayOneOrMore<T> = {
-    0: T
-} & Array<T>
-
+    0: T;
+} & Array<T>;
 
 export interface JasperRule {
     /**
@@ -20,29 +19,28 @@ export interface JasperRule {
     /**
      * lifecycle hook before the action is executed
      */
-    beforeAction?: ((context: ExecutionContext) => any);
+    beforeAction?: (context: ExecutionContext) => any;
 
     /**
      * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
      */
-    action: string | Observable<unknown> | (() => any) | (() => Promise<any>)
+    action: string | Observable<unknown> | (() => any) | (() => Promise<any>);
 
     /**
      * lifecycle hook after the action has been executing executed
      */
-    afterAction?: ((context: ExecutionContext) => any);
+    afterAction?: (context: ExecutionContext) => any;
 
     /**
      * lifecycle hook after the action has error
      */
-    onError?: ((error: any, context: ExecutionContext) => any);
+    onError?: (error: any, context: ExecutionContext) => any;
 
     /**
      * the dependencies of the rule that will be executed
      */
     dependencies?: CompoundDependency | undefined;
-
 }
 
 export function isJasperRule(object: any): object is JasperRule {
@@ -51,7 +49,7 @@ export function isJasperRule(object: any): object is JasperRule {
 
 export interface CompoundDependency {
     /**
-     * 
+     *
      */
     name: string;
 
@@ -59,22 +57,22 @@ export interface CompoundDependency {
      * whether the children rule should be evaluated in parallel or sequentially
      * the default is parallel
      */
-    executionOrder?: ExecutionOrder,
+    executionOrder?: ExecutionOrder;
 
     /**
-     * 
+     *
      */
     operator?: Operator;
 
     /**
-     * 
+     *
      */
-    rules: ArrayOneOrMore<(CompoundDependency | SimpleDependency)>;
+    rules: ArrayOneOrMore<CompoundDependency | SimpleDependency>;
 
     /**
-     * 
+     *
      */
-    onError?: ((error: any, context: ExecutionContext) => any);
+    onError?: (error: any, context: ExecutionContext) => any;
 }
 
 export function isCompoundDependency(object: any): object is CompoundDependency {
@@ -83,7 +81,7 @@ export function isCompoundDependency(object: any): object is CompoundDependency 
 
 export interface SimpleDependency {
     /**
-     * 
+     *
      */
     name: string;
 
@@ -97,12 +95,12 @@ export interface SimpleDependency {
 
     rule: string;
 
-    when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>
+    when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
 
     whenDescription?: string;
 
     required?: boolean;
-    
+
     executionOrder?: ExecutionOrder;
 
     onError?: (error: any, context: ExecutionContext) => any;
@@ -128,7 +126,7 @@ export interface ExecutionContext {
     contextId: string;
     root: any;
     options: EngineOptions;
-    rule: JasperRule,
+    rule: JasperRule;
     parentContext?: ExecutionContext;
     childrenContexts?: Record<string, ExecutionContext>;
     process: Observable<any>;

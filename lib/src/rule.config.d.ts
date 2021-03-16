@@ -15,7 +15,7 @@ export interface JasperRule {
     /**
      * lifecycle hook before the action is executed
      */
-    beforeAction?: ((context: ExecutionContext) => any);
+    beforeAction?: (context: ExecutionContext) => any;
     /**
      * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
@@ -24,11 +24,11 @@ export interface JasperRule {
     /**
      * lifecycle hook after the action has been executing executed
      */
-    afterAction?: ((context: ExecutionContext) => any);
+    afterAction?: (context: ExecutionContext) => any;
     /**
      * lifecycle hook after the action has error
      */
-    onError?: ((error: any, context: ExecutionContext) => any);
+    onError?: (error: any, context: ExecutionContext) => any;
     /**
      * the dependencies of the rule that will be executed
      */
@@ -52,11 +52,11 @@ export interface CompoundDependency {
     /**
      *
      */
-    rules: ArrayOneOrMore<(CompoundDependency | SimpleDependency)>;
+    rules: ArrayOneOrMore<CompoundDependency | SimpleDependency>;
     /**
      *
      */
-    onError?: ((error: any, context: ExecutionContext) => any);
+    onError?: (error: any, context: ExecutionContext) => any;
 }
 export declare function isCompoundDependency(object: any): object is CompoundDependency;
 export interface SimpleDependency {

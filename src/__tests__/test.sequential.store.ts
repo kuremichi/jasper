@@ -1,4 +1,4 @@
-import { JasperRule, Operator, ExecutionOrder } from '../src/rule.config';
+import { JasperRule, Operator, ExecutionOrder } from '../rule.config';
 import { of } from 'rxjs';
 import _ from 'lodash';
 import { tap, delay } from 'rxjs/operators';

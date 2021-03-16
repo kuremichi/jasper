@@ -7,6 +7,5 @@ export enum JasperEngineRecipe {
     /*
         use this recipe if perform a series of actions depending on the business process rule
     */
-    BusinessProcessEngine
-    
+    BusinessProcessEngine,
 }
