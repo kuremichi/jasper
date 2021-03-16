@@ -49,7 +49,9 @@ export class JasperEngine {
         } 
         
         if (action instanceof Observable) {
-            return from(action).pipe(toArray());
+            return from(action).pipe(
+                toArray()
+            );
         } 
         
         if (action instanceof AsyncFunction && AsyncFunction !== Function && AsyncFunction !== GeneratorFunction) {
@@ -63,70 +65,68 @@ export class JasperEngine {
         return of(null);
     }
 
-    private processPath(context: ExecutionContext, path: string | ((context: ExecutionContext) => any)): Observable<any[]> {
+    private processPath(path: string | ((context: ExecutionContext) => any), context: ExecutionContext): Observable<any[]> {
         if (typeof path === 'string') {
             const expression = jsonata(path as string);
             const pathObject = expression.evaluate(context.root);
             return of(pathObject).pipe(
                 toArray(),
+                map(arr => {
+                    return _.flatten(arr);
+                }),
             );
         }
 
         if (path instanceof Observable) {
             return from(path).pipe(
                 toArray(),
+                map(arr => {
+                    return _.flatten(arr);
+                }),
             );
         }
 
         if (path instanceof AsyncFunction && AsyncFunction !== Function && AsyncFunction !== GeneratorFunction) {
             return from(path(context)).pipe(
                 toArray(),
+                map(arr => {
+                    return _.flatten(arr);
+                }),
             );
         } 
         
         if (path instanceof Function) {
             return of(path(context)).pipe(
                 toArray(),
+                map(arr => {
+                    return _.flatten(arr);
+                }),
             );
         }
 
         return of([]);
     }
 
-    private processCompoundDependency(context: ExecutionContext, compoundDependency: CompoundDependency): Observable<CompoundDependencyExecutionResponse> {
-        const operator = compoundDependency.operator || Operator.AND;
-        const executionOrder = compoundDependency.executionOrder || ExecutionOrder.Parallel;
-
-        const response: CompoundDependencyExecutionResponse = {
-            name: compoundDependency.name,
-            hasError: false,
-            isSuccessful: false,
-            operator,
-            rules: [],
-            startDateTime: moment.utc().toDate(),
-        };
-
-        const tasks: Record<string, Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>> = _.reduce(
-            compoundDependency.rules,
-            (acc: any, rule) => {
-                if (isSimpleDependency(rule)) {
-                    const simpleDependency = rule as SimpleDependency;
+    private processSimpleDependency(accumulator: Record<string, Observable<any>>, simpleDependency: SimpleDependency, context: ExecutionContext): void {
+        const registerMatchesHandler = this.processPath(simpleDependency.path, context).subscribe(
+            (pathObjects: any[]) => {
+                _.each(pathObjects, (pathObject, index) => {
                     const simpleDependencyResponse: SimpleDependencyExecutionResponse = {
-                        name: rule.name,
+                        name: `${simpleDependency.name}`,
                         isSkipped: false,
-                        rule: rule.rule,
+                        rule: simpleDependency.rule,
+                        executionOrder: simpleDependency.executionOrder || ExecutionOrder.Parallel,
                         hasError: false,
                         isSuccessful: false,
                         result: null,
-                        dependencies: undefined,
-                    }
+                        index,
+                    };
 
-                    const task = this.processPath(context, rule.path).pipe(
-                        switchMap((pathObjects: any[]) => {
-                            // TODO: consume every path object
+                    const task = of(pathObject).pipe(
+                        switchMap((pathObject: any) => {
                             simpleDependencyResponse.startDateTime = moment.utc().toDate();
                             return this.execute({
-                                root: pathObjects[0],
+                                root: pathObject,
                                 ruleName: simpleDependency.rule,
                                 parentExecutionContext: context,
                             });
@@ -147,7 +147,46 @@ export class JasperEngine {
                         }),
                     );
 
-                    acc[rule.name] = task;
+                    accumulator[`${simpleDependency.name}-${index}`] = task;
+                });
+            },
+            (err) => {
+                const errReponse: SimpleDependencyExecutionResponse = {
+                    name: `${simpleDependency.name}`,
+                    isSkipped: false,
+                    rule: simpleDependency.rule,
+                    executionOrder: simpleDependency.executionOrder || ExecutionOrder.Parallel,
+                    error: err,
+                    hasError: true,
+                    isSuccessful: false,
+                    result: null,
+                };
+                accumulator[`${simpleDependency.name}`] = of(errReponse);
+            }
+        );
+
+        registerMatchesHandler.unsubscribe();
+    }
+
+    private processCompoundDependency(compoundDependency: CompoundDependency, context: ExecutionContext): Observable<CompoundDependencyExecutionResponse> {
+        const operator = compoundDependency.operator || Operator.AND;
+        const executionOrder = compoundDependency.executionOrder || ExecutionOrder.Parallel;
+
+        const response: CompoundDependencyExecutionResponse = {
+            name: compoundDependency.name,
+            hasError: false,
+            isSuccessful: false,
+            operator,
+            executionOrder: compoundDependency.executionOrder || ExecutionOrder.Parallel,
+            rules: [],
+            startDateTime: moment.utc().toDate(),
+        };
+
+        const tasks: Record<string, Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>> = _.reduce(
+            compoundDependency.rules,
+            (acc: Record<string, Observable<any>>, rule) => {
+                if (isSimpleDependency(rule)) {
+                    this.processSimpleDependency(acc, rule, context);
                 } else if (isCompoundDependency(rule)) {
                     const childCompoundDependency = rule as CompoundDependency;
                     const compoundDependencyResponse: CompoundDependencyExecutionResponse = {
@@ -155,13 +194,14 @@ export class JasperEngine {
                         hasError: false,
                         isSuccessful: false,
                         operator,
+                        executionOrder: childCompoundDependency.executionOrder || ExecutionOrder.Parallel,
                         rules: [],
                     };
 
                     acc[rule.name] = of(true).pipe(
                         switchMap(() => {
                             compoundDependencyResponse.startDateTime = moment.utc().toDate();
-                            return this.processCompoundDependency(context, childCompoundDependency)
+                            return this.processCompoundDependency(childCompoundDependency, context)
                         }),
                         switchMap((r: CompoundDependencyExecutionResponse) => {
                             compoundDependencyResponse.isSuccessful = r.isSuccessful;
@@ -177,10 +217,8 @@ export class JasperEngine {
             {}
         );
 
-        const keys = _.keys(tasks);
         const values = _.values(tasks);
-
-        let counter = 0;
+        // let counter = 0;
 
         const runTask: Observable<(SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[]> = 
         executionOrder === ExecutionOrder.Parallel ?
@@ -194,14 +232,10 @@ export class JasperEngine {
             ) :
             concat(...values).pipe(
                 tap((result) => {
-                    const key = keys[counter];
-                    console.log(`dependency: ${key} processed`);
-
                     response.rules.push(result);
-                    counter ++;
+                    // counter ++;
                 }),
                 toArray(),
-                delay(2000),
             );
             
         return runTask.pipe(
@@ -268,6 +302,7 @@ export class JasperEngine {
         };
 
         context.process = of(true).pipe(
+            // call beforeAction
             tap(() => {
                 if (rule.beforeAction) {
                     if (
@@ -276,25 +311,28 @@ export class JasperEngine {
                         AsyncFunction !== GeneratorFunction
                     ) {
                         const subscription = from(rule.beforeAction(context)).subscribe(
-                            (x) => {
-                                console.log(x);
-                            },
-                            (e) => {
-                                console.log(e);
+                            // eslint-disable-next-line @typescript-eslint/no-empty-function
+                            () => { },
+                            (error) => {
+                                console.error(error);
                             }
                         );
-
                         subscription.unsubscribe();
                     } else if (rule.beforeAction instanceof Function) {
-                        rule.beforeAction(context);
+                        try {
+                            rule.beforeAction(context);
+                        } catch (error) {
+                            console.error(error);
+                        }
                     }
                 }
             }),
+            // execute the main action
             switchMap(() => {
                 return this.executeAction({
                     context,
                     action: rule.action,
-                }).pipe();
+                });
             }),
             tap((result) => {
                 context.complete = true;
@@ -307,15 +345,36 @@ export class JasperEngine {
                 response.hasError = true;
                 response.error = err;
                 response.completedTime = moment.utc().toDate();
-                /*
-                    if the 'root' is always evaluated before the dependencies.
-                */
-                // TODO: call error callback
+                if (rule.onError) {
+                    if (
+                        (rule.onError instanceof AsyncFunction &&
+                            AsyncFunction !== Function &&
+                            AsyncFunction !== GeneratorFunction) === true
+                    ) {
+                        const subscription = from(rule.onError(err, context)).subscribe(
+                            // eslint-disable-next-line @typescript-eslint/no-empty-function
+                            () => { },
+                            (error) => {
+                                console.error(error);
+                            }
+                        );
+
+                        subscription.unsubscribe();
+                    } else if (rule.onError instanceof Function) {
+                        try {
+                            rule.onError(err, context);    
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+                }
+
                 return throwError(err);
             }),
+            // call dependency rules
             switchMap(() => {
                 if (rule.dependencies && rule.dependencies.rules && rule.dependencies.rules.length) {
-                    return this.processCompoundDependency(context, rule.dependencies);
+                    return this.processCompoundDependency(rule.dependencies, context);
                 }
 
                 return of(undefined);
@@ -323,6 +382,7 @@ export class JasperEngine {
             tap((dependencyReponse) => {
                 response.dependencies = dependencyReponse;
             }),
+            // call afterAction
             tap(() => {
                 if (rule.afterAction) {
                     if (
@@ -331,17 +391,20 @@ export class JasperEngine {
                             AsyncFunction !== GeneratorFunction) === true
                     ) {
                         const subscription = from(rule.afterAction(context)).subscribe(
-                            (x) => {
-                                console.log(x);
-                            },
-                            (e) => {
-                                console.log(e);
+                            // eslint-disable-next-line @typescript-eslint/no-empty-function
+                            () => { },
+                            (error) => {
+                                console.error(error);
                             }
                         );
 
                         subscription.unsubscribe();
                     } else if (rule.afterAction instanceof Function) {
-                        rule.afterAction(context);
+                        try {
+                            rule.afterAction(context);
+                        } catch (error) {
+                            console.error(error);
+                        }
                     }
                 }
             }),

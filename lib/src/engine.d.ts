@@ -8,6 +8,7 @@ export declare class JasperEngine {
     constructor(ruleStore: Record<string, JasperRule>, options?: EngineOptions);
     private executeAction;
     private processPath;
+    private processSimpleDependency;
     private processCompoundDependency;
     /**
      * @param params

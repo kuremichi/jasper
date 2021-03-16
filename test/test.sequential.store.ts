@@ -1,7 +1,7 @@
 import { JasperRule, Operator, ExecutionOrder } from '../src/rule.config';
 import { of } from 'rxjs';
 import _ from 'lodash';
-import { tap } from 'rxjs/operators';
+import { tap, delay } from 'rxjs/operators';
 
 const store: JasperRule[] = [
     {
@@ -22,10 +22,9 @@ const store: JasperRule[] = [
         beforeAction: () => {
             console.log('preprocessing rule 2');
         },
-        action: () => {
-            console.log('processing rule 2');
-            return 'processing rule 2';
-        },
+        action: of('result for rule 2').pipe(
+            delay(3000),
+        ),
     },
     {
         name: 'test rule 3',
@@ -39,17 +38,17 @@ const store: JasperRule[] = [
             rules: [
                 {
                     name: 'dependency rule 3 - 1',
-                    path: '$',
+                    path: 'packages',
                     rule: 'test rule 1',
                 },
                 {
                     name: 'dependency rule 3 - 2',
-                    executionOrder: ExecutionOrder.Parallel,
+                    executionOrder: ExecutionOrder.Sequential,
                     operator: Operator.AND,
                     rules: [
                         {
                             name: 'dependency rule 3 - 2 - 1',
-                            path: '$',
+                            path: 'packages',
                             rule: 'test rule 2',
                         },
                         {

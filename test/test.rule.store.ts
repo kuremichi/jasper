@@ -1,7 +1,7 @@
 import { JasperRule, Operator } from '../src/rule.config';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import _ from 'lodash';
-import { tap } from 'rxjs/operators';
+import { tap, delay, switchMapTo } from 'rxjs/operators';
 
 const store: JasperRule[] = [
     {
@@ -10,11 +10,12 @@ const store: JasperRule[] = [
         beforeAction: () => {
             console.log('preprocessing rule 1');
         },
-        action: async () => {
-            // console.log('processing rule 1')
-            // return 'processing rule 1'
-            throw 'error rule 1';
-        },
+        action: of(1).pipe(
+            delay(3000),
+            tap(() => {
+                throw new Error('an error has occurred');
+            }),
+        )
     },
     {
         name: 'test rule 2',
@@ -39,7 +40,7 @@ const store: JasperRule[] = [
             rules: [
                 {
                     name: 'dependency rule 3 - 1',
-                    path: '$',
+                    path: 'packages',
                     rule: 'test rule 2',
                 },
                 {

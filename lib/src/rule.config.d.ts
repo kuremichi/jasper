@@ -75,6 +75,7 @@ export interface SimpleDependency {
     when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
     whenDescription?: string;
     required?: boolean;
+    executionOrder?: ExecutionOrder;
     onError?: (error: any, context: ExecutionContext) => any;
     retry?: number;
 }

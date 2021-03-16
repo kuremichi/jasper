@@ -102,6 +102,8 @@ export interface SimpleDependency {
     whenDescription?: string;
 
     required?: boolean;
+    
+    executionOrder?: ExecutionOrder;
 
     onError?: (error: any, context: ExecutionContext) => any;
 
