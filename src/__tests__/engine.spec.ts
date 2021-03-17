@@ -1,5 +1,5 @@
 import { JasperEngine } from '../engine';
-import { ExecutionContext, DefaultEngineOptions, JasperRule } from '../rule.config';
+import { ExecutionContext, JasperRule } from '../rule.config';
 import { Observable, of, empty } from 'rxjs';
 import _ from 'lodash';
 import { switchMap } from 'rxjs/operators';
@@ -15,9 +15,9 @@ describe('processPath', () => {
         const context: ExecutionContext = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
@@ -40,9 +40,9 @@ describe('processPath', () => {
         const context: ExecutionContext = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
@@ -69,15 +69,15 @@ describe('processPath', () => {
         const context: ExecutionContext = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
-        const mock = jest.fn().mockReturnValue(_.get(context.root, 'children'));
-        const pathFunction = (context: ExecutionContext) => {
-            return mock();
+        const mockFn = jest.fn().mockReturnValue(_.get(context.root, 'children'));
+        const pathFunction = () => {
+            return mockFn(context);
         };
 
         const ob: Observable<any[]> = (engine as any).processPath(pathFunction, context);
@@ -88,7 +88,8 @@ describe('processPath', () => {
             },
             complete: () => {
                 expect(processPathSpy).toBeCalledTimes(1);
-                expect(mock).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledWith(context);
                 done();
             }
         });
@@ -100,15 +101,15 @@ describe('processPath', () => {
         const context: ExecutionContext = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
-        const mock = jest.fn().mockResolvedValue(_.get(context.root, 'children'));
+        const mockFn = jest.fn().mockResolvedValue(_.get(context.root, 'children'));
         const asyncPathFunction = async (context: ExecutionContext) => {
-            return mock();
+            return mockFn(context);
         };
 
         const ob: Observable<any[]> = (engine as any).processPath(asyncPathFunction, context);
@@ -119,7 +120,8 @@ describe('processPath', () => {
             },
             complete: () => {
                 expect(processPathSpy).toBeCalledTimes(1);
-                expect(mock).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledWith(context);
                 done();
             }
         });
@@ -131,9 +133,9 @@ describe('processPath', () => {
         const context: ExecutionContext = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
@@ -141,7 +143,7 @@ describe('processPath', () => {
 
         ob.subscribe({
             next: (pahtObjects: any[]) => {
-                expect(pahtObjects.length).toBe(0);
+                expect(pahtObjects).toHaveLength(0);
             },
             complete: () => {
                 expect(processPathSpy).toBeCalledTimes(1);
@@ -169,13 +171,13 @@ describe('executeAction', () => {
                     { id: 2, text: 'child2' }
                 ]
             },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
-        const action: string = 'children[id=1]';
+        const action = 'children[id=1]';
 
         const ob: Observable<any> = (engine as any).executeAction({action, context});
         
@@ -190,7 +192,7 @@ describe('executeAction', () => {
         });
     });
 
-    it('should handle jsonata action expression', done => {
+    it('should handle String jsonata action expression', done => {
         const engine = new JasperEngine({});
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
         const context: ExecutionContext = {
@@ -201,13 +203,13 @@ describe('executeAction', () => {
                     { id: 2, text: 'child2' }
                 ]
             },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
-        const action: String = new String('children[id=1]');
+        const action = new String('children[id=1]');
 
         const ob: Observable<any> = (engine as any).executeAction({action, context});
         
@@ -233,9 +235,9 @@ describe('executeAction', () => {
                     { id: 2, text: 'child2' }
                 ]
             },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
@@ -265,16 +267,16 @@ describe('executeAction', () => {
                     { id: 2, text: 'child2' }
                 ]
             },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
-        const mock = jest.fn().mockResolvedValue(123);
+        const mockFn = jest.fn().mockResolvedValue(123);
 
-        const action = async () => {
-            return mock();
+        const action = async (context: ExecutionContext) => {
+            return mockFn(context);
         }
 
         const ob: Observable<any> = (engine as any).executeAction({action, context});
@@ -285,7 +287,8 @@ describe('executeAction', () => {
             },
             complete: () => {
                 expect(executeActionSpy).toBeCalledTimes(1);
-                expect(mock).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledWith(context);
                 done();
             }
         });
@@ -302,15 +305,15 @@ describe('executeAction', () => {
                     { id: 2, text: 'child2' }
                 ]
             },
-            options: DefaultEngineOptions,
             rule: mockRule,
-            process: empty(),
+            _process$: empty(),
+            contextData: {},
             complete: false,
         };
 
-        const mock = jest.fn().mockReturnValue(123);
-        const action = () => {
-            return mock();
+        const mockFn = jest.fn().mockReturnValue(123);
+        const action = (context: ExecutionContext) => {
+            return mockFn(context);
         }
 
         const ob: Observable<any> = (engine as any).executeAction({action, context});
@@ -321,7 +324,8 @@ describe('executeAction', () => {
             },
             complete: () => {
                 expect(executeActionSpy).toBeCalledTimes(1);
-                expect(mock).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledTimes(1);
+                expect(mockFn).toBeCalledWith(context);
                 done();
             }
         });

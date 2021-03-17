@@ -74,11 +74,11 @@ export class JasperEngine {
         }
 
         if (params.action instanceof AsyncFunction && AsyncFunction !== Function && AsyncFunction !== GeneratorFunction) {
-            return from(params.action(params.context.root));
+            return from(params.action(params.context));
         }
 
         if (params.action instanceof Function) {
-            return of(params.action(params.context.root));
+            return of(params.action(params.context));
         }
 
         return of(null);
