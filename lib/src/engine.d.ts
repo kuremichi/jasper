@@ -5,6 +5,16 @@ export declare class JasperEngine {
     private contextStore;
     private ruleStore;
     private readonly options;
+    private numberOfGenerated;
+    private generated;
+    generated$: Observable<number>;
+    private numberOfInProgress;
+    private inProgress;
+    inProgress$: Observable<number>;
+    private numberOfCompleted;
+    private completed;
+    completed$: Observable<number>;
+    throttle$: Observable<boolean>;
     constructor(ruleStore: Record<string, JasperRule>, options?: EngineOptions);
     /**
      * execute the rule action
@@ -43,6 +53,12 @@ export declare class JasperEngine {
      * processPath(of(true), context);
      */
     private processPath;
+    /**
+     * generate a list tasks to be orchestrated by the compound dependency
+     * @param accumulator
+     * @param simpleDependency
+     * @param context
+     */
     private processSimpleDependency;
     private processCompoundDependency;
     /**

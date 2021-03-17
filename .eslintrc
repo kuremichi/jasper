@@ -1,10 +1,6 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "tsconfig.json",
-    "sourceType": "module"
-  },
   "plugins": [
     "@typescript-eslint/eslint-plugin",
     "jest"
@@ -24,6 +20,7 @@
     "jest/no-disabled-tests": "warn",
     "jest/no-focused-tests": "error",
     "jest/no-identical-title": "error",
+    "jest/no-done-callback": "off",
     "jest/prefer-to-have-length": "warn",
     "jest/valid-expect": "error",
     "@typescript-eslint/interface-name-prefix": "off",

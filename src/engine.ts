@@ -1,4 +1,4 @@
-import { Observable, empty, of, from, forkJoin, throwError, concat } from 'rxjs';
+import { Observable, empty, of, from, forkJoin, throwError, concat, defer } from 'rxjs';
 import { switchMap, tap, toArray, share, catchError, shareReplay, map } from 'rxjs/operators';
 import {
     JasperRule,
@@ -167,7 +167,6 @@ export class JasperEngine {
                         name: `${simpleDependency.name}`,
                         isSkipped: false,
                         rule: simpleDependency.rule,
-                        executionOrder: simpleDependency.executionOrder || ExecutionOrder.Parallel,
                         hasError: false,
                         isSuccessful: false,
                         result: null,
@@ -187,7 +186,16 @@ export class JasperEngine {
                             simpleDependencyResponse.result = r.result;
                             simpleDependencyResponse.isSuccessful = r.isSuccessful;
                             simpleDependencyResponse.dependencies = r.dependencies;
+                            simpleDependencyResponse.startDateTime = r.startDateTime;
                             simpleDependencyResponse.completedTime = r.completedTime;
+                            if (this.options.debug) {
+                                simpleDependencyResponse.debugContext = r.debugContext;
+                                
+                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                simpleDependencyResponse.debugContext!.executionOrder = simpleDependency.executionOrder || ExecutionOrder.Parallel;
+                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                simpleDependencyResponse.debugContext!.whenDescription = simpleDependency.whenDescription;
+                            }
                             return of(simpleDependencyResponse);
                         }),
                         catchError((err) => {
@@ -207,7 +215,7 @@ export class JasperEngine {
                     name: `${simpleDependency.name}`,
                     isSkipped: false,
                     rule: simpleDependency.rule,
-                    executionOrder: simpleDependency.executionOrder || ExecutionOrder.Parallel,
+                    debugContext: undefined,
                     error: err,
                     hasError: true,
                     isSuccessful: false,
@@ -231,12 +239,19 @@ export class JasperEngine {
         const response: CompoundDependencyExecutionResponse = {
             name: compoundDependency.name,
             hasError: false,
+            isSkipped: false,
             isSuccessful: false,
-            operator,
-            executionOrder: compoundDependency.executionOrder || ExecutionOrder.Parallel,
             rules: [],
             startDateTime: moment.utc().toDate(),
         };
+
+        if (this.options.debug) {
+            response.debugContext = {
+                root: context.root,
+                executionOrder,
+                operator,
+            }
+        }
 
         const tasks: Record<
             string,
@@ -245,31 +260,106 @@ export class JasperEngine {
             compoundDependency.rules,
             (acc: Record<string, Observable<any>>, rule) => {
                 if (isSimpleDependency(rule)) {
-                    this.processSimpleDependency(acc, rule, context);
+                    // process when clause
+                    const whenSubscription = defer(() => {
+                        return rule.when ? this.processPath(rule.when, context).pipe(
+                            switchMap(r => {
+                                return of(_.get(r, '[0]', false));
+                            }),
+                        ) : of(true);
+                    }).subscribe({
+                        next: (x: boolean) => {
+                            if (x) {
+                                this.processSimpleDependency(acc, rule, context);
+                            } else {
+                                const skipped: SimpleDependencyExecutionResponse = {
+                                    name: `${rule.name}`,
+                                    isSkipped: true,
+                                    rule: rule.rule,
+                                    hasError: false,
+                                    isSuccessful: true,
+                                    result: null,
+                                };
+                                if (this.options.debug) {
+                                    skipped.debugContext = {
+                                        root: context.root,
+                                        whenDescription: rule.whenDescription,
+                                    };
+                                }
+                                acc[`${rule.name}`] = of(skipped);
+                            }
+                        },
+                        error: (err) => {
+                            const errorResponse: SimpleDependencyExecutionResponse = {
+                                name: `${rule.name}`,
+                                isSkipped: true,
+                                rule: rule.rule,
+                                error: err,
+                                debugContext: undefined,
+                                hasError: true,
+                                isSuccessful: false,
+                                result: null,
+                            };
+                            acc[`${rule.name}`] = of(errorResponse);
+                        }
+                    });
+
+                    whenSubscription.unsubscribe();
                 } else if (isCompoundDependency(rule)) {
                     const childCompoundDependency = rule as CompoundDependency;
                     const compoundDependencyResponse: CompoundDependencyExecutionResponse = {
                         name: childCompoundDependency.name,
                         hasError: false,
                         isSuccessful: false,
-                        operator,
-                        executionOrder: childCompoundDependency.executionOrder || ExecutionOrder.Parallel,
+                        isSkipped: false,
                         rules: [],
                     };
 
-                    acc[rule.name] = of(true).pipe(
-                        switchMap(() => {
-                            compoundDependencyResponse.startDateTime = moment.utc().toDate();
-                            return this.processCompoundDependency(childCompoundDependency, context);
-                        }),
-                        switchMap((r: CompoundDependencyExecutionResponse) => {
-                            compoundDependencyResponse.isSuccessful = r.isSuccessful;
-                            compoundDependencyResponse.rules = r.rules;
-                            compoundDependencyResponse.completedTime = r.completedTime;
+                    const whenSubscription = defer(() => {
+                        return rule.when ? this.processPath(rule.when, context).pipe(
+                            switchMap(r => {
+                                return of(_.get(r, '[0]', false));
+                            }),
+                        ) : of(true);
+                    }).subscribe({
+                        next: (when: boolean) => {
+                            if (when) {
+                                acc[rule.name] = of(true).pipe(
+                                    switchMap(() => {
+                                        compoundDependencyResponse.startDateTime = moment.utc().toDate();
+                                        return this.processCompoundDependency(childCompoundDependency, context);
+                                    }),
+                                    switchMap((r: CompoundDependencyExecutionResponse) => {
+                                        compoundDependencyResponse.isSuccessful = r.isSuccessful;
+                                        compoundDependencyResponse.rules = r.rules;
+                                        compoundDependencyResponse.completedTime = r.completedTime;
+                                        if (this.options.debug) {
+                                            compoundDependencyResponse.debugContext = r.debugContext;
+                                        }
+            
+                                        return of(compoundDependencyResponse);
+                                    })
+                                );
+                            } else {
+                                compoundDependencyResponse.isSkipped = true;
+                                compoundDependencyResponse.isSuccessful = true;
+                                if (this.options.debug) {
+                                    compoundDependencyResponse.debugContext = {
+                                        root: context.root,
+                                        whenDescription: rule.whenDescription,
+                                    };
+                                }
+                                acc[`${rule.name}`] = of(compoundDependencyResponse);
+                            }
+                        },
+                        error: (err) => {
+                            compoundDependencyResponse.hasError = true;
+                            compoundDependencyResponse.error = err;
+                            acc[`${rule.name}`] = of(compoundDependencyResponse);
+                        }
+                    });
 
-                            return of(compoundDependencyResponse);
-                        })
-                    );
+                    whenSubscription.unsubscribe();
                 }
                 return acc;
             },
@@ -349,7 +439,10 @@ export class JasperEngine {
     }): Observable<ExecutionResponse> {
         const rule: JasperRule = this.ruleStore[params.ruleName];
 
-        const contextId = `${params.ruleName}-${hash(params.root)}${ this.options.suppressDuplicateTasks ? '' : _.uniqueId()}`;
+        const ruleHash = hash(params.ruleName);
+        const objectHash = hash(params.root);
+        const contextHash = ruleHash + objectHash;
+        const contextId = `${contextHash}${ this.options.suppressDuplicateTasks ? '' : _.uniqueId('-')}`;
         let context: ExecutionContext = this.contextStore[contextId];
 
         if (!context || this.options.suppressDuplicateTasks === false) {
@@ -360,9 +453,12 @@ export class JasperEngine {
                 root: params.root,
                 process: empty(),
                 complete: false,
+                contextData: {},
             };
 
-            console.debug(`adding context ${contextId}`);
+            if (this.options.debug) {
+                context.contextData.objectHash = objectHash;
+            }
 
             this.contextStore[contextId] = context;
             if (params.parentExecutionContext) {
@@ -381,6 +477,13 @@ export class JasperEngine {
             isSuccessful: false,
             result: undefined,
             startDateTime: moment.utc().toDate(),
+            debugContext: this.options.debug ? 
+            {
+                contextId,
+                root: context.root,
+                ruleName: rule.name,
+                parent: context?.parentContext?.root,
+            } : undefined,
         };
 
         context.process = of(true).pipe(

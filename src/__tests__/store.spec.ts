@@ -2,13 +2,14 @@ import { JasperEngine } from '../engine';
 import { StaticRuleStore } from './test.sequential.store';
 import { EngineOptions } from '../rule.config';
 import { JasperEngineRecipe } from '../recipe';
-
+jest.setTimeout(150000);
 describe('dummy', () => {
     it('should run', (done) => {
         const options: EngineOptions = {
             recipe: JasperEngineRecipe.ValidationRuleEngine,
             suppressDuplicateTasks: true,
             debug: true,
+            maxConcurrency: 1,
         }
         const engine = new JasperEngine(StaticRuleStore, options);
 
@@ -21,6 +22,7 @@ describe('dummy', () => {
                 console.error(err);
             },
             complete: () => {
+                expect(true).toBe(true);
                 done();
             }
         });

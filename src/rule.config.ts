@@ -73,6 +73,10 @@ export interface CompoundDependency {
      *
      */
     onError?: (error: any, context: ExecutionContext) => any;
+
+    when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
+
+    whenDescription?: string;
 }
 
 export function isCompoundDependency(object: any): object is CompoundDependency {
@@ -131,12 +135,14 @@ export interface ExecutionContext {
     childrenContexts?: Record<string, ExecutionContext>;
     process: Observable<any>;
     complete: boolean;
+    contextData: Record<string, any>;
 }
 
 export interface EngineOptions {
     suppressDuplicateTasks: boolean;
     recipe: JasperEngineRecipe;
     debug?: boolean;
+    maxConcurrency?: number;
 }
 
 export const DefaultEngineOptions: EngineOptions = {

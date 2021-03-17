@@ -1,32 +1,41 @@
 import { Operator, ExecutionOrder } from './rule.config';
 
-export interface ExecutionResponse {
-    rule: string;
+interface CommonResponse {
     hasError: boolean;
     error?: any;
     isSuccessful: boolean;
-    result: any;
-    dependencies?: CompoundDependencyExecutionResponse | undefined;
     startDateTime?: Date;
     completedTime?: Date;
+    debugContext?: DebugContext | undefined;
 }
 
-export interface SimpleDependencyExecutionResponse extends ExecutionResponse {
+interface CommonDependencyResponse {
     name: string;
     isSkipped: boolean;
-    executionOrder: ExecutionOrder;
+}
+
+export interface ExecutionResponse extends CommonResponse {
+    rule: string;
+    result: any;
+    dependencies?: CompoundDependencyExecutionResponse | undefined;
+}
+
+export interface SimpleDependencyExecutionResponse extends ExecutionResponse, CommonDependencyResponse {
     index?: number;
 }
 
-export interface CompoundDependencyExecutionResponse {
-    name: string;
-    hasError: boolean;
-    isSuccessful: boolean;
-    operator: Operator;
-    executionOrder: ExecutionOrder;
+export interface CompoundDependencyExecutionResponse extends CommonResponse, CommonDependencyResponse {
     rules: (SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[];
-    startDateTime?: Date;
-    completedTime?: Date;
+}
+
+export interface DebugContext {
+    contextId?: string;
+    root: any;
+    ruleName?: string;
+    parent?: any;
+    operator?: Operator;
+    executionOrder?: ExecutionOrder | undefined;
+    whenDescription?: string;
 }
 
 export function isCompoundDependencyExecutionResponse(object: any): object is CompoundDependencyExecutionResponse {
