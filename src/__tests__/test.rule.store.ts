@@ -40,7 +40,7 @@ const store: JasperRule[] = [
             rules: [
                 {
                     name: 'dependency rule 3 - 1',
-                    path: 'packages',
+                    path: '$',
                     rule: 'test rule 2',
                 },
                 {

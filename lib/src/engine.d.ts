@@ -6,6 +6,24 @@ export declare class JasperEngine {
     private ruleStore;
     private readonly options;
     constructor(ruleStore: Record<string, JasperRule>, options?: EngineOptions);
+    /**
+     * execute the rule action
+     * @param params
+     * @param params.action action to run
+     * @param params.context the execution context
+     *
+     * @example jsonata expression
+     * executeAction('jsonataExpression', context)
+     *
+     * @example observable
+     * executeAction(of(1), context)
+     *
+     * @example async function
+     * executeAction(async (context) => {}, context)
+     *
+     * @example function
+     * executeAction((context) => {}, context)
+     */
     private executeAction;
     /**
      * Process the path expression|function|observable

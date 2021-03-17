@@ -349,10 +349,10 @@ export class JasperEngine {
     }): Observable<ExecutionResponse> {
         const rule: JasperRule = this.ruleStore[params.ruleName];
 
-        const contextId = `${params.ruleName}-${hash(params.root)}`;
+        const contextId = `${params.ruleName}-${hash(params.root)}${ this.options.suppressDuplicateTasks ? '' : _.uniqueId()}`;
         let context: ExecutionContext = this.contextStore[contextId];
 
-        if (!context) {
+        if (!context || this.options.suppressDuplicateTasks === false) {
             context = {
                 contextId,
                 options: this.options,
@@ -511,6 +511,6 @@ export class JasperEngine {
      * @param params.ruleName the rule name to evaluate against
      */
     run(params: { root: any; ruleName: string }): Observable<ExecutionResponse> {
-        return this.execute(params);
+        return this.execute({ root: params.root, ruleName: params.ruleName });
     }
 }

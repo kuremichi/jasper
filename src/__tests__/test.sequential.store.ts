@@ -11,7 +11,7 @@ const store: JasperRule[] = [
             console.log('preprocessing rule 1');
         },
         action: async () => {
-            // console.log('processing rule 1')
+            console.log('processing rule 1')
             // return 'processing rule 1'
             throw 'error rule 1';
         },
@@ -23,7 +23,10 @@ const store: JasperRule[] = [
             console.log('preprocessing rule 2');
         },
         action: of('result for rule 2').pipe(
-            delay(3000),
+            tap(() => {
+                console.log('processing rule 2');
+            }),
+            delay(1000),
         ),
     },
     {
@@ -38,12 +41,12 @@ const store: JasperRule[] = [
             rules: [
                 {
                     name: 'dependency rule 3 - 1',
-                    path: 'packages',
+                    path: '$',
                     rule: 'test rule 1',
                 },
                 {
                     name: 'dependency rule 3 - 2',
-                    executionOrder: ExecutionOrder.Sequential,
+                    executionOrder: ExecutionOrder.Parallel,
                     operator: Operator.AND,
                     rules: [
                         {
@@ -53,6 +56,11 @@ const store: JasperRule[] = [
                         },
                         {
                             name: 'dependency rule 3 - 2 - 2',
+                            path: 'packages',
+                            rule: 'test rule 2',
+                        },
+                        {
+                            name: 'dependency rule 3 - 2 - 3',
                             path: '$',
                             rule: 'test rule 4',
                         },
