@@ -129,11 +129,11 @@ export enum ExecutionOrder {
 export interface ExecutionContext {
     contextId: string;
     root: any;
-    options: EngineOptions;
+    
     rule: JasperRule;
     parentContext?: ExecutionContext;
     childrenContexts?: Record<string, ExecutionContext>;
-    process: Observable<any>;
+    _process$: Observable<any>;
     complete: boolean;
     contextData: Record<string, any>;
 }

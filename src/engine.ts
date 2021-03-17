@@ -185,7 +185,7 @@ export class JasperEngine {
                         switchMap((r: ExecutionResponse) => {
                             simpleDependencyResponse.result = r.result;
                             simpleDependencyResponse.isSuccessful = r.isSuccessful;
-                            simpleDependencyResponse.dependencies = r.dependencies;
+                            simpleDependencyResponse.dependency = r.dependency;
                             simpleDependencyResponse.startDateTime = r.startDateTime;
                             simpleDependencyResponse.completedTime = r.completedTime;
                             if (this.options.debug) {
@@ -448,10 +448,9 @@ export class JasperEngine {
         if (!context || this.options.suppressDuplicateTasks === false) {
             context = {
                 contextId,
-                options: this.options,
                 rule,
                 root: params.root,
-                process: empty(),
+                _process$: empty(),
                 complete: false,
                 contextData: {},
             };
@@ -468,7 +467,7 @@ export class JasperEngine {
                 ] = context;
             }
         } else {
-            return context.process;
+            return context._process$;
         }
 
         const response: ExecutionResponse = {
@@ -486,7 +485,7 @@ export class JasperEngine {
             } : undefined,
         };
 
-        context.process = of(true).pipe(
+        context._process$ = of(true).pipe(
             // call beforeAction
             tap(() => {
                 if (rule.beforeAction) {
@@ -565,7 +564,7 @@ export class JasperEngine {
                 return of(undefined);
             }),
             tap((dependencyReponse) => {
-                response.dependencies = dependencyReponse;
+                response.dependency = dependencyReponse;
             }),
             // call afterAction
             tap(() => {
@@ -599,12 +598,12 @@ export class JasperEngine {
         );
 
         if (this.options.suppressDuplicateTasks) {
-            context.process = context.process.pipe(shareReplay(1));
+            context._process$ = context._process$.pipe(shareReplay(1));
         } else {
-            context.process = context.process.pipe(share());
+            context._process$ = context._process$.pipe(share());
         }
 
-        return context.process;
+        return context._process$;
     }
 
     /* istanbul ignore next */

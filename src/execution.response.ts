@@ -17,7 +17,7 @@ interface CommonDependencyResponse {
 export interface ExecutionResponse extends CommonResponse {
     rule: string;
     result: any;
-    dependencies?: CompoundDependencyExecutionResponse | undefined;
+    dependency?: CompoundDependencyExecutionResponse | undefined;
 }
 
 export interface SimpleDependencyExecutionResponse extends ExecutionResponse, CommonDependencyResponse {

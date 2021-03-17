@@ -1,7 +1,7 @@
 import { JasperRule, Operator, ExecutionOrder } from '../rule.config';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import _ from 'lodash';
-import { tap, delay, switchMapTo } from 'rxjs/operators';
+import { tap, delay } from 'rxjs/operators';
 
 const store: JasperRule[] = [
     {
@@ -10,7 +10,7 @@ const store: JasperRule[] = [
         beforeAction: () => {
             console.log('preprocessing rule 1');
         },
-        action: of('result for rule 2').pipe(
+        action: of('result for rule 1').pipe(
             tap(() => {
                 console.log('processing rule 2');
             }),
