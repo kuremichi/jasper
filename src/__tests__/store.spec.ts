@@ -8,7 +8,7 @@ describe('dummy', () => {
         const options: EngineOptions = {
             recipe: JasperEngineRecipe.ValidationRuleEngine,
             suppressDuplicateTasks: true,
-            debug: false,
+            debug: true,
             maxConcurrency: 1,
         }
         const engine = new JasperEngine(StaticRuleStore, options);

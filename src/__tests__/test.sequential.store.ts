@@ -7,16 +7,19 @@ const store: JasperRule[] = [
     {
         name: 'test rule 1',
         description: '',
-        beforeAction: () => {
-            console.log('preprocessing rule 1');
+        beforeAction: (context) => {
+            console.log(`preprocessing rule 1 for context ${context.contextId}`);
         },
         action: of('result for rule 1').pipe(
             tap(() => {
-                console.log('processing rule 2');
+                console.log('processing rule 1');
             }),
             delay(1000),
             // switchMapTo(throwError('error')),
         ),
+        afterAction: (context) => {
+            console.log(`postprocessing rule 1 for context ${context.contextId}`);
+        },
     },
     {
         name: 'test rule 2',

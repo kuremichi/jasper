@@ -1,4 +1,4 @@
-import { Observable, empty, of, from, forkJoin, throwError, concat, defer } from 'rxjs';
+import { Observable, empty, of, from, forkJoin, throwError, concat, defer, combineLatest } from 'rxjs';
 import { switchMap, tap, toArray, share, catchError, shareReplay, map } from 'rxjs/operators';
 import {
     JasperRule,
@@ -35,11 +35,13 @@ export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
     private ruleStore: Record<string, JasperRule>;
     private readonly options: EngineOptions;
+    private logger: any;
 
-    constructor(ruleStore: Record<string, JasperRule>, options: EngineOptions = DefaultEngineOptions) {
+    constructor(ruleStore: Record<string, JasperRule>, options: EngineOptions = DefaultEngineOptions, logger = console) {
         this.options = options;
         this.contextStore = {};
         this.ruleStore = ruleStore;
+        this.logger = logger;
     }
 
     /**
@@ -90,77 +92,90 @@ export class JasperEngine {
      * @param context
      *
      * @example
-     * processPath('jsonataExpression', context);
+     * processExpression('jsonataExpression', context);
      *
      * @example
-     * processPath((context) => {} , context);
+     * processExpression((context) => {} , context);
      *
      * @example
-     * processPath(async (context) => {} , context);
+     * processExpression(async (context) => {} , context);
      *
      * @example
-     * processPath(of(true), context);
+     * processExpression(of(true), context);
      */
-    private processPath(
-        path: string | ((context: ExecutionContext) => any) | Observable<any>,
+    private processExpression(
+        expression: string | ((context: ExecutionContext) => any) | Observable<any>,
         context: ExecutionContext
     ): Observable<any[]> {
-        if (typeof path === 'string') {
-            const expression = jsonata(path as string);
-            const pathObject = expression.evaluate(context.root);
-            return of(pathObject).pipe(
+        if (typeof expression === 'string') {
+            const jsonataExpression = jsonata(expression as string);
+            const expressionObject = jsonataExpression.evaluate(context.root);
+            return of(expressionObject).pipe(
                 toArray(),
                 map((arr) => {
                     return _.chain(_.flatten(arr))
-                        .filter((pathObject) => pathObject)
+                        .filter((expressionObject) => expressionObject)
                         .value();
                 })
             );
         }
 
-        if (path instanceof Observable) {
-            return from(path).pipe(
+        if (expression instanceof Observable) {
+            return (expression as Observable<any>).pipe(
                 toArray(),
                 map((arr) => {
                     return _.chain(_.flatten(arr))
-                        .filter((pathObject) => pathObject)
+                        .filter((expressionObject) => expressionObject)
                         .value();
                 })
             );
         }
 
-        if (path instanceof AsyncFunction && AsyncFunction !== Function && AsyncFunction !== GeneratorFunction) {
-            return from(path(context)).pipe(
+        if (expression instanceof AsyncFunction && AsyncFunction !== Function && AsyncFunction !== GeneratorFunction) {
+            return from(expression(context)).pipe(
                 toArray(),
                 map((arr) => {
                     return _.chain(_.flatten(arr))
-                        .filter((pathObject) => pathObject)
+                        .filter((expressionObject) => expressionObject)
                         .value();
                 })
             );
         }
 
-        if (path instanceof Function) {
-            return of(path(context)).pipe(
+        if (expression instanceof Function) {
+            return of(1).pipe(
+                switchMap(() => {
+                    try {
+                        return of(expression(context));
+                    } catch (error) {
+                        return throwError(error);
+                    }
+                }),
                 toArray(),
                 map((arr) => {
                     return _.chain(_.flatten(arr))
-                        .filter((pathObject) => pathObject)
+                        .filter((expressionObject) => expressionObject)
                         .value();
-                })
+                }),
             );
         }
 
         return of([]);
     }
 
-    /* istanbul ignore next */
+    /**
+     * Process a simple dependency
+     * it will execute the path expression and for each match schedule an observables and add to the accumulator
+     * @param accumulator a dictionar of tasks
+     * @param compoundDependency the compound dependency object
+     * @param context the current execution context
+     */
     private processSimpleDependency(
         accumulator: Record<string, Observable<any>>,
         simpleDependency: SimpleDependency,
         context: ExecutionContext
     ): void {
-        const registerMatchesHandler = this.processPath(simpleDependency.path, context).subscribe(
+        const registerMatchesHandler = this.processExpression(simpleDependency.path, context).subscribe(
             (pathObjects: any[]) => {
                 _.each(pathObjects, (pathObject, index) => {
                     const simpleDependencyResponse: SimpleDependencyExecutionResponse = {
@@ -222,37 +237,23 @@ export class JasperEngine {
                     result: null,
                 };
                 accumulator[`${simpleDependency.name}`] = of(errReponse);
-            }
+            },
         );
 
         registerMatchesHandler.unsubscribe();
     }
 
-    /* istanbul ignore next */
-    private processCompoundDependency(
+    // TODO: further break down collectDependencyTasks into two methods
+
+    /**
+     * 
+     * @param compoundDependency 
+     * @param context 
+     */
+    private collectDependencyTasks(
         compoundDependency: CompoundDependency,
         context: ExecutionContext
-    ): Observable<CompoundDependencyExecutionResponse> {
-        const operator = compoundDependency.operator || Operator.AND;
-        const executionOrder = compoundDependency.executionOrder || ExecutionOrder.Parallel;
-
-        const response: CompoundDependencyExecutionResponse = {
-            name: compoundDependency.name,
-            hasError: false,
-            isSkipped: false,
-            isSuccessful: false,
-            rules: [],
-            startDateTime: moment.utc().toDate(),
-        };
-
-        if (this.options.debug) {
-            response.debugContext = {
-                root: context.root,
-                executionOrder,
-                operator,
-            }
-        }
-
+    ): Record<string, Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>> {
         const tasks: Record<
             string,
             Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>
@@ -262,7 +263,7 @@ export class JasperEngine {
                 if (isSimpleDependency(rule)) {
                     // process when clause
                     const whenSubscription = defer(() => {
-                        return rule.when ? this.processPath(rule.when, context).pipe(
+                        return rule.when ? this.processExpression(rule.when, context).pipe(
                             switchMap(r => {
                                 return of(_.get(r, '[0]', false));
                             }),
@@ -316,7 +317,7 @@ export class JasperEngine {
                     };
 
                     const whenSubscription = defer(() => {
-                        return rule.when ? this.processPath(rule.when, context).pipe(
+                        return rule.when ? this.processExpression(rule.when, context).pipe(
                             switchMap(r => {
                                 return of(_.get(r, '[0]', false));
                             }),
@@ -365,6 +366,40 @@ export class JasperEngine {
             },
             {}
         );
+
+        return tasks;
+    }
+
+    /**
+     * Process a compound dependency
+     * @param compoundDependency the compound dependency object
+     * @param context the current execution context
+     */
+    private processCompoundDependency(
+        compoundDependency: CompoundDependency,
+        context: ExecutionContext
+    ): Observable<CompoundDependencyExecutionResponse> {
+        const operator = compoundDependency.operator || Operator.AND;
+        const executionOrder = compoundDependency.executionOrder || ExecutionOrder.Parallel;
+
+        const response: CompoundDependencyExecutionResponse = {
+            name: compoundDependency.name,
+            hasError: false,
+            isSkipped: false,
+            isSuccessful: false,
+            rules: [],
+            startDateTime: moment.utc().toDate(),
+        };
+
+        if (this.options.debug) {
+            response.debugContext = {
+                root: context.root,
+                executionOrder,
+                operator,
+            }
+        }
+
+        const tasks = this.collectDependencyTasks(compoundDependency, context);
 
         const values = _.values(tasks);
         // let counter = 0;
@@ -475,7 +510,6 @@ export class JasperEngine {
             hasError: false,
             isSuccessful: false,
             result: undefined,
-            startDateTime: moment.utc().toDate(),
             debugContext: this.options.debug ? 
             {
                 contextId,
@@ -488,27 +522,19 @@ export class JasperEngine {
         context._process$ = of(true).pipe(
             // call beforeAction
             tap(() => {
+                response.startDateTime = moment.utc().toDate();
                 if (rule.beforeAction) {
-                    if (
-                        rule.beforeAction instanceof AsyncFunction &&
-                        AsyncFunction !== Function &&
-                        AsyncFunction !== GeneratorFunction
-                    ) {
-                        const subscription = from(rule.beforeAction(context)).subscribe(
-                            // eslint-disable-next-line @typescript-eslint/no-empty-function
-                            () => {},
-                            (error) => {
-                                console.error(error);
+                    const subscription = this.processExpression(rule.beforeAction, context).subscribe(
+                        () => {
+                            if (this.options.debug) {
+                                this.logger.debug(`before action executed for context ${context.contextId}`);
                             }
-                        );
-                        subscription.unsubscribe();
-                    } else if (rule.beforeAction instanceof Function) {
-                        try {
-                            rule.beforeAction(context);
-                        } catch (error) {
-                            console.error(error);
+                        },
+                        (error) => {
+                            this.logger.error(error);
                         }
-                    }
+                    );
+                    subscription.unsubscribe();
                 }
             }),
             // execute the main action
@@ -530,27 +556,17 @@ export class JasperEngine {
                 response.error = err;
                 response.completedTime = moment.utc().toDate();
                 if (rule.onError) {
-                    if (
-                        (rule.onError instanceof AsyncFunction &&
-                            AsyncFunction !== Function &&
-                            AsyncFunction !== GeneratorFunction) === true
-                    ) {
-                        const subscription = from(rule.onError(err, context)).subscribe(
-                            // eslint-disable-next-line @typescript-eslint/no-empty-function
-                            () => {},
-                            (error) => {
-                                console.error(error);
+                    const subscription = from(rule.onError(err, context)).subscribe(
+                        () => {
+                            if (this.options.debug) {
+                                this.logger.debug(`onError executed for context ${context.contextId}`);
                             }
-                        );
-
-                        subscription.unsubscribe();
-                    } else if (rule.onError instanceof Function) {
-                        try {
-                            rule.onError(err, context);
-                        } catch (error) {
-                            console.error(error);
+                        },
+                        (error) => {
+                            this.logger.error(error);
                         }
-                    }
+                    );
+                    subscription.unsubscribe();
                 }
 
                 return throwError(err);
@@ -569,27 +585,17 @@ export class JasperEngine {
             // call afterAction
             tap(() => {
                 if (rule.afterAction) {
-                    if (
-                        (rule.afterAction instanceof AsyncFunction &&
-                            AsyncFunction !== Function &&
-                            AsyncFunction !== GeneratorFunction) === true
-                    ) {
-                        const subscription = from(rule.afterAction(context)).subscribe(
-                            // eslint-disable-next-line @typescript-eslint/no-empty-function
-                            () => {},
-                            (error) => {
-                                console.error(error);
+                    const subscription = this.processExpression(rule.afterAction, context).subscribe(
+                        () => {
+                            if (this.options.debug) {
+                                this.logger.debug(`before action executed for context ${context.contextId}`);
                             }
-                        );
-
-                        subscription.unsubscribe();
-                    } else if (rule.afterAction instanceof Function) {
-                        try {
-                            rule.afterAction(context);
-                        } catch (error) {
-                            console.error(error);
+                        },
+                        (error) => {
+                            this.logger.error(error);
                         }
-                    }
+                    );
+                    subscription.unsubscribe();
                 }
             }),
             switchMap(() => {
