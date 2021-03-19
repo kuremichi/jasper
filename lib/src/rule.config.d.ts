@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { JasperEngineRecipe } from './recipe';
+import { ExecutionResponse } from './execution.response';
 declare type ArrayOneOrMore<T> = {
     0: T;
 } & Array<T>;
@@ -15,7 +16,7 @@ export interface JasperRule {
     /**
      * lifecycle hook before the action is executed
      */
-    beforeAction?: (context: ExecutionContext) => any;
+    beforeAction?: (context: ExecutionContext) => Observable<any>;
     /**
      * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
@@ -24,7 +25,7 @@ export interface JasperRule {
     /**
      * lifecycle hook after the action has been executing executed
      */
-    afterAction?: (context: ExecutionContext) => any;
+    afterAction?: (response: ExecutionResponse, context: ExecutionContext) => Observable<ExecutionResponse>;
     /**
      * lifecycle hook after the action has error
      */
@@ -34,7 +35,6 @@ export interface JasperRule {
      */
     dependencies?: CompoundDependency | undefined;
 }
-export declare function isJasperRule(object: any): object is JasperRule;
 export interface CompoundDependency {
     /**
      *
@@ -56,7 +56,9 @@ export interface CompoundDependency {
     /**
      *
      */
-    onError?: (error: any, context: ExecutionContext) => any;
+    onError?: (error: any, context: ExecutionContext) => Observable<any>;
+    when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
+    whenDescription?: string;
 }
 export declare function isCompoundDependency(object: any): object is CompoundDependency;
 export interface SimpleDependency {
@@ -91,12 +93,12 @@ export declare enum ExecutionOrder {
 export interface ExecutionContext {
     contextId: string;
     root: any;
-    options: EngineOptions;
     rule: JasperRule;
     parentContext?: ExecutionContext;
     childrenContexts?: Record<string, ExecutionContext>;
-    process: Observable<any>;
+    _process$: Observable<any>;
     complete: boolean;
+    contextData: Record<string, any>;
 }
 export interface EngineOptions {
     suppressDuplicateTasks: boolean;

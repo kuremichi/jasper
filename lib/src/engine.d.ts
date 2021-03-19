@@ -5,17 +5,14 @@ export declare class JasperEngine {
     private contextStore;
     private ruleStore;
     private readonly options;
-    private numberOfGenerated;
-    private generated;
-    generated$: Observable<number>;
-    private numberOfInProgress;
-    private inProgress;
-    inProgress$: Observable<number>;
-    private numberOfCompleted;
-    private completed;
-    completed$: Observable<number>;
-    throttle$: Observable<boolean>;
-    constructor(ruleStore: Record<string, JasperRule>, options?: EngineOptions);
+    private logger;
+    /**
+     *
+     * @param ruleStore a dictionary of all rules
+     * @param options options
+     * @param logger logger
+     */
+    constructor(ruleStore: Record<string, JasperRule>, options?: EngineOptions, logger?: Console);
     /**
      * execute the rule action
      * @param params
@@ -41,27 +38,48 @@ export declare class JasperEngine {
      * @param context
      *
      * @example
-     * processPath('jsonataExpression', context);
+     * processExpression('jsonataExpression', context);
      *
      * @example
-     * processPath((context) => {} , context);
+     * processExpression((context) => {} , context);
      *
      * @example
-     * processPath(async (context) => {} , context);
+     * processExpression(async (context) => {} , context);
      *
      * @example
-     * processPath(of(true), context);
+     * processExpression(of(true), context);
      */
-    private processPath;
+    private processExpression;
     /**
-     * generate a list tasks to be orchestrated by the compound dependency
-     * @param accumulator
-     * @param simpleDependency
-     * @param context
+     * Process a simple dependency
+     * it will execute the path expression and for each match schedule an observables and add to the accumulator
+     * @param accumulator a dictionary of tasks
+     * @param compoundDependency the compound dependency object
+     * @param context the current execution context
      */
     private processSimpleDependency;
+    /**
+     *
+     * @param accumulator a dictionary of tasks
+     * @param simpleDependency the simple dependency object
+     * @param context the current execution context
+     */
+    private extractSimpleDependencyTasks;
+    private extractCompoundDependencyTasks;
+    /**
+     *
+     * @param compoundDependency
+     * @param context
+     */
+    private collectDependencyTasks;
+    /**
+     * Process a compound dependency
+     * @param compoundDependency the compound dependency object
+     * @param context the current execution context
+     */
     private processCompoundDependency;
     /**
+     * execute the root object against a rule
      * @param params
      * @param params.root the object to evaluate
      * @param params.ruleName the rule name to evaluate against
