@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { JasperEngineRecipe } from './recipe';
+import { ExecutionResponse } from './execution.response';
 
 type ArrayOneOrMore<T> = {
     0: T;
@@ -19,7 +20,7 @@ export interface JasperRule {
     /**
      * lifecycle hook before the action is executed
      */
-    beforeAction?: (context: ExecutionContext) => any;
+    beforeAction?: (context: ExecutionContext) => Observable<any>;
 
     /**
      * the action to run
@@ -30,7 +31,7 @@ export interface JasperRule {
     /**
      * lifecycle hook after the action has been executing executed
      */
-    afterAction?: (context: ExecutionContext) => any;
+    afterAction?: (response: ExecutionResponse, context: ExecutionContext) => Observable<ExecutionResponse>;
 
     /**
      * lifecycle hook after the action has error
@@ -43,9 +44,9 @@ export interface JasperRule {
     dependencies?: CompoundDependency | undefined;
 }
 
-export function isJasperRule(object: any): object is JasperRule {
-    return 'name' in object && 'action' in object;
-}
+// export function isJasperRule(object: any): object is JasperRule {
+//     return 'name' in object && 'action' in object;
+// }
 
 export interface CompoundDependency {
     /**
@@ -72,7 +73,7 @@ export interface CompoundDependency {
     /**
      *
      */
-    onError?: (error: any, context: ExecutionContext) => any;
+    onError?: (error: any, context: ExecutionContext) => Observable<any>;
 
     when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
 

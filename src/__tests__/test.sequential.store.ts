@@ -7,8 +7,12 @@ const store: JasperRule[] = [
     {
         name: 'test rule 1',
         description: '',
-        beforeAction: (context) => {
-            console.log(`preprocessing rule 1 for context ${context.contextId}`);
+        beforeAction: () => {
+            return of(1).pipe(
+                tap(() => {
+                    console.log('preprocessing rule 1');
+                })
+            );
         },
         action: of('result for rule 1').pipe(
             tap(() => {
@@ -17,15 +21,23 @@ const store: JasperRule[] = [
             delay(1000),
             // switchMapTo(throwError('error')),
         ),
-        afterAction: (context) => {
-            console.log(`postprocessing rule 1 for context ${context.contextId}`);
+        afterAction: (response, context) => {
+            return of(response).pipe(
+                tap(() => {
+                    console.log(`postprocessing rule 1 for context ${context.contextId}`);
+                }),
+            );
         },
     },
     {
         name: 'test rule 2',
         description: '',
         beforeAction: () => {
-            console.log('preprocessing rule 2');
+            return of(1).pipe(
+                tap(() => {
+                    console.log('preprocessing rule 2');
+                })
+            );
         },
         action: of('result for rule 2').pipe(
             tap(() => {
@@ -37,8 +49,12 @@ const store: JasperRule[] = [
     {
         name: 'test rule 3',
         description: '',
-        beforeAction: async () => {
-            console.log('preprocessing rule 3');
+        beforeAction: () => {
+            return of(1).pipe(
+                tap(() => {
+                    console.log('preprocessing rule 3');
+                })
+            );
         },
         action: of('processing 3').pipe(
             tap(() => console.log('processing rule 3')),
@@ -83,7 +99,11 @@ const store: JasperRule[] = [
         name: 'test rule 4',
         description: '',
         beforeAction: () => {
-            console.log('preprocessing rule 4');
+            return of(1).pipe(
+                tap(() => {
+                    console.log('preprocessing rule 4');
+                })
+            );
         },
         action: of('processing 4').pipe(
             tap(() => console.log('processing rule 4')),
