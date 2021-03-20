@@ -176,6 +176,7 @@ export class JasperEngine {
                             simpleDependencyResponse.dependency = r.dependency;
                             simpleDependencyResponse.startDateTime = r.startDateTime;
                             simpleDependencyResponse.completedTime = r.completedTime;
+                            /* istanbul ignore next */
                             if (this.options.debug) {
                                 simpleDependencyResponse.debugContext = r.debugContext;
                                 
@@ -247,6 +248,7 @@ export class JasperEngine {
                         isSuccessful: true,
                         result: null,
                     };
+                    /* istanbul ignore next */
                     if (this.options.debug) {
                         skipped.debugContext = {
                             root: context.root,
@@ -390,6 +392,7 @@ export class JasperEngine {
             startDateTime: moment.utc().toDate(),
         };
 
+        /* istanbul ignore next */
         if (this.options.debug) {
             response.debugContext = {
                 root: context.root,
@@ -518,6 +521,7 @@ export class JasperEngine {
                 if (rule.beforeAction) {
                     return rule.beforeAction(context).pipe(
                         tap(() => {
+                            /* istanbul ignore next */
                             if (this.options.debug) {
                                 this.logger.debug(`before action executed for rule ${rule.name} - context ${context.contextId}`);
                             }

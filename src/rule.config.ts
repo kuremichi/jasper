@@ -154,7 +154,6 @@ export interface EngineOptions {
     suppressDuplicateTasks: boolean;
     recipe: JasperEngineRecipe;
     debug?: boolean;
-    maxConcurrency?: number;
 }
 
 export const DefaultEngineOptions: EngineOptions = {
