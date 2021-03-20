@@ -1,4 +1,4 @@
-import { Operator, ExecutionOrder } from './rule.config';
+import { ExecutionOrder, Operator } from './enum';
 
 interface CommonResponse {
     hasError: boolean;
@@ -17,15 +17,15 @@ interface CommonDependencyResponse {
 export interface ExecutionResponse extends CommonResponse {
     rule: string;
     result: any;
-    dependency?: CompoundDependencyExecutionResponse | undefined;
+    dependency?: CompositeDependencyExecutionResponse | undefined;
 }
 
 export interface SimpleDependencyExecutionResponse extends ExecutionResponse, CommonDependencyResponse {
     index?: number;
 }
 
-export interface CompoundDependencyExecutionResponse extends CommonResponse, CommonDependencyResponse {
-    rules: (SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[];
+export interface CompositeDependencyExecutionResponse extends CommonResponse, CommonDependencyResponse {
+    rules: (SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse)[];
 }
 
 export interface DebugContext {
@@ -38,6 +38,6 @@ export interface DebugContext {
     whenDescription?: string;
 }
 
-export function isCompoundDependencyExecutionResponse(object: any): object is CompoundDependencyExecutionResponse {
+export function isCompositeDependencyExecutionResponse(object: any): object is CompositeDependencyExecutionResponse {
     return 'operator' in object && 'rules' in object;
 }

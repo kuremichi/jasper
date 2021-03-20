@@ -33,13 +33,13 @@ export interface JasperRule {
     /**
      * the dependencies of the rule that will be executed
      */
-    dependencies?: CompoundDependency | undefined;
+    dependencies?: CompositeDependency | undefined;
     /**
      * custom meta data defined by user
      */
     metadata?: Record<string, any>;
 }
-export interface CompoundDependency {
+export interface CompositeDependency {
     /**
      *
      */
@@ -56,7 +56,7 @@ export interface CompoundDependency {
     /**
      *
      */
-    rules: ArrayOneOrMore<CompoundDependency | SimpleDependency>;
+    rules: ArrayOneOrMore<CompositeDependency | SimpleDependency>;
     /**
      *
      */
@@ -64,7 +64,7 @@ export interface CompoundDependency {
     when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
     whenDescription?: string;
 }
-export declare function isCompoundDependency(object: any): object is CompoundDependency;
+export declare function isCompositeDependency(object: any): object is CompositeDependency;
 export interface SimpleDependency {
     /**
      *

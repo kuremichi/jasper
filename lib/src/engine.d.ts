@@ -54,7 +54,7 @@ export declare class JasperEngine {
      * Process a simple dependency
      * it will execute the path expression and for each match schedule an observables and add to the accumulator
      * @param accumulator a dictionary of tasks
-     * @param compoundDependency the compound dependency object
+     * @param compositeDependency the compound dependency object
      * @param context the current execution context
      */
     private processSimpleDependency;
@@ -65,19 +65,19 @@ export declare class JasperEngine {
      * @param context the current execution context
      */
     private extractSimpleDependencyTasks;
-    private extractCompoundDependencyTasks;
+    private extractCompositeDependencyTasks;
     /**
      *
-     * @param compoundDependency
+     * @param compositeDependency
      * @param context
      */
     private collectDependencyTasks;
     /**
      * Process a compound dependency
-     * @param compoundDependency the compound dependency object
+     * @param compositeDependency the compound dependency object
      * @param context the current execution context
      */
-    private processCompoundDependency;
+    private processCompositeDependency;
     /**
      * execute the root object against a rule
      * @param params

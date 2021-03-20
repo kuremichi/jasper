@@ -1,21 +1,18 @@
 import { JasperEngine } from '../engine';
-import {
-    ExecutionContext,
-    JasperRule,
-    SimpleDependency,
-    CompoundDependency,
-    Operator,
-    ExecutionOrder,
-} from '../rule.config';
+
 import { Observable, of, empty, forkJoin, concat, throwError } from 'rxjs';
 import _ from 'lodash';
 import { switchMap, tap, toArray } from 'rxjs/operators';
-import { JasperEngineRecipe } from '../recipe';
 import {
     SimpleDependencyExecutionResponse,
-    CompoundDependencyExecutionResponse,
+    CompositeDependencyExecutionResponse,
     ExecutionResponse,
 } from '../execution.response';
+import { JasperRule } from '../jasper.rule';
+import { ExecutionContext } from '../execution.context';
+import { SimpleDependency } from '../simple.dependency';
+import { ExecutionOrder, JasperEngineRecipe, Operator } from '../enum';
+import { CompositeDependency } from '../composite.dependency';
 
 describe('processExpression', () => {
     const mockRule: JasperRule = {
@@ -629,10 +626,10 @@ describe('collectDependencyTasks', () => {
         });
     });
 
-    describe('extractCompoundDependencyTasks', () => {
+    describe('extractCompositeDependencyTasks', () => {
         it('should return response with error if unable to evaluate when expression', (done) => {
             const engine = new JasperEngine({});
-            const extractCompoundDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompoundDependencyTasks');
+            const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
             const rule: JasperRule = {
                 name: 'mockRule',
                 description: 'description for mock rule',
@@ -641,11 +638,11 @@ describe('collectDependencyTasks', () => {
                 },
             };
 
-            const compoundDependency: CompoundDependency = {
-                name: 'test compound dependency',
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
                 rules: [
                     {
-                        name: 'compound dependency',
+                        name: 'composite dependency',
                         rule: rule.name,
                         path: '$',
                     },
@@ -669,14 +666,14 @@ describe('collectDependencyTasks', () => {
                 complete: false,
             };
 
-            const accumulator: Record<string, Observable<CompoundDependencyExecutionResponse>> = {};
-            (engine as any).extractCompoundDependencyTasks(accumulator, compoundDependency, context);
+            const accumulator: Record<string, Observable<CompositeDependencyExecutionResponse>> = {};
+            (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
             const tasks = _.entries(accumulator).map((t) => t[1]);
             concat(...tasks)
                 .pipe(toArray())
                 .subscribe({
-                    next: (results: CompoundDependencyExecutionResponse[]) => {
-                        expect(extractCompoundDependencyTasksSpy).toBeCalledTimes(1);
+                    next: (results: CompositeDependencyExecutionResponse[]) => {
+                        expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
                         expect(results[0].hasError).toBe(true);
                         expect(results[0].isSuccessful).toBe(false);
                         done();
@@ -684,7 +681,7 @@ describe('collectDependencyTasks', () => {
                 });
         });
 
-        it('should skip compound dependency if when express evalutes to false', (done) => {
+        it('should skip composite dependency if when express evalutes to false', (done) => {
             const rule: JasperRule = {
                 name: 'mockRule',
                 description: 'description for mock rule',
@@ -697,13 +694,13 @@ describe('collectDependencyTasks', () => {
                 mockRule: rule,
             });
 
-            const extractCompoundDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompoundDependencyTasks');
+            const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
 
-            const compoundDependency: CompoundDependency = {
-                name: 'test compound dependency',
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
                 rules: [
                     {
-                        name: 'compound dependency',
+                        name: 'composite dependency',
                         rule: rule.name,
                         path: '$',
                     },
@@ -725,14 +722,14 @@ describe('collectDependencyTasks', () => {
                 complete: false,
             };
 
-            const accumulator: Record<string, Observable<CompoundDependencyExecutionResponse>> = {};
-            (engine as any).extractCompoundDependencyTasks(accumulator, compoundDependency, context);
+            const accumulator: Record<string, Observable<CompositeDependencyExecutionResponse>> = {};
+            (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
             const tasks = _.entries(accumulator).map((t) => t[1]);
             concat(...tasks)
                 .pipe(toArray())
                 .subscribe({
-                    next: (results: CompoundDependencyExecutionResponse[]) => {
-                        expect(extractCompoundDependencyTasksSpy).toBeCalledTimes(1);
+                    next: (results: CompositeDependencyExecutionResponse[]) => {
+                        expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
                         expect(results[0].hasError).toBe(false);
                         expect(results[0].isSkipped).toBe(true);
                         expect(results[0].isSuccessful).toBe(true);
@@ -741,7 +738,7 @@ describe('collectDependencyTasks', () => {
                 });
         });
 
-        it('should extract compound dependency tasks if when is not defined', (done) => {
+        it('should extract composite dependency tasks if when is not defined', (done) => {
             const parentRule: JasperRule = {
                 name: 'parentRule',
                 description: 'description for mock rule',
@@ -772,10 +769,10 @@ describe('collectDependencyTasks', () => {
                 mockRule2,
             });
 
-            const extractCompoundDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompoundDependencyTasks');
+            const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
 
-            const compoundDependency: CompoundDependency = {
-                name: 'test compound dependency',
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
                 rules: [
                     {
                         name: 'child dependency 1',
@@ -804,14 +801,14 @@ describe('collectDependencyTasks', () => {
                 complete: false,
             };
 
-            const accumulator: Record<string, Observable<CompoundDependencyExecutionResponse>> = {};
-            (engine as any).extractCompoundDependencyTasks(accumulator, compoundDependency, context);
+            const accumulator: Record<string, Observable<CompositeDependencyExecutionResponse>> = {};
+            (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
             const tasks = _.entries(accumulator).map((t) => t[1]);
             concat(...tasks)
                 .pipe(toArray())
                 .subscribe({
-                    next: (results: CompoundDependencyExecutionResponse[]) => {
-                        expect(extractCompoundDependencyTasksSpy).toBeCalledTimes(1);
+                    next: (results: CompositeDependencyExecutionResponse[]) => {
+                        expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
                         expect(results[0].hasError).toBe(false);
                         expect(results[0].isSkipped).toBe(false);
                         expect(results[0].isSuccessful).toBe(true);
@@ -828,7 +825,7 @@ describe('collectDependencyTasks', () => {
     });
 });
 
-describe('processCompoundDependency', () => {
+describe('processCompositeDependency', () => {
     describe('operator OR', () => {
         it('consider compound compendency to be successful if either dependency task is successful', (done) => {
             const parentRule: JasperRule = {
@@ -861,10 +858,10 @@ describe('processCompoundDependency', () => {
                 mockRule2,
             });
 
-            const extractCompoundDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompoundDependencyTasks');
+            const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
 
-            const compoundDependency: CompoundDependency = {
-                name: 'test compound dependency',
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
                 operator: Operator.OR,
                 executionOrder: ExecutionOrder.Sequential,
                 rules: [
@@ -895,14 +892,14 @@ describe('processCompoundDependency', () => {
                 complete: false,
             };
 
-            const accumulator: Record<string, Observable<CompoundDependencyExecutionResponse>> = {};
-            (engine as any).extractCompoundDependencyTasks(accumulator, compoundDependency, context);
+            const accumulator: Record<string, Observable<CompositeDependencyExecutionResponse>> = {};
+            (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
             const tasks = _.entries(accumulator).map((t) => t[1]);
             concat(...tasks)
                 .pipe(toArray())
                 .subscribe({
-                    next: (results: CompoundDependencyExecutionResponse[]) => {
-                        expect(extractCompoundDependencyTasksSpy).toBeCalledTimes(1);
+                    next: (results: CompositeDependencyExecutionResponse[]) => {
+                        expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
                         expect(results[0].hasError).toBe(false);
                         expect(results[0].isSkipped).toBe(false);
                         expect(results[0].isSuccessful).toBe(true);
@@ -948,10 +945,10 @@ describe('processCompoundDependency', () => {
                 mockRule2,
             });
 
-            const extractCompoundDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompoundDependencyTasks');
+            const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
 
-            const compoundDependency: CompoundDependency = {
-                name: 'test compound dependency',
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
                 operator: Operator.OR,
                 executionOrder: ExecutionOrder.Sequential,
                 rules: [
@@ -982,14 +979,14 @@ describe('processCompoundDependency', () => {
                 complete: false,
             };
 
-            const accumulator: Record<string, Observable<CompoundDependencyExecutionResponse>> = {};
-            (engine as any).extractCompoundDependencyTasks(accumulator, compoundDependency, context);
+            const accumulator: Record<string, Observable<CompositeDependencyExecutionResponse>> = {};
+            (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
             const tasks = _.entries(accumulator).map((t) => t[1]);
             concat(...tasks)
                 .pipe(toArray())
                 .subscribe({
-                    next: (results: CompoundDependencyExecutionResponse[]) => {
-                        expect(extractCompoundDependencyTasksSpy).toBeCalledTimes(1);
+                    next: (results: CompositeDependencyExecutionResponse[]) => {
+                        expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
                         expect(results[0].hasError).toBe(true);
                         expect(results[0].isSkipped).toBe(false);
                         expect(results[0].isSuccessful).toBe(false);
@@ -1037,10 +1034,10 @@ describe('processCompoundDependency', () => {
                 mockRule2,
             });
 
-            const extractCompoundDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompoundDependencyTasks');
+            const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
 
-            const compoundDependency: CompoundDependency = {
-                name: 'test compound dependency',
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
                 operator: Operator.AND,
                 executionOrder: ExecutionOrder.Sequential,
                 rules: [
@@ -1071,14 +1068,14 @@ describe('processCompoundDependency', () => {
                 complete: false,
             };
 
-            const accumulator: Record<string, Observable<CompoundDependencyExecutionResponse>> = {};
-            (engine as any).extractCompoundDependencyTasks(accumulator, compoundDependency, context);
+            const accumulator: Record<string, Observable<CompositeDependencyExecutionResponse>> = {};
+            (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
             const tasks = _.entries(accumulator).map((t) => t[1]);
             concat(...tasks)
                 .pipe(toArray())
                 .subscribe({
-                    next: (results: CompoundDependencyExecutionResponse[]) => {
-                        expect(extractCompoundDependencyTasksSpy).toBeCalledTimes(1);
+                    next: (results: CompositeDependencyExecutionResponse[]) => {
+                        expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
                         expect(results[0].hasError).toBe(false);
                         expect(results[0].isSkipped).toBe(false);
                         expect(results[0].isSuccessful).toBe(true);
@@ -1124,10 +1121,10 @@ describe('processCompoundDependency', () => {
                 mockRule2,
             });
 
-            const extractCompoundDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompoundDependencyTasks');
+            const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
 
-            const compoundDependency: CompoundDependency = {
-                name: 'test compound dependency',
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
                 operator: Operator.AND,
                 executionOrder: ExecutionOrder.Sequential,
                 rules: [
@@ -1158,14 +1155,14 @@ describe('processCompoundDependency', () => {
                 complete: false,
             };
 
-            const accumulator: Record<string, Observable<CompoundDependencyExecutionResponse>> = {};
-            (engine as any).extractCompoundDependencyTasks(accumulator, compoundDependency, context);
+            const accumulator: Record<string, Observable<CompositeDependencyExecutionResponse>> = {};
+            (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
             const tasks = _.entries(accumulator).map((t) => t[1]);
             concat(...tasks)
                 .pipe(toArray())
                 .subscribe({
-                    next: (results: CompoundDependencyExecutionResponse[]) => {
-                        expect(extractCompoundDependencyTasksSpy).toBeCalledTimes(1);
+                    next: (results: CompositeDependencyExecutionResponse[]) => {
+                        expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
                         expect(results[0].hasError).toBe(true);
                         expect(results[0].isSkipped).toBe(false);
                         expect(results[0].isSuccessful).toBe(false);

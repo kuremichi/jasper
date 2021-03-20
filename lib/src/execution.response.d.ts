@@ -14,13 +14,13 @@ interface CommonDependencyResponse {
 export interface ExecutionResponse extends CommonResponse {
     rule: string;
     result: any;
-    dependency?: CompoundDependencyExecutionResponse | undefined;
+    dependency?: CompositeDependencyExecutionResponse | undefined;
 }
 export interface SimpleDependencyExecutionResponse extends ExecutionResponse, CommonDependencyResponse {
     index?: number;
 }
-export interface CompoundDependencyExecutionResponse extends CommonResponse, CommonDependencyResponse {
-    rules: (SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[];
+export interface CompositeDependencyExecutionResponse extends CommonResponse, CommonDependencyResponse {
+    rules: (SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse)[];
 }
 export interface DebugContext {
     contextId?: string;
@@ -31,5 +31,5 @@ export interface DebugContext {
     executionOrder?: ExecutionOrder | undefined;
     whenDescription?: string;
 }
-export declare function isCompoundDependencyExecutionResponse(object: any): object is CompoundDependencyExecutionResponse;
+export declare function isCompositeDependencyExecutionResponse(object: any): object is CompositeDependencyExecutionResponse;
 export {};

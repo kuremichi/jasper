@@ -1,35 +1,20 @@
 import { Observable, empty, of, from, forkJoin, throwError, concat, defer } from 'rxjs';
 import { switchMap, tap, toArray, share, catchError, shareReplay, map, mapTo } from 'rxjs/operators';
-import {
-    JasperRule,
-    ExecutionContext,
-    isSimpleDependency,
-    SimpleDependency,
-    Operator,
-    isCompoundDependency,
-    CompoundDependency,
-    EngineOptions,
-    DefaultEngineOptions,
-    ExecutionOrder,
-} from './rule.config';
 import jsonata from 'jsonata';
 import hash from 'object-hash';
 import _ from 'lodash';
 import {
     ExecutionResponse,
-    CompoundDependencyExecutionResponse,
+    CompositeDependencyExecutionResponse,
     SimpleDependencyExecutionResponse,
 } from './execution.response';
 import moment from 'moment';
-
-/* istanbul ignore next */
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const AsyncFunction = (async () => {}).constructor;
-/* istanbul ignore next */
-// eslint-disable-next-line require-yield
-const GeneratorFunction = function* () {
-    return {};
-}.constructor;
+import { ExecutionContext } from './execution.context';
+import { JasperRule } from './jasper.rule';
+import { DefaultEngineOptions, EngineOptions } from './engine.option';
+import { isSimpleDependency, SimpleDependency } from './simple.dependency';
+import { ExecutionOrder, Operator } from './enum';
+import { CompositeDependency, isCompositeDependency } from './composite.dependency';
 
 export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
@@ -140,7 +125,7 @@ export class JasperEngine {
      * Process a simple dependency
      * it will execute the path expression and for each match schedule an observables and add to the accumulator
      * @param accumulator a dictionary of tasks
-     * @param compoundDependency the compound dependency object
+     * @param compositeDependency the compound dependency object
      * @param context the current execution context
      */
     private processSimpleDependency(
@@ -224,7 +209,7 @@ export class JasperEngine {
      * @param context the current execution context
      */
     private extractSimpleDependencyTasks(
-        accumulator: Record<string, Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>>,
+        accumulator: Record<string, Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>>,
         simpleDependency: SimpleDependency,
         context: ExecutionContext,
     ) {
@@ -276,13 +261,13 @@ export class JasperEngine {
         whenSubscription.unsubscribe();
     }
 
-    private extractCompoundDependencyTasks(
-        accumulator: Record<string, Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>>,
-        compoundDependency: CompoundDependency,
+    private extractCompositeDependencyTasks(
+        accumulator: Record<string, Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>>,
+        compositeDependency: CompositeDependency,
         context: ExecutionContext,
     ) {
-        const compoundDependencyResponse: CompoundDependencyExecutionResponse = {
-            name: compoundDependency.name,
+        const compositeDependencyResponse: CompositeDependencyExecutionResponse = {
+            name: compositeDependency.name,
             hasError: false,
             isSuccessful: false,
             isSkipped: false,
@@ -290,7 +275,7 @@ export class JasperEngine {
         };
 
         const whenSubscription = defer(() => {
-            return compoundDependency.when ? this.processExpression(compoundDependency.when, context).pipe(
+            return compositeDependency.when ? this.processExpression(compositeDependency.when, context).pipe(
                 switchMap(r => {
                     return of(_.get(r, '[0]', false));
                 }),
@@ -298,43 +283,43 @@ export class JasperEngine {
         }).subscribe({
             next: (when: boolean) => {
                 if (when) {
-                    accumulator[compoundDependency.name] = of(true).pipe(
+                    accumulator[compositeDependency.name] = of(true).pipe(
                         switchMap(() => {
-                            compoundDependencyResponse.startDateTime = moment.utc().toDate();
-                            return this.processCompoundDependency(compoundDependency, context);
+                            compositeDependencyResponse.startDateTime = moment.utc().toDate();
+                            return this.processCompositeDependency(compositeDependency, context);
                         }),
-                        switchMap((r: CompoundDependencyExecutionResponse) => {
-                            compoundDependencyResponse.isSuccessful = r.isSuccessful;
-                            compoundDependencyResponse.hasError = r.hasError;
-                            compoundDependencyResponse.error = r.error;
-                            compoundDependencyResponse.rules = r.rules;
-                            compoundDependencyResponse.completedTime = r.completedTime;
+                        switchMap((r: CompositeDependencyExecutionResponse) => {
+                            compositeDependencyResponse.isSuccessful = r.isSuccessful;
+                            compositeDependencyResponse.hasError = r.hasError;
+                            compositeDependencyResponse.error = r.error;
+                            compositeDependencyResponse.rules = r.rules;
+                            compositeDependencyResponse.completedTime = r.completedTime;
                             /* istanbul ignore next */
                             if (this.options.debug) {
-                                compoundDependencyResponse.debugContext = r.debugContext;
+                                compositeDependencyResponse.debugContext = r.debugContext;
                             }
 
-                            return of(compoundDependencyResponse);
+                            return of(compositeDependencyResponse);
                         })
                     );
                 } else {
-                    compoundDependencyResponse.isSkipped = true;
-                    compoundDependencyResponse.isSuccessful = true;
+                    compositeDependencyResponse.isSkipped = true;
+                    compositeDependencyResponse.isSuccessful = true;
 
                     /* istanbul ignore next */
                     if (this.options.debug) {
-                        compoundDependencyResponse.debugContext = {
+                        compositeDependencyResponse.debugContext = {
                             root: context.root,
-                            whenDescription: compoundDependency.whenDescription,
+                            whenDescription: compositeDependency.whenDescription,
                         };
                     }
-                    accumulator[`${compoundDependency.name}`] = of(compoundDependencyResponse);
+                    accumulator[`${compositeDependency.name}`] = of(compositeDependencyResponse);
                 }
             },
             error: (err) => {
-                compoundDependencyResponse.hasError = true;
-                compoundDependencyResponse.error = err;
-                accumulator[`${compoundDependency.name}`] = of(compoundDependencyResponse);
+                compositeDependencyResponse.hasError = true;
+                compositeDependencyResponse.error = err;
+                accumulator[`${compositeDependency.name}`] = of(compositeDependencyResponse);
             }
         });
 
@@ -343,25 +328,25 @@ export class JasperEngine {
 
     /**
      * 
-     * @param compoundDependency 
+     * @param compositeDependency 
      * @param context 
      */
     private collectDependencyTasks(
-        compoundDependency: CompoundDependency,
+        compositeDependency: CompositeDependency,
         context: ExecutionContext
-    ): Record<string, Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>> {
+    ): Record<string, Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>> {
         const tasks: Record<
             string,
-            Observable<SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse>
+            Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>
         > = _.reduce(
-            compoundDependency.rules,
+            compositeDependency.rules,
             (accumulator: Record<string, Observable<any>>, rule) => {
                 if (isSimpleDependency(rule)) {
                     this.extractSimpleDependencyTasks(accumulator, rule as SimpleDependency, context);
                 } 
                 /* istanbul ignore else  */
-                else if (isCompoundDependency(rule)) {
-                    this.extractCompoundDependencyTasks(accumulator, rule as CompoundDependency, context);
+                else if (isCompositeDependency(rule)) {
+                    this.extractCompositeDependencyTasks(accumulator, rule as CompositeDependency, context);
                 }
                 return accumulator;
             },
@@ -373,18 +358,18 @@ export class JasperEngine {
 
     /**
      * Process a compound dependency
-     * @param compoundDependency the compound dependency object
+     * @param compositeDependency the compound dependency object
      * @param context the current execution context
      */
-    private processCompoundDependency(
-        compoundDependency: CompoundDependency,
+    private processCompositeDependency(
+        compositeDependency: CompositeDependency,
         context: ExecutionContext
-    ): Observable<CompoundDependencyExecutionResponse> {
-        const operator = compoundDependency.operator || Operator.AND;
-        const executionOrder = compoundDependency.executionOrder || ExecutionOrder.Parallel;
+    ): Observable<CompositeDependencyExecutionResponse> {
+        const operator = compositeDependency.operator || Operator.AND;
+        const executionOrder = compositeDependency.executionOrder || ExecutionOrder.Parallel;
 
-        const response: CompoundDependencyExecutionResponse = {
-            name: compoundDependency.name,
+        const response: CompositeDependencyExecutionResponse = {
+            name: compositeDependency.name,
             hasError: false,
             isSkipped: false,
             isSuccessful: false,
@@ -401,25 +386,25 @@ export class JasperEngine {
             }
         }
 
-        const tasks = this.collectDependencyTasks(compoundDependency, context);
+        const tasks = this.collectDependencyTasks(compositeDependency, context);
 
         const values = _.values(tasks);
         // let counter = 0;
 
-        const runTask: Observable<(SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[]> =
+        const runTask: Observable<(SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse)[]> =
             executionOrder === ExecutionOrder.Parallel
                 ? forkJoin(tasks).pipe(
                       map(
                           (
                               results: Record<
                                   string,
-                                  SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse
+                                  SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse
                               >
                           ) => {
                               const entries = _.entries(results).map(([, result]) => result);
                               response.rules = _.map(
                                   entries,
-                                  (result: SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse) =>
+                                  (result: SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse) =>
                                       result
                               );
 
@@ -436,18 +421,18 @@ export class JasperEngine {
                   );
 
         return runTask.pipe(
-            switchMap((results: (SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse)[]) => {
+            switchMap((results: (SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse)[]) => {
                 response.completedTime = moment.utc().toDate();
                 response.isSuccessful =
                     operator === Operator.AND
                         ? _.every(
                               results,
-                              (result: SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse) =>
+                              (result: SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse) =>
                                   result.isSuccessful
                           )
                         : _.some(
                               results,
-                              (result: SimpleDependencyExecutionResponse | CompoundDependencyExecutionResponse) =>
+                              (result: SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse) =>
                                   result.isSuccessful
                           );
                 response.hasError = !response.isSuccessful;
@@ -568,7 +553,7 @@ export class JasperEngine {
             // call dependency rules
             switchMap(() => {
                 if (rule.dependencies && rule.dependencies.rules && rule.dependencies.rules.length) {
-                    return this.processCompoundDependency(rule.dependencies, context).pipe(
+                    return this.processCompositeDependency(rule.dependencies, context).pipe(
                         tap((dependencyReponse) => {
                             response.dependency = dependencyReponse;
                         }),
