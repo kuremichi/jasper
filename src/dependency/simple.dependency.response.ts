@@ -1,4 +1,5 @@
 import { CommonDependencyResponse } from './common.dependency.response';
+import { SimpleDependencyExecutionResponse } from './simple.dependency.execution.response';
 
 /**
  * response to capture the simple dependency
@@ -6,13 +7,5 @@ import { CommonDependencyResponse } from './common.dependency.response';
 export interface SimpleDependencyResponse extends CommonDependencyResponse {
     // the dependency rule name
     rule: string;
+    matches: SimpleDependencyExecutionResponse[];
 }
-
-/**
- * response for each of the simple dependency match result
- */
-export interface SimpleDependencyExecutionResponse extends SimpleDependencyResponse {
-    index: number;
-    result: any;
-}
-

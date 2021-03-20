@@ -14,7 +14,7 @@ export interface CommonDependencyResponse {
     /**
      * the error
      */
-    error?: any;
+    errors?: any[];
 
     /**
      * whether dependency is executed successfully
@@ -24,12 +24,12 @@ export interface CommonDependencyResponse {
     /**
      * dependency start time
      */
-    startDateTime?: Date;
+    startTime?: Date;
 
     /**
      * dependency end time
      */
-    completedTime?: Date;
+    completeTime?: Date;
 
     /**
      * debug context

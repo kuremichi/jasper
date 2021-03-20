@@ -1,7 +1,8 @@
 import { Observable } from 'rxjs';
 import { ExecutionOrder } from '../enum';
 import { ExecutionContext } from '../execution.context';
-import { SimpleDependencyExecutionResponse } from '../execution.response';
+import { SimpleDependencyExecutionResponse } from './simple.dependency.execution.response';
+import { SimpleDependencyResponse } from './simple.dependency.response';
 
 
 export interface SimpleDependency {
@@ -41,12 +42,7 @@ export interface SimpleDependency {
     /**
      * 
      */
-    onError?: (error: any, context: ExecutionContext) => any;
-
-    /**
-     * 
-     */
-    onDependencyError?: (error: any, context: ExecutionContext) => Observable<any>;
+    onDependencyError?: (error: any, response: SimpleDependencyResponse, context: ExecutionContext) => Observable<SimpleDependencyResponse>;
 
     /**
      * the logic to run before the simple dependency is executed
@@ -56,7 +52,7 @@ export interface SimpleDependency {
     /**
      * the logic to run before each dependency match is executed
      */
-    beforeEachDependency?: ((context: ExecutionContext) => Observable<any>);
+    beforeEachDependency?: ((pathObject: any, context: ExecutionContext) => Observable<any>);
 
     /**
      * 
