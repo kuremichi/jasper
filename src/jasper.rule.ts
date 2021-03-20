@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { CompositeDependency } from './composite.dependency';
+import { CompositeDependency } from './dependency/composite.dependency';
 import { ExecutionContext } from './execution.context';
 import { ExecutionResponse } from './execution.response';
 

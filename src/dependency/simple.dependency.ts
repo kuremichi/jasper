@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
-import { ExecutionOrder } from './enum';
-import { ExecutionContext } from './execution.context';
+import { ExecutionOrder } from '../enum';
+import { ExecutionContext } from '../execution.context';
+import { SimpleDependencyExecutionResponse } from '../execution.response';
 
 
 export interface SimpleDependency {
@@ -44,6 +45,41 @@ export interface SimpleDependency {
 
     /**
      * 
+     */
+    onDependencyError?: (error: any, context: ExecutionContext) => Observable<any>;
+
+    /**
+     * the logic to run before the simple dependency is executed
+     */
+    beforeDependency?: ((context: ExecutionContext) => Observable<any>);
+
+    /**
+     * the logic to run before each dependency match is executed
+     */
+    beforeEachDependency?: ((context: ExecutionContext) => Observable<any>);
+
+    /**
+     * 
+     */
+    onEachDependencyError?: ((error: any, response: SimpleDependencyExecutionResponse, context: ExecutionContext) => Observable<SimpleDependencyExecutionResponse>);
+    /**
+     * the logic to run after each dependency match is executed
+     */
+    afterEachDependency?: ((context: ExecutionContext) => Observable<any>);
+
+    /**
+     * the logic to run after the simple dependency is executed
+     */
+    afterDependency?: ((context: ExecutionContext) => Observable<any>);
+
+    /**
+     * the maximum current execution to run for matches.
+     * Default is -1 unlimited
+     */
+    maxCurrency?: number;
+
+    /**
+     * TODO: to implement
      */
     retry?: number;
 }

@@ -1,10 +1,11 @@
-import { DebugContext } from './execution.context';
-import { CompositeDependencyExecutionResponse } from './dependency/composite.dependency.response';
+import { DebugContext } from '../execution.context';
 
+export interface CommonDependencyResponse {
+    name: string;
+    isSkipped: boolean;
+    beforeDependencyResponse?: any;
+    afterDependencyResponse?: any;
 
-export interface ExecutionResponse {
-    rule: string;
-    result: any;
     /**
      * whether dependency has error
      */
@@ -34,5 +35,4 @@ export interface ExecutionResponse {
      * debug context
      */
     debugContext?: DebugContext | undefined;
-    dependency?: CompositeDependencyExecutionResponse | undefined;
 }

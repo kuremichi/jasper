@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
-import { ExecutionOrder, Operator } from './enum';
-import { ExecutionContext } from './execution.context';
+import { ExecutionOrder, Operator } from '../enum';
+import { ExecutionContext } from '../execution.context';
 
 import { SimpleDependency } from './simple.dependency';
 

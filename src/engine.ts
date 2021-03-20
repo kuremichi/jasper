@@ -1,20 +1,30 @@
-import { Observable, empty, of, from, forkJoin, throwError, concat, defer } from 'rxjs';
-import { switchMap, tap, toArray, share, catchError, shareReplay, map, mapTo } from 'rxjs/operators';
+import { Observable, empty, of, from, forkJoin, throwError, concat, defer, iif } from 'rxjs';
+import {
+    switchMap,
+    tap,
+    toArray,
+    share,
+    catchError,
+    shareReplay,
+    map,
+    mapTo,
+    concatAll,
+    switchMapTo,
+} from 'rxjs/operators';
 import jsonata from 'jsonata';
 import hash from 'object-hash';
 import _ from 'lodash';
-import {
-    ExecutionResponse,
-    CompositeDependencyExecutionResponse,
-    SimpleDependencyExecutionResponse,
-} from './execution.response';
+
 import moment from 'moment';
 import { ExecutionContext } from './execution.context';
 import { JasperRule } from './jasper.rule';
 import { DefaultEngineOptions, EngineOptions } from './engine.option';
-import { isSimpleDependency, SimpleDependency } from './simple.dependency';
+import { isSimpleDependency, SimpleDependency } from './dependency/simple.dependency';
 import { ExecutionOrder, Operator } from './enum';
-import { CompositeDependency, isCompositeDependency } from './composite.dependency';
+import { CompositeDependency, isCompositeDependency } from './dependency/composite.dependency';
+import { SimpleDependencyExecutionResponse, SimpleDependencyResponse } from './dependency/simple.dependency.response';
+import { CompositeDependencyExecutionResponse } from './dependency/composite.dependency.response';
+import { ExecutionResponse } from './execution.response';
 
 export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
@@ -23,12 +33,16 @@ export class JasperEngine {
     private logger: any;
 
     /**
-     * 
+     *
      * @param ruleStore a dictionary of all rules
      * @param options options
      * @param logger logger
      */
-    constructor(ruleStore: Record<string, JasperRule>, options: EngineOptions = DefaultEngineOptions, logger = console) {
+    constructor(
+        ruleStore: Record<string, JasperRule>,
+        options: EngineOptions = DefaultEngineOptions,
+        logger = console
+    ) {
         this.options = options;
         this.contextStore = {};
         this.ruleStore = ruleStore;
@@ -37,25 +51,25 @@ export class JasperEngine {
 
     /**
      * execute the rule action
-     * @param params 
+     * @param params
      * @param params.action action to run
      * @param params.context the execution context
-     * 
+     *
      * @example jsonata expression
      * executeAction('jsonataExpression', context)
-     * 
+     *
      * @example observable
      * executeAction(of(1), context)
-     * 
-     * @example async function 
+     *
+     * @example async function
      * executeAction(async (context) => {}, context)
-     * 
-     * @example function 
+     *
+     * @example function
      * executeAction((context) => {}, context)
      */
     private executeAction(params: {
-        action: string | Observable<unknown> | ((context: ExecutionContext) => Observable<any>),
-        context: ExecutionContext,
+        action: string | Observable<unknown> | ((context: ExecutionContext) => Observable<any>);
+        context: ExecutionContext;
     }): Observable<any> {
         if (typeof params.action === 'string' || params.action instanceof String) {
             const expression = jsonata(params.action as string);
@@ -67,7 +81,7 @@ export class JasperEngine {
         }
 
         if (params.action instanceof Function) {
-            return (params.action(params.context) as Observable<any>);
+            return params.action(params.context) as Observable<any>;
         }
 
         return of(null);
@@ -133,93 +147,241 @@ export class JasperEngine {
         simpleDependency: SimpleDependency,
         context: ExecutionContext
     ): void {
-        const registerMatchesHandler = this.processExpression(simpleDependency.path, context).subscribe(
-            (pathObjects: any[]) => {
-                _.each(pathObjects, (pathObject, index) => {
-                    const simpleDependencyResponse: SimpleDependencyExecutionResponse = {
-                        name: `${simpleDependency.name}`,
-                        isSkipped: false,
-                        rule: simpleDependency.rule,
-                        hasError: false,
-                        isSuccessful: false,
-                        result: null,
-                        index,
-                    };
+        const registerMatchesHandler = of(1)
+            .pipe(
+                tap(() => {
+                    if (simpleDependency.beforeDependency) {
+                        accumulator[`${simpleDependency.name}-beforeDependency`] = simpleDependency.beforeDependency(
+                            context
+                        );
+                    }
+                }),
+                switchMap(() => {
+                    return this.processExpression(simpleDependency.path, context).pipe(
+                        tap((pathObjects: any[]) => {
+                            _.each(pathObjects, (pathObject, index) => {
+                                const simpleDependencyResponse: SimpleDependencyExecutionResponse = {
+                                    name: `${simpleDependency.name}`,
+                                    isSkipped: false,
+                                    rule: simpleDependency.rule,
+                                    hasError: false,
+                                    isSuccessful: false,
+                                    result: null,
+                                    index,
+                                };
 
-                    const task = of(pathObject).pipe(
-                        switchMap((pathObject: any) => {
-                            simpleDependencyResponse.startDateTime = moment.utc().toDate();
-                            return this.execute({
-                                root: pathObject,
-                                ruleName: simpleDependency.rule,
-                                parentExecutionContext: context,
+                                const task = of(pathObject).pipe(
+                                    switchMap((pathObject: any) => {
+                                        simpleDependencyResponse.startDateTime = moment.utc().toDate();
+                                        return this.execute({
+                                            root: pathObject,
+                                            ruleName: simpleDependency.rule,
+                                            parentExecutionContext: context,
+                                        });
+                                    }),
+                                    switchMap((r: ExecutionResponse) => {
+                                        simpleDependencyResponse.result = r.result;
+                                        simpleDependencyResponse.isSuccessful = r.isSuccessful;
+                                        simpleDependencyResponse.dependency = r.dependency;
+                                        simpleDependencyResponse.startDateTime = r.startDateTime;
+                                        simpleDependencyResponse.completedTime = r.completedTime;
+                                        /* istanbul ignore next */
+                                        if (this.options.debug) {
+                                            simpleDependencyResponse.debugContext = r.debugContext;
+
+                                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                            simpleDependencyResponse.debugContext!.executionOrder =
+                                                simpleDependency.executionOrder || ExecutionOrder.Parallel;
+                                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                            simpleDependencyResponse.debugContext!.whenDescription =
+                                                simpleDependency.whenDescription;
+                                        }
+                                        return of(simpleDependencyResponse);
+                                    }),
+                                    catchError((err) => {
+                                        simpleDependencyResponse.error = err;
+                                        simpleDependencyResponse.hasError = true;
+                                        simpleDependencyResponse.isSuccessful = false;
+                                        simpleDependencyResponse.completedTime = moment.utc().toDate();
+                                        return of(simpleDependencyResponse);
+                                    })
+                                );
+
+                                accumulator[`${simpleDependency.name}-${index}`] = task;
                             });
                         }),
-                        switchMap((r: ExecutionResponse) => {
-                            simpleDependencyResponse.result = r.result;
-                            simpleDependencyResponse.isSuccessful = r.isSuccessful;
-                            simpleDependencyResponse.dependency = r.dependency;
-                            simpleDependencyResponse.startDateTime = r.startDateTime;
-                            simpleDependencyResponse.completedTime = r.completedTime;
-                            /* istanbul ignore next */
-                            if (this.options.debug) {
-                                simpleDependencyResponse.debugContext = r.debugContext;
-                                
-                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                simpleDependencyResponse.debugContext!.executionOrder = simpleDependency.executionOrder || ExecutionOrder.Parallel;
-                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                                simpleDependencyResponse.debugContext!.whenDescription = simpleDependency.whenDescription;
-                            }
-                            return of(simpleDependencyResponse);
-                        }),
                         catchError((err) => {
-                            simpleDependencyResponse.error = err;
-                            simpleDependencyResponse.hasError = true;
-                            simpleDependencyResponse.isSuccessful = false;
-                            simpleDependencyResponse.completedTime = moment.utc().toDate();
-                            return of(simpleDependencyResponse);
+                            const errReponse: SimpleDependencyExecutionResponse = {
+                                name: `${simpleDependency.name}`,
+                                isSkipped: false,
+                                rule: simpleDependency.rule,
+                                debugContext: undefined,
+                                error: err,
+                                hasError: true,
+                                isSuccessful: false,
+                                result: null,
+                            };
+                            accumulator[`${simpleDependency.name}`] = of(errReponse);
+
+                            return of([]);
                         })
                     );
-
-                    accumulator[`${simpleDependency.name}-${index}`] = task;
-                });
-            },
-            (err) => {
-                const errReponse: SimpleDependencyExecutionResponse = {
-                    name: `${simpleDependency.name}`,
-                    isSkipped: false,
-                    rule: simpleDependency.rule,
-                    debugContext: undefined,
-                    error: err,
-                    hasError: true,
-                    isSuccessful: false,
-                    result: null,
-                };
-                accumulator[`${simpleDependency.name}`] = of(errReponse);
-            },
-        );
+                }),
+                tap(() => {
+                    if (simpleDependency.afterDependency) {
+                        accumulator[`${simpleDependency.name}-afterDependency`] = simpleDependency.afterDependency(
+                            context
+                        );
+                    }
+                })
+            )
+            .subscribe();
 
         registerMatchesHandler.unsubscribe();
     }
 
+    private processSimpleDependency2(
+        simpleDependency: SimpleDependency,
+        context: ExecutionContext
+    ): Observable<SimpleDependencyResponse> {
+        const dependencyResponse: SimpleDependencyResponse = {
+            name: `${simpleDependency.name}`,
+            isSkipped: false,
+            rule: simpleDependency.rule,
+            hasError: false,
+            isSuccessful: false,
+        };
+
+        return (simpleDependency.when
+            ? this.processExpression(simpleDependency.when, context).pipe(
+                  switchMap((r) => {
+                      const w: boolean = _.get(r, '[0]', false);
+                      return of(w);
+                  })
+              )
+            : of(true)
+        ).pipe(
+            switchMap(() => {
+                return (simpleDependency.beforeDependency ? simpleDependency.beforeDependency(context) : of(null)).pipe(
+                    switchMap((beforeDependencyResult: any) => {
+                        return this.processExpression(simpleDependency.path, context).pipe(
+                            switchMap((pathObjects: any[]) => {
+                                const executeOrder = simpleDependency.executionOrder || ExecutionOrder.Parallel;
+                                const tasks = _.map(pathObjects, (pathObject, index) => {
+                                    const simpleDependencyResponse: SimpleDependencyExecutionResponse = {
+                                        name: `${simpleDependency.name}`,
+                                        isSkipped: false,
+                                        rule: simpleDependency.rule,
+                                        hasError: false,
+                                        isSuccessful: false,
+                                        result: null,
+                                        index,
+                                    };
+
+                                    const task = of(pathObject).pipe(
+                                        switchMap((pathObject: any) => {
+                                            simpleDependencyResponse.startDateTime = moment.utc().toDate();
+                                            return this.execute({
+                                                root: pathObject,
+                                                ruleName: simpleDependency.rule,
+                                                parentExecutionContext: context,
+                                            });
+                                        }),
+                                        switchMap((r: ExecutionResponse) => {
+                                            simpleDependencyResponse.result = r.result;
+                                            simpleDependencyResponse.isSuccessful = r.isSuccessful;
+                                            simpleDependencyResponse.dependency = r.dependency;
+                                            simpleDependencyResponse.startDateTime = r.startDateTime;
+                                            simpleDependencyResponse.completedTime = r.completedTime;
+                                            /* istanbul ignore next */
+                                            if (this.options.debug) {
+                                                simpleDependencyResponse.debugContext = r.debugContext;
+
+                                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                                simpleDependencyResponse.debugContext!.executionOrder =
+                                                    simpleDependency.executionOrder || ExecutionOrder.Parallel;
+                                                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                                simpleDependencyResponse.debugContext!.whenDescription =
+                                                    simpleDependency.whenDescription;
+                                            }
+                                            return of(simpleDependencyResponse);
+                                        }),
+                                        catchError((err) => {
+                                            simpleDependencyResponse.error = err;
+                                            simpleDependencyResponse.hasError = true;
+                                            simpleDependencyResponse.isSuccessful = false;
+                                            simpleDependencyResponse.completedTime = moment.utc().toDate();
+
+                                            if (simpleDependency.onEachDependencyError) {
+                                                return simpleDependency.onEachDependencyError(
+                                                    err,
+                                                    simpleDependencyResponse,
+                                                    context
+                                                );
+                                            }
+
+                                            return of(simpleDependencyResponse);
+                                        })
+                                    );
+                                    return task;
+                                });
+
+                                return executeOrder == ExecutionOrder.Sequential
+                                    ? concat(...tasks).pipe(toArray())
+                                    : forkJoin(tasks);
+                            }),
+                            switchMap((responses: SimpleDependencyExecutionResponse[]) => {
+                                return simpleDependency.afterDependency
+                                    ? simpleDependency.afterDependency(context).pipe(switchMapTo(of(responses)))
+                                    : of(responses);
+                            })
+                        );
+                    }),
+                    catchError((err) => {
+                        const errReponse: SimpleDependencyExecutionResponse = {
+                            name: `${simpleDependency.name}`,
+                            isSkipped: false,
+                            rule: simpleDependency.rule,
+                            debugContext: undefined,
+                            error: err,
+                            hasError: true,
+                            isSuccessful: false,
+                            result: null,
+                        };
+
+                        return of(errReponse);
+                    }),
+                    switchMap(() => {
+                        return of(dependencyResponse);
+                    })
+                );
+            })
+        );
+    }
+
     /**
-     * 
-     * @param accumulator a dictionary of tasks 
+     *
+     * @param accumulator a dictionary of tasks
      * @param simpleDependency the simple dependency object
      * @param context the current execution context
      */
     private extractSimpleDependencyTasks(
-        accumulator: Record<string, Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>>,
+        accumulator: Record<
+            string,
+            Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>
+        >,
         simpleDependency: SimpleDependency,
-        context: ExecutionContext,
+        context: ExecutionContext
     ) {
         // process when clause
         const whenSubscription = defer(() => {
-            return simpleDependency.when ? this.processExpression(simpleDependency.when, context).pipe(
-                switchMap(r => {
-                    return of(_.get(r, '[0]', false));
-                }),
-            ) : of(true);
+            return simpleDependency.when
+                ? this.processExpression(simpleDependency.when, context).pipe(
+                      switchMap((r) => {
+                          return of(_.get(r, '[0]', false));
+                      })
+                  )
+                : of(true);
         }).subscribe({
             next: (x: boolean) => {
                 if (x) {
@@ -255,16 +417,19 @@ export class JasperEngine {
                     result: null,
                 };
                 accumulator[`${simpleDependency.name}`] = of(errorResponse);
-            }
+            },
         });
 
         whenSubscription.unsubscribe();
     }
 
     private extractCompositeDependencyTasks(
-        accumulator: Record<string, Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>>,
+        accumulator: Record<
+            string,
+            Observable<SimpleDependencyExecutionResponse | CompositeDependencyExecutionResponse>
+        >,
         compositeDependency: CompositeDependency,
-        context: ExecutionContext,
+        context: ExecutionContext
     ) {
         const compositeDependencyResponse: CompositeDependencyExecutionResponse = {
             name: compositeDependency.name,
@@ -275,11 +440,13 @@ export class JasperEngine {
         };
 
         const whenSubscription = defer(() => {
-            return compositeDependency.when ? this.processExpression(compositeDependency.when, context).pipe(
-                switchMap(r => {
-                    return of(_.get(r, '[0]', false));
-                }),
-            ) : of(true);
+            return compositeDependency.when
+                ? this.processExpression(compositeDependency.when, context).pipe(
+                      switchMap((r) => {
+                          return of(_.get(r, '[0]', false));
+                      })
+                  )
+                : of(true);
         }).subscribe({
             next: (when: boolean) => {
                 if (when) {
@@ -320,16 +487,16 @@ export class JasperEngine {
                 compositeDependencyResponse.hasError = true;
                 compositeDependencyResponse.error = err;
                 accumulator[`${compositeDependency.name}`] = of(compositeDependencyResponse);
-            }
+            },
         });
 
         whenSubscription.unsubscribe();
     }
 
     /**
-     * 
-     * @param compositeDependency 
-     * @param context 
+     *
+     * @param compositeDependency
+     * @param context
      */
     private collectDependencyTasks(
         compositeDependency: CompositeDependency,
@@ -343,9 +510,8 @@ export class JasperEngine {
             (accumulator: Record<string, Observable<any>>, rule) => {
                 if (isSimpleDependency(rule)) {
                     this.extractSimpleDependencyTasks(accumulator, rule as SimpleDependency, context);
-                } 
+                } else if (isCompositeDependency(rule)) {
                 /* istanbul ignore else  */
-                else if (isCompositeDependency(rule)) {
                     this.extractCompositeDependencyTasks(accumulator, rule as CompositeDependency, context);
                 }
                 return accumulator;
@@ -383,7 +549,7 @@ export class JasperEngine {
                 root: context.root,
                 executionOrder,
                 operator,
-            }
+            };
         }
 
         const tasks = this.collectDependencyTasks(compositeDependency, context);
@@ -458,7 +624,7 @@ export class JasperEngine {
         const ruleHash = hash(params.ruleName);
         const objectHash = hash(params.root);
         const contextHash = ruleHash + objectHash;
-        const contextId = `${contextHash}${ this.options.suppressDuplicateTasks ? '' : _.uniqueId('-')}`;
+        const contextId = `${contextHash}${this.options.suppressDuplicateTasks ? '' : _.uniqueId('-')}`;
         let context: ExecutionContext = this.contextStore[contextId];
 
         if (!context || this.options.suppressDuplicateTasks === false) {
@@ -491,12 +657,13 @@ export class JasperEngine {
             hasError: false,
             isSuccessful: false,
             result: undefined,
-            debugContext: this.options.debug ? 
-            {
-                contextId,
-                root: context.root,
-                ruleName: rule.name,
-            } : undefined,
+            debugContext: this.options.debug
+                ? {
+                      contextId,
+                      root: context.root,
+                      ruleName: rule.name,
+                  }
+                : undefined,
         };
 
         context._process$ = of(true).pipe(
@@ -508,9 +675,11 @@ export class JasperEngine {
                         tap(() => {
                             /* istanbul ignore next */
                             if (this.options.debug) {
-                                this.logger.debug(`before action executed for rule ${rule.name} - context ${context.contextId}`);
+                                this.logger.debug(
+                                    `before action executed for rule ${rule.name} - context ${context.contextId}`
+                                );
                             }
-                        }),
+                        })
                     );
                 }
                 return of(x);
@@ -531,14 +700,16 @@ export class JasperEngine {
                     /* if a custom onError handler is specified
                        let it decide if we should replace the the stream 
                        or let it fail
-                    */ 
+                    */
                     return rule.onError(err, context).pipe(
                         tap(() => {
                             /* istanbul ignore next */
                             if (this.options.debug) {
-                                this.logger.debug(`onError executed for rule ${rule.name} - context ${context.contextId}`);
+                                this.logger.debug(
+                                    `onError executed for rule ${rule.name} - context ${context.contextId}`
+                                );
                             }
-                        }),
+                        })
                     );
                 }
 
@@ -557,7 +728,7 @@ export class JasperEngine {
                         tap((dependencyReponse) => {
                             response.dependency = dependencyReponse;
                         }),
-                        mapTo(response),
+                        mapTo(response)
                     );
                 }
                 return of(response);
@@ -569,9 +740,11 @@ export class JasperEngine {
                         tap(() => {
                             /* istanbul ignore next */
                             if (this.options.debug) {
-                                this.logger.debug(`after action executed for rule ${rule.name} - context ${context.contextId}`);
+                                this.logger.debug(
+                                    `after action executed for rule ${rule.name} - context ${context.contextId}`
+                                );
                             }
-                        }),
+                        })
                     );
                 }
                 return of(response);
