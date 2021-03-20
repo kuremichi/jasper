@@ -530,9 +530,9 @@ export class JasperEngine {
               )
             : of(true)
         ).pipe(
-            switchMap((skipped: boolean) => {
-                dependencyResponse.isSkipped = skipped;
-                if (skipped) {
+            switchMap((run: boolean) => {
+                dependencyResponse.isSkipped = !run;
+                if (dependencyResponse.isSkipped) {
                     /* istanbul ignore next */
                     if (this.options.debug) {
                         dependencyResponse.debugContext = {
@@ -582,7 +582,7 @@ export class JasperEngine {
                                 dependencyResponse.rules = responses;
                                 return of(dependencyResponse);
                             }),
-                        );                        
+                        );
                     }),
                     // after dependency
                     switchMap(() => {
@@ -593,6 +593,19 @@ export class JasperEngine {
                         )
                     }),
                     switchMap((afterDependencyResult) => {
+                        dependencyResponse.isSuccessful =
+                            operator === Operator.AND
+                                ? _.every(
+                                    dependencyResponse.rules,
+                                    (result: SimpleDependencyResponse | CompositeDependencyExecutionResponse) =>
+                                        result.isSuccessful
+                                )
+                                : _.some(
+                                    dependencyResponse.rules,
+                                    (result: SimpleDependencyResponse | CompositeDependencyExecutionResponse) =>
+                                        result.isSuccessful
+                                );
+                        dependencyResponse.hasError = !dependencyResponse.isSuccessful;
                         return of(dependencyResponse);
                     }),
                     catchError(err => {
@@ -639,9 +652,9 @@ export class JasperEngine {
               )
             : of(true)
         ).pipe(
-            switchMap(skipped => {
-                dependencyResponse.isSkipped = skipped;
-                if (skipped) {
+            switchMap(run => {
+                dependencyResponse.isSkipped = !run;
+                if (dependencyResponse.isSkipped) {
                     /* istanbul ignore next */
                     if (this.options.debug) {
                         dependencyResponse.debugContext = {
@@ -674,7 +687,7 @@ export class JasperEngine {
                                         switchMap((pathObject: any) => {
                                             executionResponse.startTime = moment.utc().toDate();
                                             return simpleDependency.beforeEachDependency ?
-                                                simpleDependency.beforeEachDependency(pathObject, context) : 
+                                                simpleDependency.beforeEachDependency(pathObject, index, context) : 
                                                 of(null);
                                         }),
                                         // execute
@@ -703,7 +716,7 @@ export class JasperEngine {
                                             }
 
                                             return simpleDependency.afterEachDependency ?
-                                                simpleDependency.afterEachDependency(context) :
+                                                simpleDependency.afterEachDependency(pathObject, index, context) :
                                                 of(executionResponse);
                                         }),
                                         tap(() => {
@@ -726,6 +739,9 @@ export class JasperEngine {
 
                                             return of(executionResponse);
                                         }),
+                                        tap(() => {
+                                            dependencyResponse.matches.push(executionResponse);
+                                        }),
                                     );
                                     return task;
                                 });
@@ -737,6 +753,7 @@ export class JasperEngine {
                                     )
                                     : from(tasks).pipe(
                                         mergeAll(simpleDependency.maxCurrency),
+                                        toArray(),
                                     );
                             }),
                             switchMap((responses: SimpleDependencyExecutionResponse[]) => {
@@ -759,6 +776,9 @@ export class JasperEngine {
                         );
                     }),
                     switchMap(() => {
+                        dependencyResponse.hasError = false;
+                        dependencyResponse.isSuccessful = true;
+                        dependencyResponse.completeTime = moment.utc().toDate();
                         return of(dependencyResponse);
                     }),
                     catchError((err) => {
@@ -895,6 +915,9 @@ export class JasperEngine {
                 return (
                     rule.dependencies 
                     ? this.processCompositeDependency2(rule.dependencies, context).pipe(
+                        tap((dependencyResponse: CompositeDependencyExecutionResponse) => {
+                            response.dependency = dependencyResponse;
+                        }),
                         switchMapTo(of(response)),
                     )
                     : of(response)

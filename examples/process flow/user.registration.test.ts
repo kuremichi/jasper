@@ -7,7 +7,7 @@ it('should run', (done) => {
     const options: EngineOptions = {
         recipe: JasperEngineRecipe.ValidationRuleEngine,
         suppressDuplicateTasks: true,
-        debug: false,
+        debug: true,
     };
     const engine = new JasperEngine(StaticRuleStore, options);
 
@@ -18,7 +18,7 @@ it('should run', (done) => {
         })
         .subscribe({
             next: (r) => {
-                console.log(JSON.stringify(r, null, 2));
+                console.log(JSON.stringify(r));
                 console.log('completed');
             },
             error: (err) => {

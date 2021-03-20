@@ -52,7 +52,7 @@ export interface SimpleDependency {
     /**
      * the logic to run before each dependency match is executed
      */
-    beforeEachDependency?: ((pathObject: any, context: ExecutionContext) => Observable<any>);
+    beforeEachDependency?: ((pathObject: any, index: number, context: ExecutionContext) => Observable<any>);
 
     /**
      * 
@@ -61,7 +61,7 @@ export interface SimpleDependency {
     /**
      * the logic to run after each dependency match is executed
      */
-    afterEachDependency?: ((context: ExecutionContext) => Observable<any>);
+    afterEachDependency?: ((pathObject: any, index: number, context: ExecutionContext) => Observable<any>);
 
     /**
      * the logic to run after the simple dependency is executed

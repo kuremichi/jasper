@@ -44,12 +44,18 @@ const store: JasperRule[] = [
                         of(context.root).pipe(
                             switchMap((userObject) => {
                                 return of(`
-                                <html>
-                                    <body>
-                                        <p>Hi ${userObject.name}! Welcome to Jasper Rule Engine!</p>
-                                    </body>
-                                </html>
-                            `);
+                                    <html>
+                                        <body>
+                                            <p>Hi ${userObject.name}! Welcome to Jasper Rule Engine!</p>
+                                        </body>
+                                    </html>
+                                `, `
+                                    <html>
+                                        <body>
+                                            <p>Hi ${userObject.name} again! Welcome to Jasper Rule Engine!</p>
+                                        </body>
+                                    </html>
+                                `);
                             })
                         ),
                     beforeDependency: (context) => of(context.contextId).pipe(
@@ -57,7 +63,17 @@ const store: JasperRule[] = [
                             console.log(`[${contextId}] before welcome user`);
                         }),
                     ),
+                    beforeEachDependency: (userObject, index, context) => of(context.contextId).pipe(
+                        tap((contextId) => {
+                            console.log(`[${contextId}] before sending ${index+1} email`);
+                        }),
+                    ),
                     rule: 'send email',
+                    afterEachDependency: (userObject, index, context) => of(context.contextId).pipe(
+                        tap((contextId) => {
+                            console.log(`[${contextId}] after sending ${index+1} email`);
+                        }),
+                    ),
                     afterDependency: (context) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] after welcome user`);
