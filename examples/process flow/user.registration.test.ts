@@ -1,7 +1,7 @@
 import { JasperEngine } from '../../src/engine';
+import { EngineOptions } from '../../src/engine.option';
+import { JasperEngineRecipe } from '../../src/enum';
 import { StaticRuleStore } from './user.registrator.rule.store';
-import { EngineOptions } from '../../src/rule.config';
-import { JasperEngineRecipe } from '../../src/recipe';
 
 it('should run', (done) => {
     const options: EngineOptions = {
