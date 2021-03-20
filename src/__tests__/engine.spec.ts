@@ -21,7 +21,7 @@ describe('processExpression', () => {
     const mockRule: JasperRule = {
         name: 'mockRule',
         description: 'description for mock rule',
-        action: of(1),
+        action: () => of(1),
     };
     it('should handle jsonata path expression', (done) => {
         const engine = new JasperEngine({});
@@ -61,7 +61,7 @@ describe('processExpression', () => {
         };
 
         const ob: Observable<any[]> = (engine as any).processExpression(
-            of(true).pipe(
+            () => of(true).pipe(
                 switchMap(() => {
                     return of(_.get(context.root, 'children'));
                 })
@@ -75,70 +75,6 @@ describe('processExpression', () => {
             },
             complete: () => {
                 expect(processExpressionSpy).toBeCalledTimes(1);
-                done();
-            },
-        });
-    });
-
-    it('should handle synchronous function path expression', (done) => {
-        const engine = new JasperEngine({});
-        const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
-        const context: ExecutionContext = {
-            contextId: '1',
-            root: { children: [{ id: 1 }, { id: 2 }] },
-            rule: mockRule,
-            _process$: empty(),
-            contextData: {},
-            complete: false,
-        };
-
-        const mockFn = jest.fn().mockReturnValue(_.get(context.root, 'children'));
-        const pathFunction = () => {
-            return mockFn(context);
-        };
-
-        const ob: Observable<any[]> = (engine as any).processExpression(pathFunction, context);
-
-        ob.subscribe({
-            next: (pahtObjects: any[]) => {
-                expect(pahtObjects).toHaveLength(2);
-            },
-            complete: () => {
-                expect(processExpressionSpy).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledWith(context);
-                done();
-            },
-        });
-    });
-
-    it('should handle async function path expression', (done) => {
-        const engine = new JasperEngine({});
-        const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
-        const context: ExecutionContext = {
-            contextId: '1',
-            root: { children: [{ id: 1 }, { id: 2 }] },
-            rule: mockRule,
-            _process$: empty(),
-            contextData: {},
-            complete: false,
-        };
-
-        const mockFn = jest.fn().mockResolvedValue(_.get(context.root, 'children'));
-        const asyncPathFunction = async (context: ExecutionContext) => {
-            return mockFn(context);
-        };
-
-        const ob: Observable<any[]> = (engine as any).processExpression(asyncPathFunction, context);
-
-        ob.subscribe({
-            next: (pahtObjects: any[]) => {
-                expect(pahtObjects).toHaveLength(2);
-            },
-            complete: () => {
-                expect(processExpressionSpy).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledWith(context);
                 done();
             },
         });
@@ -174,7 +110,7 @@ describe('executeAction', () => {
     const mockRule: JasperRule = {
         name: 'mockRule',
         description: 'description for mock rule',
-        action: of(1),
+        action: () => of(1),
     };
 
     it('should handle jsonata action expression', (done) => {
@@ -273,81 +209,6 @@ describe('executeAction', () => {
         });
     });
 
-    it('should handle async action expression', (done) => {
-        const engine = new JasperEngine({});
-        const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
-        const context: ExecutionContext = {
-            contextId: '1',
-            root: {
-                children: [
-                    { id: 1, text: 'child1' },
-                    { id: 2, text: 'child2' },
-                ],
-            },
-            rule: mockRule,
-            _process$: empty(),
-            contextData: {},
-            complete: false,
-        };
-
-        const mockFn = jest.fn().mockResolvedValue(123);
-
-        const action = async (context: ExecutionContext) => {
-            return mockFn(context);
-        };
-
-        const ob: Observable<any> = (engine as any).executeAction({ action, context });
-
-        ob.subscribe({
-            next: (result: any) => {
-                expect(result).toBe(123);
-            },
-            complete: () => {
-                expect(executeActionSpy).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledWith(context);
-                done();
-            },
-        });
-    });
-
-    it('should handle synchronous action expression', (done) => {
-        const engine = new JasperEngine({});
-        const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
-        const context: ExecutionContext = {
-            contextId: '1',
-            root: {
-                children: [
-                    { id: 1, text: 'child1' },
-                    { id: 2, text: 'child2' },
-                ],
-            },
-            rule: mockRule,
-            _process$: empty(),
-            contextData: {},
-            complete: false,
-        };
-
-        const mockFn = jest.fn().mockReturnValue(123);
-        const action = (context: ExecutionContext) => {
-            return mockFn(context);
-        };
-
-        const ob: Observable<any> = (engine as any).executeAction({ action, context });
-
-        ob.subscribe({
-            next: (result: any) => {
-                expect(result).toBe(123);
-            },
-            complete: () => {
-                expect(executeActionSpy).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledWith(context);
-                done();
-            },
-        });
-    });
-
     it('should return null if invalid expression passed', (done) => {
         const engine = new JasperEngine({});
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
@@ -371,7 +232,7 @@ describe('processSimpleDependency', () => {
     const mockRule: JasperRule = {
         name: 'mockRule',
         description: 'description for mock rule',
-        action: of(1),
+        action: () => of(1),
     };
 
     it('should put no tasks on accumulator if pathExpression does not find anything', () => {
@@ -409,13 +270,12 @@ describe('processSimpleDependency', () => {
     it('should return response with error if unable to evaluate path expression', (done) => {
         const engine = new JasperEngine({});
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
-        const mockFn = jest.fn().mockImplementation(() => {
-            throw new Error('path error');
-        });
+        const mockFn = jest.fn();
         const simpleDependency: SimpleDependency = {
             name: 'test simple dependency',
             path: () => {
                 mockFn();
+                return throwError(new Error('error'));
             },
             rule: 'test rule',
         };
@@ -486,7 +346,7 @@ describe('processSimpleDependency', () => {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
-                return mockFn();
+                return of(mockFn());
             },
         };
 
@@ -615,7 +475,7 @@ describe('collectDependencyTasks', () => {
                 name: 'mockRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
             const engine = new JasperEngine({
@@ -667,7 +527,7 @@ describe('collectDependencyTasks', () => {
                 name: 'mockRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
             const engine = new JasperEngine({
@@ -719,7 +579,7 @@ describe('collectDependencyTasks', () => {
                 name: 'mockRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
             const engine = new JasperEngine({
@@ -777,7 +637,7 @@ describe('collectDependencyTasks', () => {
                 name: 'mockRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -829,7 +689,7 @@ describe('collectDependencyTasks', () => {
                 name: 'mockRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -848,7 +708,7 @@ describe('collectDependencyTasks', () => {
                         path: '$',
                     },
                 ],
-                when: of(false),
+                when: () => of(false),
             };
 
             const context: ExecutionContext = {
@@ -886,7 +746,7 @@ describe('collectDependencyTasks', () => {
                 name: 'parentRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -894,7 +754,7 @@ describe('collectDependencyTasks', () => {
                 name: 'mockRule1',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -902,7 +762,7 @@ describe('collectDependencyTasks', () => {
                 name: 'mockRule2',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -975,7 +835,7 @@ describe('processCompoundDependency', () => {
                 name: 'parentRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -983,7 +843,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule1',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -991,7 +851,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule2',
                 description: 'description for mock rule',
                 action: () => {
-                    throw new Error('error');
+                    return throwError(new Error('error'));
                 },
             };
 
@@ -1062,7 +922,7 @@ describe('processCompoundDependency', () => {
                 name: 'parentRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -1070,7 +930,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule1',
                 description: 'description for mock rule',
                 action: () => {
-                    throw new Error('error');
+                    return throwError(new Error('error'));
                 },
             };
 
@@ -1078,7 +938,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule2',
                 description: 'description for mock rule',
                 action: () => {
-                    throw new Error('error');
+                    return throwError(new Error('error'));
                 },
             };
 
@@ -1151,7 +1011,7 @@ describe('processCompoundDependency', () => {
                 name: 'parentRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -1159,7 +1019,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule1',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -1167,7 +1027,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule2',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -1238,7 +1098,7 @@ describe('processCompoundDependency', () => {
                 name: 'parentRule',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -1246,7 +1106,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule1',
                 description: 'description for mock rule',
                 action: () => {
-                    return 1;
+                    return of(1);
                 },
             };
 
@@ -1254,7 +1114,7 @@ describe('processCompoundDependency', () => {
                 name: 'mockRule2',
                 description: 'description for mock rule',
                 action: () => {
-                    throw new Error('error');
+                    return throwError(new Error('error'));
                 },
             };
 
@@ -1334,7 +1194,7 @@ describe('execute', () => {
                 return of(beforeActionMock());
             },
             action: () => {
-                return actionMock();
+                return of(actionMock());
             },
         };
 
@@ -1378,7 +1238,7 @@ describe('execute', () => {
                 );
             },
             action: () => {
-                return actionMock();
+                return of(actionMock());
             },
         };
 
@@ -1433,7 +1293,7 @@ describe('execute', () => {
             description: 'description for mock rule',
             action: () => {
                 actionMock();
-                throw new Error('exception');
+                return throwError(new Error('exception'));
             },
             onError: (err) => {
                 errorMock();
@@ -1474,7 +1334,7 @@ describe('execute', () => {
             description: 'description for mock rule',
             action: () => {
                 actionMock();
-                throw new Error('exception');
+                return throwError(new Error('exception'));
             },
             onError: () => {
                 errorMock();
@@ -1513,7 +1373,7 @@ describe('execute', () => {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
-                return actionMock();
+                return of(actionMock());
             },
         };
 
@@ -1556,7 +1416,7 @@ describe('execute', () => {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
-                return actionMock();
+                return of(actionMock());
             },
         };
 

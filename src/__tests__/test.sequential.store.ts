@@ -7,19 +7,22 @@ const store: JasperRule[] = [
     {
         name: 'test rule 1',
         description: '',
+        metadata: {
+            entity: 'account'
+        },
         beforeAction: () => {
             return of(1).pipe(
                 tap(() => {
+                    
                     console.log('preprocessing rule 1');
                 })
             );
         },
-        action: of('result for rule 1').pipe(
+        action: () => of('result for rule 1').pipe(
             tap(() => {
                 console.log('processing rule 1');
             }),
             delay(1000),
-            // switchMapTo(throwError('error')),
         ),
         afterAction: (response, context) => {
             return of(response).pipe(
@@ -39,7 +42,7 @@ const store: JasperRule[] = [
                 })
             );
         },
-        action: of('result for rule 2').pipe(
+        action: () => of('result for rule 2').pipe(
             tap(() => {
                 console.log('processing rule 2');
             }),
@@ -56,7 +59,7 @@ const store: JasperRule[] = [
                 })
             );
         },
-        action: of('processing 3').pipe(
+        action: () => of('processing 3').pipe(
             tap(() => console.log('processing rule 3')),
             delay(1300),
         ),
@@ -105,7 +108,7 @@ const store: JasperRule[] = [
                 })
             );
         },
-        action: of('processing 4').pipe(
+        action: () => of('processing 4').pipe(
             tap(() => console.log('processing rule 4')),
             delay(1500),
         ),

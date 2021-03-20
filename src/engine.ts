@@ -69,7 +69,7 @@ export class JasperEngine {
      * executeAction((context) => {}, context)
      */
     private executeAction(params: {
-        action: string | Observable<unknown> | ((obj: any) => any),
+        action: string | Observable<unknown> | ((context: ExecutionContext) => Observable<any>),
         context: ExecutionContext,
     }): Observable<any> {
         if (typeof params.action === 'string' || params.action instanceof String) {
@@ -81,12 +81,8 @@ export class JasperEngine {
             return from(params.action);
         }
 
-        if (params.action instanceof AsyncFunction && AsyncFunction !== Function && AsyncFunction !== GeneratorFunction) {
-            return from(params.action(params.context));
-        }
-
         if (params.action instanceof Function) {
-            return of(params.action(params.context));
+            return (params.action(params.context) as Observable<any>);
         }
 
         return of(null);
@@ -110,7 +106,7 @@ export class JasperEngine {
      * processExpression(of(true), context);
      */
     private processExpression(
-        expression: string | ((context: ExecutionContext) => any) | Observable<any>,
+        expression: string | ((context: ExecutionContext) => Observable<any>),
         context: ExecutionContext
     ): Observable<any[]> {
         if (typeof expression === 'string') {
@@ -126,44 +122,14 @@ export class JasperEngine {
             );
         }
 
-        if (expression instanceof Observable) {
-            return (expression as Observable<any>).pipe(
-                toArray(),
-                map((arr) => {
-                    return _.chain(_.flatten(arr))
-                        .filter((expressionObject) => expressionObject)
-                        .value();
-                })
-            );
-        }
-
-        if (expression instanceof AsyncFunction && AsyncFunction !== Function && AsyncFunction !== GeneratorFunction) {
-            // TODO: fix the bug where exception thrown by async function will stop the while stream
-            return from(expression(context)).pipe(
-                toArray(),
-                map((arr) => {
-                    return _.chain(_.flatten(arr))
-                        .filter((expressionObject) => expressionObject)
-                        .value();
-                })
-            );
-        }
-
         if (expression instanceof Function) {
-            return of(1).pipe(
-                switchMap(() => {
-                    try {
-                        return of(expression(context));
-                    } catch (error) {
-                        return throwError(error);
-                    }
-                }),
+            return expression(context).pipe(
                 toArray(),
                 map((arr) => {
                     return _.chain(_.flatten(arr))
                         .filter((expressionObject) => expressionObject)
                         .value();
-                }),
+                })
             );
         }
 

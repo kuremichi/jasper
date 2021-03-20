@@ -21,7 +21,7 @@ export interface JasperRule {
      * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
      */
-    action: string | Observable<unknown> | (() => any) | (() => Promise<any>);
+    action: string | ((context: ExecutionContext) => Observable<unknown>);
     /**
      * lifecycle hook after the action has been executing executed
      */
@@ -34,6 +34,10 @@ export interface JasperRule {
      * the dependencies of the rule that will be executed
      */
     dependencies?: CompoundDependency | undefined;
+    /**
+     * custom meta data defined by user
+     */
+    metadata?: Record<string, any>;
 }
 export interface CompoundDependency {
     /**

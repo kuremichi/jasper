@@ -26,7 +26,7 @@ export interface JasperRule {
      * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
      */
-    action: string | Observable<unknown> | (() => any) | (() => Promise<any>);
+    action: string | ((context: ExecutionContext) => Observable<unknown>);
 
     /**
      * lifecycle hook after the action has been executing executed
@@ -42,6 +42,11 @@ export interface JasperRule {
      * the dependencies of the rule that will be executed
      */
     dependencies?: CompoundDependency | undefined;
+
+    /**
+     * custom meta data defined by user
+     */
+    metadata?: Record<string, any>;
 }
 
 // export function isJasperRule(object: any): object is JasperRule {
@@ -75,8 +80,14 @@ export interface CompoundDependency {
      */
     onError?: (error: any, context: ExecutionContext) => Observable<any>;
 
-    when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
+    /**
+     * 
+     */
+    when?: string | (() => Observable<boolean>);
 
+    /**
+     * 
+     */
     whenDescription?: string;
 }
 
@@ -96,11 +107,11 @@ export interface SimpleDependency {
      * if function is passed, it will be executed. The response object will be the root for the child rule
      * if async function is passed, it will be executed and awaited. The response object will be the root for the child rule
      */
-    path: string | ((context: ExecutionContext) => any);
+    path: string | ((context: ExecutionContext) => Observable<any>);
 
     rule: string;
 
-    when?: string | (() => boolean) | (() => Promise<boolean>) | Observable<boolean>;
+    when?: string | ((context: ExecutionContext) => Observable<boolean>);
 
     whenDescription?: string;
 
