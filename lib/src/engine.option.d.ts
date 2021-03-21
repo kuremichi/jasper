@@ -1,6 +1,6 @@
 import { JasperEngineRecipe } from './enum';
 export interface EngineOptions {
-    suppressDuplicateTasks: boolean;
+    suppressDuplicateTasks?: boolean;
     recipe: JasperEngineRecipe;
     debug?: boolean;
 }

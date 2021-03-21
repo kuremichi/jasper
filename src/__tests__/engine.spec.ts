@@ -1552,9 +1552,15 @@ describe('execute', () => {
             },
         };
 
-        const engine = new JasperEngine({
-            mockRule: rule,
-        });
+        const engine = new JasperEngine(
+            {
+                mockRule: rule,
+            },
+            {
+                recipe: JasperEngineRecipe.BusinessProcessEngine,
+                suppressDuplicateTasks: true,
+            }
+        );
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 
@@ -1724,10 +1730,16 @@ describe('execute', () => {
             dependencies: compositeDependency,
         };
 
-        const engine = new JasperEngine({
-            mockRule,
-            parentRule,
-        });
+        const engine = new JasperEngine(
+            {
+                mockRule,
+                parentRule,
+            },
+            {
+                recipe: JasperEngineRecipe.BusinessProcessEngine,
+                suppressDuplicateTasks: true,
+            }
+        );
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 

@@ -29,10 +29,80 @@
 
 # 2. Quickstart
       To get started  
-      npm install --save jasper-engine 
+      npm install --save jasper-engine rxjs jsonata
 
 ```typescript
+/*
+  Define your rules
+*/
+const isJasper: JasperRule = {
+    // the name of the rule
+    name: 'isJasper',
+    // a description for your rule. (documentation purpose only)
+    description: 'a rule to check if the dog is named Jasper',
+    // a jsonata expression to test if rule is true/false
+    action: 'name = "Jasper"',
+};
 
+const isSamoyed: JasperRule = {
+    name: 'isSamoyed',
+    description: 'a rule to check if the dog is of breed samoyed',
+    action: 'breed = "Samoyed"',
+};
+
+const isMyDog: JasperRule = {
+    name: 'isMyDog',
+    description: 'a rule to check if the dog is my dog',
+    action: 'true',
+    dependencies: {
+        name: 'my dog is a samoyed named Jasper',
+        operator: Operator.AND,
+        executionOrder: ExecutionOrder.Parallel,
+        rules: [
+            {
+                name: 'name should be jasper',
+                path: '$',
+                rule: isJasper.name,
+            },
+            {
+                name: 'breed should be samoyed',
+                path: '$',
+                rule: isSamoyed.name,
+            },
+        ],
+    },
+};
+
+/*
+  compile your rules
+*/
+const ruleStore: Record<string, JasperRule> = 
+    [isJasper, isSamoyed, isMyDog].reduce((accumulator: any, rule) => {
+        accumulator[`${rule.name}`] = rule;
+        return accumulator;
+    }, {});
+
+
+/*
+* execute to figure out if the dog is Jasper.
+*/
+const engine = new JasperEngine(ruleStore);
+const dog = {
+    name: 'Jasper',
+    breed: 'Samoyed',
+};
+
+engine
+    .run({
+        root: dog,
+        ruleName: 'isMyDog',
+    })
+    .subscribe({
+        next: (response) => {
+            expect(response.isSuccessful).toBe(true);
+            done();
+        },
+    });
 
 ```
 
