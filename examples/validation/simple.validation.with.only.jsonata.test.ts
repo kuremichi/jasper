@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { JasperEngine } from '../../src/engine';
 import { EngineOptions } from '../../src/engine.option';
-import { JasperEngineRecipe } from '../../src/enum';
+import { EngineRecipe } from '../../src/enum';
 import { StaticRuleStore } from './simple.validation.with.only.jsonata.store';
 
 /**
@@ -15,7 +15,7 @@ import { StaticRuleStore } from './simple.validation.with.only.jsonata.store';
 
 it('should run', (done) => {
     const options: EngineOptions = {
-        recipe: JasperEngineRecipe.ValidationRuleEngine,
+        recipe: EngineRecipe.ValidationRuleEngine,
         suppressDuplicateTasks: true,
         debug: true,
     };

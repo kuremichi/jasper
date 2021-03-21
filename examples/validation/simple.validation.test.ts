@@ -1,20 +1,20 @@
 import { JasperEngine } from '../../src/engine';
-import { ExecutionOrder, JasperEngineRecipe, Operator } from '../../src/enum';
-import { JasperRule } from '../../src/jasper.rule';
+import { ExecutionOrder, EngineRecipe, Operator } from '../../src/enum';
+import { Rule } from '../../src/jasper.rule';
 
-const isJasper: JasperRule = {
+const isJasper: Rule = {
     name: 'isJasper',
     description: 'a rule to check if the dog is named Jasper',
     action: 'name = "Jasper"',
 };
 
-const isSamoyed: JasperRule = {
+const isSamoyed: Rule = {
     name: 'isSamoyed',
     description: 'a rule to check if the dog is of breed samoyed',
     action: 'breed = "Samoyed"',
 };
 
-const isMyDog: JasperRule = {
+const isMyDog: Rule = {
     name: 'isMyDog',
     description: 'a rule to check if the dog is my dog',
     action: 'true',
@@ -37,7 +37,7 @@ const isMyDog: JasperRule = {
     },
 };
 
-const ruleStore: Record<string, JasperRule> = 
+const ruleStore: Record<string, Rule> = 
     [isJasper, isSamoyed, isMyDog].reduce((accumulator: any, rule) => {
         accumulator[`${rule.name}`] = rule;
         return accumulator;
@@ -45,7 +45,7 @@ const ruleStore: Record<string, JasperRule> =
 
 it('should run', (done) => {
     const engine = new JasperEngine(ruleStore, {
-        recipe: JasperEngineRecipe.ValidationRuleEngine,
+        recipe: EngineRecipe.ValidationRuleEngine,
     });
 
     const dog = {

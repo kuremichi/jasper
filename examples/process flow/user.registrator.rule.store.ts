@@ -1,10 +1,10 @@
 import { Observable, of } from 'rxjs';
 import _ from 'lodash';
 import { tap, switchMap } from 'rxjs/operators';
-import { JasperRule } from '../../src/jasper.rule';
+import { Rule } from '../../src/jasper.rule';
 import { ExecutionContext } from '../../src/execution.context';
 
-const store: JasperRule[] = [
+const store: Rule[] = [
     {
         name: 'send email',
         description: 'send an email to the user',

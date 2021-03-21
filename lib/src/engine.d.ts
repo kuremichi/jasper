@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { JasperRule } from './jasper.rule';
+import { Rule } from './jasper.rule';
 import { EngineOptions } from './engine.option';
 import { ExecutionResponse } from './execution.response';
 export declare class JasperEngine {
@@ -7,7 +7,7 @@ export declare class JasperEngine {
     private ruleStore;
     private readonly options;
     private logger;
-    constructor(ruleStore: Record<string, JasperRule>, options?: EngineOptions, logger?: Console);
+    constructor(ruleStore: Record<string, Rule>, options?: EngineOptions, logger?: Console);
     private executeAction;
     private processExpression;
     private processCompositeDependency;

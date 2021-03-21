@@ -5,10 +5,10 @@ import hash from 'object-hash';
 import _ from 'lodash';
 
 import { ExecutionContext } from './execution.context';
-import { JasperRule } from './rule';
+import { Rule } from './rule';
 import { DefaultEngineOptions, EngineOptions } from './engine.option';
 import { isSimpleDependency, SimpleDependency } from './dependency/simple.dependency';
-import { ExecutionOrder, JasperEngineRecipe, Operator } from './enum';
+import { ExecutionOrder, EngineRecipe, Operator } from './enum';
 import { CompositeDependency } from './dependency/composite.dependency';
 import { SimpleDependencyResponse } from './dependency/simple.dependency.response';
 import { CompositeDependencyResponse } from './dependency/composite.dependency.response';
@@ -17,7 +17,7 @@ import { SimpleDependencyExecutionResponse } from './dependency/simple.dependenc
 
 export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
-    private ruleStore: Record<string, JasperRule>;
+    private ruleStore: Record<string, Rule>;
     private readonly options: EngineOptions;
     private logger: any;
 
@@ -28,7 +28,7 @@ export class JasperEngine {
      * @param logger logger
      */
     constructor(
-        ruleStore: Record<string, JasperRule>,
+        ruleStore: Record<string, Rule>,
         options: EngineOptions = DefaultEngineOptions,
         logger = console
     ) {
@@ -449,7 +449,7 @@ export class JasperEngine {
         ruleName: string;
         parentExecutionContext?: ExecutionContext;
     }): Observable<ExecutionResponse> {
-        const rule: JasperRule = this.ruleStore[params.ruleName];
+        const rule: Rule = this.ruleStore[params.ruleName];
 
         const ruleHash = hash(params.ruleName);
         const objectHash = hash(rule.uniqueBy ? rule.uniqueBy(params.root) : params.root);
@@ -548,7 +548,7 @@ export class JasperEngine {
             switchMap((response) => {
                 // validation recipe expect the result for the rule to be boolean
                 // and in order for the rule to be valid, the result needs to true
-                if (this.options.recipe === JasperEngineRecipe.ValidationRuleEngine) {
+                if (this.options.recipe === EngineRecipe.ValidationRuleEngine) {
                     response.isSuccessful = response.isSuccessful && response.result === true;
                 }
 

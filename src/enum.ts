@@ -8,7 +8,7 @@ export enum ExecutionOrder {
     Parallel = 'Parallel',
 }
 
-export enum JasperEngineRecipe {
+export enum EngineRecipe {
     /*
         use this recipe if you want to perform validation against an object that will recursively validate all its children elements based
         on the rule specified.
