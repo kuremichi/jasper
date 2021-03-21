@@ -1,5 +1,5 @@
 - [1. Description](#1-description)
-  - [Jasper Workflow Engine](#jasper-workflow-engine)
+  - [Jasper Rule Engine](#jasper-rule-engine)
 - [2. Quickstart](#2-quickstart)
 - [3. Rule](#3-rule)
   - [Rule](#rule)
@@ -21,10 +21,11 @@
 
 
 # 1. Description
-  ## Jasper Workflow Engine
-  Are you building an application that contains a lot of business workflow process ?   
+  ## Jasper Rule Engine
   Are you building an application that contains a lot of validation rules ?   
-  Here comes Jasper workflow engine.
+  Are you building an application that contains a lot of business workflow process ?   
+  
+  Here comes Jasper Rule Engine.
 
 # 2. Quickstart
       To get started  

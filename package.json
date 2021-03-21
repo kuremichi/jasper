@@ -1,7 +1,7 @@
 {
-  "name": "jasper",
+  "name": "jasper-engine",
   "version": "0.1.0",
-  "description": "Jasper Engine",
+  "description": "Jasper Rule Engine",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
   "scripts": {
