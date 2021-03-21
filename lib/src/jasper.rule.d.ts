@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { CompositeDependency } from './dependency/composite.dependency';
 import { ExecutionContext } from './execution.context';
 import { ExecutionResponse } from './execution.response';
-export interface JasperRule {
+export interface Rule {
     name: string;
     description: string;
     uniqueBy?: (root: any) => any;

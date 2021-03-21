@@ -4,9 +4,9 @@ import { Observable, of, empty, throwError } from 'rxjs';
 import _ from 'lodash';
 import { switchMap, tap } from 'rxjs/operators';
 
-import { JasperRule } from '../jasper.rule';
+import { Rule } from '../rule';
 import { ExecutionContext } from '../execution.context';
-import { ExecutionOrder, JasperEngineRecipe, Operator } from '../enum';
+import { ExecutionOrder, EngineRecipe, Operator } from '../enum';
 import { SimpleDependency } from '../dependency/simple.dependency';
 import { CompositeDependency } from '../dependency/composite.dependency';
 import { CompositeDependencyResponse } from '../dependency/composite.dependency.response';
@@ -14,7 +14,7 @@ import { ExecutionResponse } from '../execution.response';
 import { SimpleDependencyResponse } from '../dependency/simple.dependency.response';
 
 describe('processExpression', () => {
-    const mockRule: JasperRule = {
+    const mockRule: Rule = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
@@ -114,7 +114,7 @@ describe('processExpression', () => {
 });
 
 describe('executeAction', () => {
-    const mockRule: JasperRule = {
+    const mockRule: Rule = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
@@ -245,13 +245,13 @@ describe('executeAction', () => {
 });
 
 describe('processSimpleDependency', () => {
-    const mockRule: JasperRule = {
+    const mockRule: Rule = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
     };
 
-    const ruleStore: Record<string, JasperRule> = {};
+    const ruleStore: Record<string, Rule> = {};
     ruleStore[`${mockRule.name}`] = mockRule;
 
     const response = {
@@ -442,7 +442,7 @@ describe('processSimpleDependency', () => {
 
     it('should not execute dependency rule if no object found by path expression', (done) => {
         const mockFn = jest.fn().mockReturnValue(1);
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -451,7 +451,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const ruleStore: Record<string, JasperRule> = {};
+        const ruleStore: Record<string, Rule> = {};
         ruleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(ruleStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
@@ -498,7 +498,7 @@ describe('processSimpleDependency', () => {
 
     it('should run simpleDependency hooks', (done) => {
         const mockFn = jest.fn().mockReturnValue(1);
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -507,7 +507,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const ruleStore: Record<string, JasperRule> = {};
+        const ruleStore: Record<string, Rule> = {};
         ruleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(ruleStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
@@ -585,7 +585,7 @@ describe('processSimpleDependency', () => {
                 throw new Error('error');
             });
 
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -594,7 +594,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const myRuleStore: Record<string, JasperRule> = {};
+        const myRuleStore: Record<string, Rule> = {};
         myRuleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(myRuleStore);
 
@@ -648,7 +648,7 @@ describe('processSimpleDependency', () => {
                 throw new Error('error');
             });
 
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -657,7 +657,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const myRuleStore: Record<string, JasperRule> = {};
+        const myRuleStore: Record<string, Rule> = {};
         myRuleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(myRuleStore);
 
@@ -716,7 +716,7 @@ describe('processSimpleDependency', () => {
                 throw new Error('error');
             });
 
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -725,7 +725,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const myRuleStore: Record<string, JasperRule> = {};
+        const myRuleStore: Record<string, Rule> = {};
         myRuleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(myRuleStore);
 
@@ -778,13 +778,13 @@ describe('processSimpleDependency', () => {
 });
 
 describe('processCompositeDependency', () => {
-    const mockRule: JasperRule = {
+    const mockRule: Rule = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
     };
 
-    const ruleStore: Record<string, JasperRule> = {};
+    const ruleStore: Record<string, Rule> = {};
     ruleStore[`${mockRule.name}`] = mockRule;
 
     const response = {
@@ -1352,7 +1352,7 @@ describe('execute', () => {
         const beforeActionMock = jest.fn().mockReturnValue(1);
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const rule: JasperRule = {
+        const rule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             beforeAction: () => {
@@ -1392,7 +1392,7 @@ describe('execute', () => {
         const afterActionMock = jest.fn().mockReturnValue(1);
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             afterAction: (context) => {
@@ -1412,7 +1412,7 @@ describe('execute', () => {
                 mockRule,
             },
             {
-                recipe: JasperEngineRecipe.ValidationRuleEngine,
+                recipe: EngineRecipe.ValidationRuleEngine,
                 suppressDuplicateTasks: true,
                 debug: true,
             }
@@ -1462,7 +1462,7 @@ describe('execute', () => {
     it('should invoke onError hook and throw error if stream not replaced', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
         const errorMock = jest.fn();
-        const rule: JasperRule = {
+        const rule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1503,7 +1503,7 @@ describe('execute', () => {
     it('should invoke onError hook and replace the stream with what is provided', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
         const errorMock = jest.fn();
-        const rule: JasperRule = {
+        const rule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1544,7 +1544,7 @@ describe('execute', () => {
     it('should share/multicast the action if option is set to suppress duplicate tasks', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const rule: JasperRule = {
+        const rule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1557,7 +1557,7 @@ describe('execute', () => {
                 mockRule: rule,
             },
             {
-                recipe: JasperEngineRecipe.BusinessProcessEngine,
+                recipe: EngineRecipe.BusinessProcessEngine,
                 suppressDuplicateTasks: true,
             }
         );
@@ -1593,7 +1593,7 @@ describe('execute', () => {
     it('should invoke action depending on the number of subscriptions if option is set to not suppress duplicate tasks', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const rule: JasperRule = {
+        const rule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1606,7 +1606,7 @@ describe('execute', () => {
                 mockRule: rule,
             },
             {
-                recipe: JasperEngineRecipe.ValidationRuleEngine,
+                recipe: EngineRecipe.ValidationRuleEngine,
                 suppressDuplicateTasks: false,
             }
         );
@@ -1642,7 +1642,7 @@ describe('execute', () => {
     it('should process rule with dependency', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1661,7 +1661,7 @@ describe('execute', () => {
             rules: [simpleDependency],
         };
 
-        const parentRule: JasperRule = {
+        const parentRule: Rule = {
             name: 'parentRule',
             description: 'description for mock rule',
             action: () => {
@@ -1700,7 +1700,7 @@ describe('execute', () => {
     it('should respect custom uniqueBy when determining object uniqueness', (done) => {
         const actionMock2 = jest.fn().mockReturnValue(1);
 
-        const mockRule: JasperRule = {
+        const mockRule: Rule = {
             name: 'mockRule',
             description: 'description for mock rule',
             uniqueBy: (root) => ({ name: root.name }),
@@ -1721,7 +1721,7 @@ describe('execute', () => {
         };
 
         const actionMock = jest.fn().mockReturnValue(1);
-        const parentRule: JasperRule = {
+        const parentRule: Rule = {
             name: 'parentRule',
             description: 'description for mock rule',
             action: () => {
@@ -1736,7 +1736,7 @@ describe('execute', () => {
                 parentRule,
             },
             {
-                recipe: JasperEngineRecipe.BusinessProcessEngine,
+                recipe: EngineRecipe.BusinessProcessEngine,
                 suppressDuplicateTasks: true,
             }
         );

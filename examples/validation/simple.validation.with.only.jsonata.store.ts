@@ -1,11 +1,11 @@
 import { of } from 'rxjs';
 import _ from 'lodash';
 import { tap, mapTo } from 'rxjs/operators';
-import { JasperRule } from '../../src/jasper.rule';
+import { Rule } from '../../src/jasper.rule';
 import { ExecutionContext } from '../../src/execution.context';
 import { ExecutionOrder } from '../../src/enum';
 
-const store: JasperRule[] = [
+const store: Rule[] = [
     {
         name: 'is payment on time ?',
         description: 'a payment is late if its payment date is greater than dueDate',

@@ -3,7 +3,7 @@ import { CompositeDependency } from './dependency/composite.dependency';
 import { ExecutionContext } from './execution.context';
 import { ExecutionResponse } from './execution.response';
 
-export interface JasperRule {
+export interface Rule {
     /**
      * the name of the rule
      */
@@ -53,6 +53,6 @@ export interface JasperRule {
     metadata?: Record<string, any>;
 }
 
-// export function isJasperRule(object: any): object is JasperRule {
+// export function isRule(object: any): object is Rule {
 //     return 'name' in object && 'action' in object;
 // }

@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs';
-import { JasperRule } from './jasper.rule';
+import { Rule } from './rule';
 import { Operator, ExecutionOrder } from './enum';
 import { ExecutionResponse } from './execution.response';
 
 export interface ExecutionContext {
     contextId: string;
     root: any;
-    rule: JasperRule;
+    rule: Rule;
     parentContext?: ExecutionContext;
     childrenContexts?: Record<string, ExecutionContext>;
     _process$: Observable<any>;
