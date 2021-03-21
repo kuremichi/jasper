@@ -1459,6 +1459,116 @@ describe('execute', () => {
         });
     });
 
+    it('should return true by default if action is not provided for Validation recipe', (done) => {
+        const mockRule: Rule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+        };
+
+        const engine = new JasperEngine(
+            {
+                mockRule,
+            },
+            {
+                recipe: EngineRecipe.ValidationRuleEngine,
+                suppressDuplicateTasks: true,
+            }
+        );
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: empty(),
+            contextData: {},
+            complete: false,
+            response: {
+                rule: mockRule.name,
+                hasError: false,
+                isSuccessful: false,
+                result: undefined,
+            },
+        };
+
+        (engine as any).execute({ root, ruleName: mockRule.name, parentExecutionContext: context }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.result).toBe(true);
+                expect(response.isSuccessful).toBe(true);
+                done();
+            },
+        });
+    });
+
+    it('should return null by default if action is not provided for BusinessProcess recipe', (done) => {
+        const mockRule: Rule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+        };
+
+        const engine = new JasperEngine(
+            {
+                mockRule,
+            },
+            {
+                recipe: EngineRecipe.BusinessProcessEngine,
+                suppressDuplicateTasks: true,
+            }
+        );
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: empty(),
+            contextData: {},
+            complete: false,
+            response: {
+                rule: mockRule.name,
+                hasError: false,
+                isSuccessful: false,
+                result: undefined,
+            },
+        };
+
+        (engine as any).execute({ root, ruleName: mockRule.name, parentExecutionContext: context }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.result).toBe(null);
+                expect(response.isSuccessful).toBe(true);
+                done();
+            },
+        });
+    });
+
     it('should invoke onError hook and throw error if stream not replaced', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
         const errorMock = jest.fn();

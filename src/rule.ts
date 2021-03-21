@@ -30,7 +30,7 @@ export interface Rule {
      * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
      */
-    action: string | ((context: ExecutionContext) => Observable<unknown>);
+    action?: string | ((context: ExecutionContext) => Observable<unknown>);
 
     /**
      * lifecycle hook after the action has been executing executed

@@ -521,10 +521,16 @@ export class JasperEngine {
             }),
             // execute the main action
             switchMap(() => {
-                return this.executeAction({
-                    action: rule.action,
-                    context,
-                });
+                if(rule.action) {
+                    return this.executeAction({
+                        action: rule.action,
+                        context,
+                    });
+                }
+                
+                return this.options.recipe === EngineRecipe.BusinessProcessEngine
+                    ? of(null)
+                    : of(true);
             }),
             tap((result) => {
                 context.complete = true;
