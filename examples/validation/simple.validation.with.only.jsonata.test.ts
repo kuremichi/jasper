@@ -27,7 +27,7 @@ it('should run', (done) => {
     const newCustomer = {
         name: 'Guest1',
         age: 21,
-        activeDays: 366,
+        activeDays: 100,
         payments: [
             {
                 billingCycle: moment.utc().add(-1, 'month').toJSON(),
@@ -42,7 +42,7 @@ it('should run', (done) => {
             {
                 billingCycle: moment.utc().add(-3, 'month').toJSON(),
                 dueDate: moment.utc().add(-3, 'month').toJSON(),
-                paymentDate: moment.utc().add(-3, 'month').add(1, 'day').toJSON(), // late payment
+                paymentDate: moment.utc().add(-3, 'month').toJSON(),
             },
         ],
     };
@@ -71,11 +71,11 @@ it('should run', (done) => {
         ],
     };
 
-    // not in good standing
+    // in good standing
     const studentCustomer = {
         name: 'Guest3',
         age: 21,
-        activeDays: 100,
+        activeDays: 400,
         payments: [
             {
                 billingCycle: now.add(-1, 'month').toJSON(),
@@ -114,7 +114,6 @@ it('should run', (done) => {
         .subscribe({
             next: (r) => {
                 expect(r.isSuccessful).toBe(false);
-                done();
             },
         });
 
@@ -125,7 +124,7 @@ it('should run', (done) => {
         })
         .subscribe({
             next: (r) => {
-                expect(r.isSuccessful).toBe(false);
+                expect(r.isSuccessful).toBe(true);
                 done();
             },
         });
