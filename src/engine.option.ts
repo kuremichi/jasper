@@ -8,6 +8,6 @@ export interface EngineOptions {
 
 export const DefaultEngineOptions: EngineOptions = {
     suppressDuplicateTasks: true,
-    recipe: JasperEngineRecipe.ValidationRuleEngine,
+    recipe: JasperEngineRecipe.BusinessProcessEngine,
     debug: false,
 };
