@@ -4,9 +4,8 @@ import jsonata from 'jsonata';
 import hash from 'object-hash';
 import _ from 'lodash';
 
-import moment from 'moment';
 import { ExecutionContext } from './execution.context';
-import { JasperRule } from './jasper.rule';
+import { JasperRule } from './rule';
 import { DefaultEngineOptions, EngineOptions } from './engine.option';
 import { isSimpleDependency, SimpleDependency } from './dependency/simple.dependency';
 import { ExecutionOrder, JasperEngineRecipe, Operator } from './enum';
@@ -147,7 +146,7 @@ export class JasperEngine {
             isSkipped: false,
             isSuccessful: true,
             rules: [],
-            startTime: moment.utc().toDate(),
+            startTime: new Date(),
         };
 
         /* istanbul ignore next */
@@ -309,7 +308,7 @@ export class JasperEngine {
                                     const task = of(pathObject).pipe(
                                         // before each match
                                         switchMap((pathObject: any) => {
-                                            executionResponse.startTime = moment.utc().toDate();
+                                            executionResponse.startTime = new Date();
                                             return simpleDependency.beforeEach
                                                 ? simpleDependency.beforeEach(pathObject, index, context)
                                                 : of(null);
@@ -361,14 +360,14 @@ export class JasperEngine {
                                                 : of(executionResponse);
                                         }),
                                         tap(() => {
-                                            executionResponse.completeTime = moment.utc().toDate();
+                                            executionResponse.completeTime = new Date();
                                             dependencyResponse.matches.push(executionResponse);
                                         }),
                                         catchError((err) => {
                                             executionResponse.hasError = true;
                                             executionResponse.error = err;
                                             executionResponse.isSuccessful = false;
-                                            executionResponse.completeTime = moment.utc().toDate();
+                                            executionResponse.completeTime = new Date();
                                             return of(executionResponse);
                                         })
                                     );
@@ -390,7 +389,7 @@ export class JasperEngine {
                                     : of(responses)
                                 ).pipe(
                                     switchMap((responses: SimpleDependencyExecutionResponse[]) => {
-                                        dependencyResponse.completeTime = moment.utc().toDate();
+                                        dependencyResponse.completeTime = new Date();
                                         const executionErrors = _.chain(responses)
                                             .filter((response) => response.hasError && response.error)
                                             .map((response) => response.error)
@@ -422,7 +421,7 @@ export class JasperEngine {
             catchError((err) => {
                 dependencyResponse.hasError = true;
                 dependencyResponse.isSuccessful = false;
-                dependencyResponse.completeTime = moment.utc().toDate();
+                dependencyResponse.completeTime = new Date();
 
                 return simpleDependency.onDependencyError
                     ? simpleDependency.onDependencyError(err, dependencyResponse, context)
@@ -505,7 +504,7 @@ export class JasperEngine {
         context._process$ = of(true).pipe(
             // call beforeAction
             switchMap((x) => {
-                response.startTime = moment.utc().toDate();
+                response.startTime = new Date();
                 if (rule.beforeAction) {
                     return rule.beforeAction(context).pipe(
                         tap(() => {
@@ -531,7 +530,7 @@ export class JasperEngine {
                 context.complete = true;
                 response.isSuccessful = true;
                 response.result = result;
-                response.completeTime = moment.utc().toDate();
+                response.completeTime = new Date();
             }),
             // call dependency rules
             switchMap(() => {
@@ -571,7 +570,7 @@ export class JasperEngine {
                 response.isSuccessful = false;
                 response.hasError = true;
                 response.error = err;
-                response.completeTime = moment.utc().toDate();
+                response.completeTime = new Date();
                 if (rule.onError) {
                     /* if a custom onError handler is specified
                        let it decide if we should replace the the stream 

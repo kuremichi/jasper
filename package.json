@@ -32,11 +32,11 @@
   "dependencies": {
     "jsonata": "^1.8.4",
     "lodash": "^4.17.21",
-    "moment": "^2.29.1",
     "object-hash": "^2.1.1",
     "rxjs": "^6.6.6"
   },
   "devDependencies": {
+    "moment": "^2.29.1",
     "@types/eslint": "^7.2.7",
     "@types/jest": "^26.0.20",
     "@types/jsonata": "^1.5.1",

@@ -4,7 +4,7 @@ import { Observable, of, empty, throwError } from 'rxjs';
 import _ from 'lodash';
 import { switchMap, tap } from 'rxjs/operators';
 
-import { JasperRule } from '../jasper.rule';
+import { JasperRule } from '../rule';
 import { ExecutionContext } from '../execution.context';
 import { ExecutionOrder, JasperEngineRecipe, Operator } from '../enum';
 import { SimpleDependency } from '../dependency/simple.dependency';

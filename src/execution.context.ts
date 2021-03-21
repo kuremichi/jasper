@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { JasperRule } from './jasper.rule';
+import { JasperRule } from './rule';
 import { Operator, ExecutionOrder } from './enum';
 import { ExecutionResponse } from './execution.response';
 
