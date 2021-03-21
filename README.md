@@ -29,7 +29,7 @@
 
 # 2. Quickstart
       To get started  
-      npm install --save @jasper/jasper-engine  
+      npm install --save jasper-engine 
 
 ```typescript
 
