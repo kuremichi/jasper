@@ -6,6 +6,8 @@
   "scripts": {
     "preversion": "npm run lint",
     "prepare": "npm run build",
+    "prepublishOnly" : "npm test && npm run lint",
+    "version" : "npm run format && git add -A src",
     "build": "tsc",
     "start": "node lib/src/index.js",
     "test": "jest --config jest.config.json --testPathPattern \"(/__tests__/.*\\.(test|spec))\\.(jsx?|tsx?)$\"",

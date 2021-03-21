@@ -1,11 +1,9 @@
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import _ from 'lodash';
-import { tap, switchMap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { JasperRule } from '../../src/jasper.rule';
 import { ExecutionContext } from '../../src/execution.context';
 import { ExecutionOrder } from '../../src/enum';
-
-
 
 const store: JasperRule[] = [
     {
