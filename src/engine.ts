@@ -19,7 +19,7 @@ import { ExecutionContext } from './execution.context';
 import { JasperRule } from './jasper.rule';
 import { DefaultEngineOptions, EngineOptions } from './engine.option';
 import { isSimpleDependency, SimpleDependency } from './dependency/simple.dependency';
-import { ExecutionOrder, Operator } from './enum';
+import { ExecutionOrder, JasperEngineRecipe, Operator } from './enum';
 import { CompositeDependency } from './dependency/composite.dependency';
 import { SimpleDependencyResponse } from './dependency/simple.dependency.response';
 import { CompositeDependencyResponse } from './dependency/composite.dependency.response';
@@ -73,7 +73,8 @@ export class JasperEngine {
     }): Observable<any> {
         if (typeof params.action === 'string' || params.action instanceof String) {
             const expression = jsonata(params.action as string);
-            return of(expression.evaluate(params.context.root));
+            const result = expression.evaluate(params.context.root);
+            return of(result);
         }
 
         if (params.action instanceof Observable) {
@@ -327,7 +328,7 @@ export class JasperEngine {
                                         rule: simpleDependency.rule,
                                         hasError: false,
                                         errors: [],
-                                        isSuccessful: false,
+                                        isSuccessful: true,
                                         index,
                                     };
 
@@ -353,6 +354,10 @@ export class JasperEngine {
                                             executionResponse.isSuccessful = r.isSuccessful;
                                             executionResponse.executionResponse = r;
 
+                                            if(this.options.recipe === JasperEngineRecipe.ValidationRuleEngine) {
+                                                executionResponse.isSuccessful = r.isSuccessful && r.result;
+                                            }
+
                                             /* istanbul ignore next */
                                             if (this.options.debug) {
                                                 executionResponse.debugContext = r.debugContext;
@@ -371,7 +376,6 @@ export class JasperEngine {
                                         }),
                                         tap(() => {
                                             executionResponse.completeTime = moment.utc().toDate();
-                                            executionResponse.isSuccessful = true;
                                         }),
                                         catchError((err) => {
                                             executionResponse.hasError = true;
@@ -425,7 +429,8 @@ export class JasperEngine {
 
                                         dependencyResponse.errors = _.concat(dependencyResponse.errors, executionErrors);
                                         dependencyResponse.hasError = dependencyResponse.errors.length > 0;
-                                        dependencyResponse.isSuccessful = !dependencyResponse.hasError;
+                                        dependencyResponse.isSuccessful = _.every(responses, response => response.isSuccessful);
+                                        
                                         return of(dependencyResponse);
                                     }),
                                 );
@@ -578,6 +583,7 @@ export class JasperEngine {
                     ? this.processCompositeDependency(rule.dependencies, context).pipe(
                         tap((dependencyResponse: CompositeDependencyResponse) => {
                             response.dependency = dependencyResponse;
+                            response.isSuccessful = response.isSuccessful && dependencyResponse.isSuccessful;
                         }),
                         switchMapTo(of(response)),
                     )

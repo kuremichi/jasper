@@ -724,7 +724,6 @@ describe('processSimpleDependency', () => {
     });
 });
 
-
 // describe('collectDependencyTasks', () => {
 //     describe('extractSimpleDependencyTasks', () => {
 //         it('should return response with error if unable to evaluate when expression', (done) => {
