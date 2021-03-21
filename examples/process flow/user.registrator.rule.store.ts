@@ -10,14 +10,14 @@ const store: JasperRule[] = [
         description: 'send an email to the user',
         action: (context: ExecutionContext) =>
             new Observable((subsriber) => {
-                console.log(`[${context.contextId}] sending email....`);
+                console.log(`[${context.contextId}] sending email for....`);
                 // email body
                 console.log(context.root);
                 setTimeout(() => {
                     console.log(`[${context.contextId}] email sent!`);
                     subsriber.next();
                     subsriber.complete();
-                }, 3000);
+                }, Math.random() * 1000);
             }),
     },
     {
@@ -32,7 +32,7 @@ const store: JasperRule[] = [
                 name: context.root.name,
             }).pipe(
                 tap((user: { id: number, name: string }) => {
-                    console.log(`an account for user ${user.name} has been created`);
+                    console.log(`[${context.contextId}] an account for user ${user.name} has been created`);
                 }),
             ),
         dependencies: {
@@ -40,8 +40,8 @@ const store: JasperRule[] = [
             rules: [
                 {
                     name: 'welcome user',
-                    path: (context: ExecutionContext) =>
-                        of(context.root).pipe(
+                    path: (context: ExecutionContext) => {
+                        return of(context.root).pipe(
                             switchMap((userObject) => {
                                 return of(`
                                     <html>
@@ -52,24 +52,37 @@ const store: JasperRule[] = [
                                 `, `
                                     <html>
                                         <body>
-                                            <p>Hi ${userObject.name} again! Welcome to Jasper Rule Engine!</p>
+                                            <p>Hi ${userObject.name} 2 time! Welcome to Jasper Rule Engine!</p>
                                         </body>
                                     </html>
-                                `);
+                                `, `
+                                    <html>
+                                        <body>
+                                            <p>Hi ${userObject.name} 3 time! Welcome to Jasper Rule Engine!</p>
+                                        </body>
+                                    </html>
+                                `, `
+                                    <html>
+                                        <body>
+                                            <p>Hi ${userObject.name} 4 time! Welcome to Jasper Rule Engine!</p>
+                                        </body>
+                                    </html>
+                                `,);
                             })
-                        ),
+                        );
+                    },
                     beforeDependency: (context) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] before welcome user`);
                         }),
                     ),
-                    beforeEachDependency: (userObject, index, context) => of(context.contextId).pipe(
+                    beforeEach: (userObject, index, context) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] before sending ${index+1} email`);
                         }),
                     ),
                     rule: 'send email',
-                    afterEachDependency: (userObject, index, context) => of(context.contextId).pipe(
+                    afterEach: (userObject, index, context) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] after sending ${index+1} email`);
                         }),

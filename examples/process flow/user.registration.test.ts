@@ -2,7 +2,7 @@ import { JasperEngine } from '../../src/engine';
 import { EngineOptions } from '../../src/engine.option';
 import { JasperEngineRecipe } from '../../src/enum';
 import { StaticRuleStore } from './user.registrator.rule.store';
-
+jest.setTimeout(15000);
 it('should run', (done) => {
     const options: EngineOptions = {
         recipe: JasperEngineRecipe.ValidationRuleEngine,

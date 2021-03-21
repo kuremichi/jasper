@@ -1,5 +1,5 @@
 import { DebugContext } from './execution.context';
-import { CompositeDependencyExecutionResponse } from './dependency/composite.dependency.response';
+import { CompositeDependencyResponse } from './dependency/composite.dependency.response';
 
 
 export interface ExecutionResponse {
@@ -34,5 +34,5 @@ export interface ExecutionResponse {
      * debug context
      */
     debugContext?: DebugContext | undefined;
-    dependency?: CompositeDependencyExecutionResponse | undefined;
+    dependency?: CompositeDependencyResponse | undefined;
 }

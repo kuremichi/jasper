@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { ExecutionOrder, Operator } from '../enum';
 import { ExecutionContext } from '../execution.context';
-import { CompositeDependencyExecutionResponse } from './composite.dependency.response';
+import { CompositeDependencyResponse } from './composite.dependency.response';
 
 import { SimpleDependency } from './simple.dependency';
 
@@ -47,20 +47,23 @@ export interface CompositeDependency {
     whenDescription?: string;
 
     /**
-     * 
+     * lifecycle handler to run when composite dependency encounters error
      */
-     onDependencyError?: (error: any, response: CompositeDependencyExecutionResponse, context: ExecutionContext) => Observable<SimpleDependencyResponse>;
+     onDependencyError?: (error: any, response: CompositeDependencyResponse, context: ExecutionContext) => Observable<SimpleDependencyResponse>;
 
      /**
-      * the logic to run before the simple dependency is executed
+      * lifecycle handler to run before the composite dependency executes
       */
      beforeDependency?: ((context: ExecutionContext) => Observable<any>);
  
      /**
-      * the logic to run after the simple dependency is executed
+      * lifecycle handler to run after the composite dependency has executed
       */
      afterDependency?: ((context: ExecutionContext) => Observable<any>);
 
+     /**
+      * the max number of direct dependencies to be evaluate at a time
+      */
      maxCurrency?: number;
 }
 

@@ -1,10 +1,10 @@
 import { SimpleDependencyResponse } from './simple.dependency.response';
 import { CommonDependencyResponse } from './common.dependency.response';
 
-export interface CompositeDependencyExecutionResponse extends CommonDependencyResponse {
-    rules: (SimpleDependencyResponse | CompositeDependencyExecutionResponse)[];
+export interface CompositeDependencyResponse extends CommonDependencyResponse {
+    rules: (SimpleDependencyResponse | CompositeDependencyResponse)[];
 }
 
-export function isCompositeDependencyExecutionResponse(object: any): object is CompositeDependencyExecutionResponse {
+export function isCompositeDependencyResponse(object: any): object is CompositeDependencyResponse {
     return 'operator' in object && 'rules' in object;
 }

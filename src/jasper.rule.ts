@@ -15,6 +15,13 @@ export interface JasperRule {
     description: string;
 
     /**
+     * 
+     * by default Jasper Workflow Engine will hash the root object provided to the rule to determine its uniqueness
+     * if you don't want the entire object to be considered and want to provide your own uniqueness algorithm, use this extension
+     */
+    uniqueBy?: (root: any) => any
+
+    /**
      * lifecycle hook before the action is executed
      */
     beforeAction?: (context: ExecutionContext) => Observable<any>;
@@ -28,7 +35,7 @@ export interface JasperRule {
     /**
      * lifecycle hook after the action has been executing executed
      */
-    afterAction?: (response: ExecutionResponse, context: ExecutionContext) => Observable<ExecutionResponse>;
+    afterAction?: (context: ExecutionContext) => Observable<ExecutionResponse>;
 
     /**
      * lifecycle hook after the action has error

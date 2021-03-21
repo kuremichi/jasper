@@ -14,7 +14,7 @@ export interface CommonDependencyResponse {
     /**
      * the error
      */
-    errors?: any[];
+    errors: any[];
 
     /**
      * whether dependency is executed successfully

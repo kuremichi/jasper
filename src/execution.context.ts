@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { JasperRule } from './jasper.rule';
 import { Operator, ExecutionOrder } from './enum';
+import { ExecutionResponse } from './execution.response';
 
 export interface ExecutionContext {
     contextId: string;
@@ -11,6 +12,7 @@ export interface ExecutionContext {
     _process$: Observable<any>;
     complete: boolean;
     contextData: Record<string, any>;
+    response: ExecutionResponse;
 }
 
 export interface DebugContext {
