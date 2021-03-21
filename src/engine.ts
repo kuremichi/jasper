@@ -324,12 +324,11 @@ export class JasperEngine {
                                 const tasks = _.map(pathObjects, (pathObject, index) => {
                                     const executionResponse: SimpleDependencyExecutionResponse = {
                                         name: `${simpleDependency.name}`,
-                                        isSkipped: false,
                                         rule: simpleDependency.rule,
                                         hasError: false,
-                                        errors: [],
                                         isSuccessful: true,
                                         index,
+                                        result: undefined,
                                     };
 
                                     const task = of(pathObject).pipe(
@@ -349,15 +348,8 @@ export class JasperEngine {
                                                 parentExecutionContext: context,
                                             });
                                         }),
-                                        // after each match
-                                        switchMap((r: ExecutionResponse) => {
-                                            executionResponse.isSuccessful = r.isSuccessful;
-                                            executionResponse.executionResponse = r;
-
-                                            if(this.options.recipe === JasperEngineRecipe.ValidationRuleEngine) {
-                                                executionResponse.isSuccessful = r.isSuccessful && r.result;
-                                            }
-
+                                        tap((r: ExecutionResponse) => {
+                                            _.merge(executionResponse, r);
                                             /* istanbul ignore next */
                                             if (this.options.debug) {
                                                 executionResponse.debugContext = r.debugContext;
@@ -369,31 +361,32 @@ export class JasperEngine {
                                                 executionResponse.debugContext!.whenDescription =
                                                     simpleDependency.whenDescription;
                                             }
+                                        }),
+                                        switchMap((response: ExecutionResponse) => {
+                                            if (executionResponse.hasError && executionResponse.error && simpleDependency.onEachError) {
+                                                return simpleDependency.onEachError(response.error, executionResponse, context);
+                                            }
 
+                                            return of(dependencyResponse);
+                                        }),
+                                        // after each match
+                                        switchMap(() => {
                                             return simpleDependency.afterEach ?
-                                                simpleDependency.afterEach(pathObject, index, context) :
+                                                simpleDependency.afterEach(pathObject, index, context).pipe(
+                                                    switchMapTo(of(executionResponse)),
+                                                ) :
                                                 of(executionResponse);
                                         }),
                                         tap(() => {
                                             executionResponse.completeTime = moment.utc().toDate();
+                                            dependencyResponse.matches.push(executionResponse);
                                         }),
                                         catchError((err) => {
                                             executionResponse.hasError = true;
+                                            executionResponse.error = err;
                                             executionResponse.isSuccessful = false;
                                             executionResponse.completeTime = moment.utc().toDate();
-                                            if (simpleDependency.onEachError) {
-                                                return simpleDependency.onEachError(
-                                                    err,
-                                                    executionResponse,
-                                                    context
-                                                );
-                                            }
-
-                                            dependencyResponse.errors.push(err);
                                             return of(executionResponse);
-                                        }),
-                                        tap(() => {
-                                            dependencyResponse.matches.push(executionResponse);
                                         }),
                                     );
                                     return task;
@@ -422,15 +415,15 @@ export class JasperEngine {
                                     switchMap((responses: SimpleDependencyExecutionResponse[]) => {
                                         dependencyResponse.completeTime = moment.utc().toDate();
                                         const executionErrors = _.chain(responses)
-                                            .filter(response => response.hasError)
-                                            .map(response => response.errors)
-                                            .flatten()
+                                            .filter(response => response.hasError && response.error)
+                                            .map(response => response.error)
                                             .value();
 
                                         dependencyResponse.errors = _.concat(dependencyResponse.errors, executionErrors);
                                         dependencyResponse.hasError = dependencyResponse.errors.length > 0;
                                         dependencyResponse.isSuccessful = _.every(responses, response => response.isSuccessful);
                                         
+                                        dependencyResponse.matches = _.orderBy(dependencyResponse.matches, ['index'], ['asc']);
                                         return of(dependencyResponse);
                                     }),
                                 );
@@ -524,7 +517,7 @@ export class JasperEngine {
         context._process$ = of(true).pipe(
             // call beforeAction
             switchMap((x) => {
-                response.startDateTime = moment.utc().toDate();
+                response.startTime = moment.utc().toDate();
                 if (rule.beforeAction) {
                     return rule.beforeAction(context).pipe(
                         tap(() => {
@@ -546,11 +539,51 @@ export class JasperEngine {
                     context,
                 });
             }),
+            tap((result) => {
+                context.complete = true;
+                response.isSuccessful = true;
+                response.result = result;
+                response.completeTime = moment.utc().toDate();
+            }),
+            // call dependency rules
+            switchMap(() => {
+                return rule.dependencies 
+                    ? this.processCompositeDependency(rule.dependencies, context).pipe(
+                        tap((dependencyResponse: CompositeDependencyResponse) => {
+                            response.dependency = dependencyResponse;
+                            response.isSuccessful = response.isSuccessful && dependencyResponse.isSuccessful;
+                        }),
+                        switchMapTo(of(response)),
+                    )
+                    : of(response);
+            }),
+            // call afterAction
+            switchMap((response) => {
+                // validation recipe expect the result for the rule to be boolean
+                // and in order for the rule to be valid, the result needs to true
+                if (this.options.recipe === JasperEngineRecipe.ValidationRuleEngine) {
+                    response.isSuccessful = response.isSuccessful && response.result === true;
+                }
+
+                if (rule.afterAction) {
+                    return rule.afterAction(context).pipe(
+                        tap(() => {
+                            /* istanbul ignore next */
+                            if (this.options.debug) {
+                                this.logger.debug(
+                                    `after action executed for rule ${rule.name} - context ${context.contextId}`
+                                );
+                            }
+                        })
+                    );
+                }
+                return of(response);
+            }),
             catchError((err) => {
                 response.isSuccessful = false;
                 response.hasError = true;
                 response.error = err;
-                response.completedTime = moment.utc().toDate();
+                response.completeTime = moment.utc().toDate();
                 if (rule.onError) {
                     /* if a custom onError handler is specified
                        let it decide if we should replace the the stream 
@@ -568,44 +601,8 @@ export class JasperEngine {
                     );
                 }
 
-                return throwError(err);
-            }),
-            tap((result) => {
-                context.complete = true;
-                response.isSuccessful = true;
-                response.result = result;
-                response.completedTime = moment.utc().toDate();
-            }),
-            // call dependency rules
-            switchMap(() => {
-                return (
-                    rule.dependencies 
-                    ? this.processCompositeDependency(rule.dependencies, context).pipe(
-                        tap((dependencyResponse: CompositeDependencyResponse) => {
-                            response.dependency = dependencyResponse;
-                            response.isSuccessful = response.isSuccessful && dependencyResponse.isSuccessful;
-                        }),
-                        switchMapTo(of(response)),
-                    )
-                    : of(response)
-                );
-            }),
-            // call afterAction
-            switchMap((response) => {
-                if (rule.afterAction) {
-                    return rule.afterAction(context).pipe(
-                        tap(() => {
-                            /* istanbul ignore next */
-                            if (this.options.debug) {
-                                this.logger.debug(
-                                    `after action executed for rule ${rule.name} - context ${context.contextId}`
-                                );
-                            }
-                        })
-                    );
-                }
                 return of(response);
-            })
+            }),
         );
 
         if (this.options.suppressDuplicateTasks) {

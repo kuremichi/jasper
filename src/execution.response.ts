@@ -3,10 +3,19 @@ import { CompositeDependencyResponse } from './dependency/composite.dependency.r
 
 
 export interface ExecutionResponse {
-    rule: string;
-    result: any;
     /**
-     * whether dependency has error
+     * the name of the rule that has been evaluated
+     */
+    rule: string;
+
+    /**
+     * the result returned from the rule action
+     * for validation rules, this should be true/false
+     */
+    result: any;
+
+    /**
+     * whether there was error thrown during the rule execution
      */
     hasError: boolean;
 
@@ -17,22 +26,28 @@ export interface ExecutionResponse {
 
     /**
      * whether dependency is executed successfully
+     * for worlkflow, this indicate whether there are exception occurred during the rule execution
+     * for validation, in addition to above, this also means the result evaluates to true
      */
     isSuccessful: boolean;
 
     /**
-     * dependency start time
+     * the timestamp in UTC for when the rule execution starts
      */
-    startDateTime?: Date;
+    startTime?: Date;
 
     /**
-     * dependency end time
+     * the timestamp in UTC for when the rule execution ends
      */
-    completedTime?: Date;
+    completeTime?: Date;
 
     /**
      * debug context
      */
     debugContext?: DebugContext | undefined;
+
+    /**
+     * the result for the dependency evaluation if any
+     */
     dependency?: CompositeDependencyResponse | undefined;
 }

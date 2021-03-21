@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
-import { JasperRule, EngineOptions } from './rule.config';
+import { JasperRule } from './jasper.rule';
+import { EngineOptions } from './engine.option';
 import { ExecutionResponse } from './execution.response';
 export declare class JasperEngine {
     private contextStore;
@@ -51,33 +52,21 @@ export declare class JasperEngine {
      */
     private processExpression;
     /**
-     * Process a simple dependency
-     * it will execute the path expression and for each match schedule an observables and add to the accumulator
-     * @param accumulator a dictionary of tasks
-     * @param compositeDependency the compound dependency object
-     * @param context the current execution context
-     */
-    private processSimpleDependency;
-    /**
-     *
-     * @param accumulator a dictionary of tasks
-     * @param simpleDependency the simple dependency object
-     * @param context the current execution context
-     */
-    private extractSimpleDependencyTasks;
-    private extractCompositeDependencyTasks;
-    /**
-     *
+     * Process a composite dependency
      * @param compositeDependency
      * @param context
-     */
-    private collectDependencyTasks;
-    /**
-     * Process a compound dependency
-     * @param compositeDependency the compound dependency object
-     * @param context the current execution context
+     * @returns
+     * the execution response for the composite dependency
      */
     private processCompositeDependency;
+    /**
+     * Process a simple dependency
+     * it will execute the path expression and for each match schedule an observables and add to the accumulator
+     * @param simpleDependency
+     * @param context the current execution context
+     * @returns
+     */
+    private processSimpleDependency;
     /**
      * execute the root object against a rule
      * @param params

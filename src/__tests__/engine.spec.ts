@@ -429,50 +429,6 @@ describe('processSimpleDependency', () => {
         subscription.unsubscribe();
     });
 
-    it('should run beforeDependency hook if provided', done => {
-        const engine = new JasperEngine(ruleStore);
-        const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
-
-        const mockFn = jest.fn().mockReturnValue(1);
-        const simpleDependency: SimpleDependency = {
-            name: 'test simple dependency',
-            path: 'children',
-            rule: mockRule.name,
-            beforeDependency: () => {
-                return of(mockFn());
-            }
-        };
-
-        const context: ExecutionContext = {
-            contextId: '1',
-            root: {
-                children: [
-                    { id: 1, text: 'child1' },
-                    { id: 2, text: 'child2' },
-                ],
-            },
-            rule: mockRule,
-            _process$: of(),
-            contextData: {},
-            complete: false,
-            response,
-        };
-
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
-
-        const subscription = task.subscribe({
-            next: (dependencyResponse) => {
-                expect(processSimpleDependencySpy).toBeCalledTimes(1);
-                expect(mockFn).toBeCalledTimes(1);
-                expect(dependencyResponse.isSkipped).toBe(false);
-                expect(dependencyResponse.isSuccessful).toBe(true);
-                done();
-            }
-        })
-
-        subscription.unsubscribe();
-    });
-
     it('should not execute dependency rule if no object found by path expression', done => {
         const mockFn = jest.fn().mockReturnValue(1);
         const mockRule: JasperRule = {
@@ -553,14 +509,16 @@ describe('processSimpleDependency', () => {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
+            executionOrder: ExecutionOrder.Sequential,
             beforeDependency: () => {
                 return of(beforeDependencyFn());
             },
             beforeEach: () => {
                 return of(beforeEachFn());
             },
-            afterEach: () => {
-                return of(afterEachFn());
+            afterEach: (pathObject, index, context) => {
+                afterEachFn();
+                return of(context.response);
             },
             afterDependency: () => {
                 return of(afterDependencyFn());
@@ -722,6 +680,70 @@ describe('processSimpleDependency', () => {
 
         subscription.unsubscribe();
     });
+
+    it('should return response with error if failed to run dependency rule for any path object but not handled by onEachError Hook', (done) => {
+        const mockFn = jest.fn().mockReturnValueOnce(1)
+            .mockImplementationOnce(() => {
+                throw new Error('error'); 
+            });
+
+        const mockRule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                mockFn();
+                return of(1);
+            },
+        };
+    
+        const myRuleStore: Record<string, JasperRule> = {};
+        myRuleStore[`${mockRule.name}`] = mockRule;
+        const engine = new JasperEngine(myRuleStore);
+
+        const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+            onEachError: (_err, response,) => {
+                response.isSuccessful = true;
+                response.hasError = false;
+                return throwError(new Error('another error'));
+            }
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: of(),
+            contextData: {},
+            complete: false,
+            response,
+        };
+
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+
+        const subscription = task.subscribe({
+            next: (dependencyResponse) => {
+                expect(processSimpleDependencySpy).toBeCalledTimes(1);
+                expect(dependencyResponse.isSkipped).toBe(false);
+                expect(dependencyResponse.isSuccessful).toBe(false);
+                expect(dependencyResponse.hasError).toBe(true);
+                expect(dependencyResponse.errors).toHaveLength(1);
+                done();
+            }
+        })
+
+        subscription.unsubscribe();
+    });
+    
 });
 
 // describe('collectDependencyTasks', () => {
