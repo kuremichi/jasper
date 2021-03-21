@@ -746,990 +746,957 @@ describe('processSimpleDependency', () => {
     
 });
 
-// describe('collectDependencyTasks', () => {
-//     describe('extractSimpleDependencyTasks', () => {
-//         it('should return response with error if unable to evaluate when expression', (done) => {
-//             const rule: JasperRule = {
-//                 name: 'mockRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-//             const engine = new JasperEngine({
-//                 mockRule: rule,
-//             });
-
-//             const extractSimpleDependencyTasksSpy = jest.spyOn(engine as any, 'extractSimpleDependencyTasks');
-
-//             const simpleDependency: SimpleDependency = {
-//                 name: 'simple dependency',
-//                 rule: rule.name,
-//                 path: '$',
-//                 when: () => {
-//                     throw new Error('path error');
-//                 },
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<SimpleDependencyExecutionResponse>> = {};
-//             (engine as any).extractSimpleDependencyTasks(accumulator, simpleDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: SimpleDependencyExecutionResponse[]) => {
-//                         expect(extractSimpleDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(true);
-//                         expect(results[0].isSuccessful).toBe(false);
-//                         done();
-//                     },
-//                 });
-//         });
-
-//         it('should run simple dependency if when expression is not defined', (done) => {
-//             const rule: JasperRule = {
-//                 name: 'mockRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-//             const engine = new JasperEngine({
-//                 mockRule: rule,
-//             });
-
-//             const extractSimpleDependencyTasksSpy = jest.spyOn(engine as any, 'extractSimpleDependencyTasks');
-//             const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
-
-//             const simpleDependency: SimpleDependency = {
-//                 name: 'simple dependency',
-//                 rule: rule.name,
-//                 path: '$',
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<SimpleDependencyExecutionResponse>> = {};
-//             (engine as any).extractSimpleDependencyTasks(accumulator, simpleDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: SimpleDependencyExecutionResponse[]) => {
-//                         expect(extractSimpleDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(processSimpleDependencySpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(false);
-//                         expect(results[0].isSuccessful).toBe(true);
-//                         expect(results[0].result).toBe(1);
-//                         done();
-//                     },
-//                 });
-//         });
-
-//         it('should skip simple dependency if when expression evaluates to false', (done) => {
-//             const rule: JasperRule = {
-//                 name: 'mockRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-//             const engine = new JasperEngine({
-//                 mockRule: rule,
-//             });
-
-//             const extractSimpleDependencyTasksSpy = jest.spyOn(engine as any, 'extractSimpleDependencyTasks');
-//             const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
-
-//             const simpleDependency: SimpleDependency = {
-//                 name: 'simple dependency',
-//                 rule: rule.name,
-//                 path: '$',
-//                 when: 'false',
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<SimpleDependencyExecutionResponse>> = {};
-//             (engine as any).extractSimpleDependencyTasks(accumulator, simpleDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: SimpleDependencyExecutionResponse[]) => {
-//                         expect(extractSimpleDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(processSimpleDependencySpy).toBeCalledTimes(0);
-//                         expect(results[0].hasError).toBe(false);
-//                         expect(results[0].isSuccessful).toBe(true);
-//                         expect(results[0].isSkipped).toBe(true);
-//                         expect(results[0].result).toBe(null);
-//                         done();
-//                     },
-//                 });
-//         });
-//     });
-
-//     describe('extractCompositeDependencyTasks', () => {
-//         it('should return response with error if unable to evaluate when expression', (done) => {
-//             const engine = new JasperEngine({});
-//             const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
-//             const rule: JasperRule = {
-//                 name: 'mockRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const compositeDependency: CompositeDependency = {
-//                 name: 'test composite dependency',
-//                 rules: [
-//                     {
-//                         name: 'composite dependency',
-//                         rule: rule.name,
-//                         path: '$',
-//                     },
-//                 ],
-//                 when: () => {
-//                     throw new Error('path error');
-//                 },
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<CompositeDependencyResponse>> = {};
-//             (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: CompositeDependencyResponse[]) => {
-//                         expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(true);
-//                         expect(results[0].isSuccessful).toBe(false);
-//                         done();
-//                     },
-//                 });
-//         });
-
-//         it('should skip composite dependency if when express evalutes to false', (done) => {
-//             const rule: JasperRule = {
-//                 name: 'mockRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const engine = new JasperEngine({
-//                 mockRule: rule,
-//             });
-
-//             const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
-
-//             const compositeDependency: CompositeDependency = {
-//                 name: 'test composite dependency',
-//                 rules: [
-//                     {
-//                         name: 'composite dependency',
-//                         rule: rule.name,
-//                         path: '$',
-//                     },
-//                 ],
-//                 when: () => of(false),
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<CompositeDependencyResponse>> = {};
-//             (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: CompositeDependencyResponse[]) => {
-//                         expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(false);
-//                         expect(results[0].isSkipped).toBe(true);
-//                         expect(results[0].isSuccessful).toBe(true);
-//                         done();
-//                     },
-//                 });
-//         });
-
-//         it('should extract composite dependency tasks if when is not defined', (done) => {
-//             const parentRule: JasperRule = {
-//                 name: 'parentRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule1: JasperRule = {
-//                 name: 'mockRule1',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule2: JasperRule = {
-//                 name: 'mockRule2',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const engine = new JasperEngine({
-//                 parentRule,
-//                 mockRule1,
-//                 mockRule2,
-//             });
-
-//             const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
-
-//             const compositeDependency: CompositeDependency = {
-//                 name: 'test composite dependency',
-//                 rules: [
-//                     {
-//                         name: 'child dependency 1',
-//                         rule: mockRule1.name,
-//                         path: '$',
-//                     },
-//                     {
-//                         name: 'child dependency 2',
-//                         rule: mockRule2.name,
-//                         path: '$',
-//                     },
-//                 ],
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule: parentRule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<CompositeDependencyResponse>> = {};
-//             (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: CompositeDependencyResponse[]) => {
-//                         expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(false);
-//                         expect(results[0].isSkipped).toBe(false);
-//                         expect(results[0].isSuccessful).toBe(true);
-//                         expect(results[0].rules[0].hasError).toBe(false);
-//                         expect(results[0].rules[0].isSkipped).toBe(false);
-//                         expect(results[0].rules[0].isSuccessful).toBe(true);
-//                         expect(results[0].rules[1].hasError).toBe(false);
-//                         expect(results[0].rules[1].isSkipped).toBe(false);
-//                         expect(results[0].rules[1].isSuccessful).toBe(true);
-//                         done();
-//                     },
-//                 });
-//         });
-//     });
-// });
-
-// describe('processCompositeDependency', () => {
-//     describe('operator OR', () => {
-//         it('consider compound compendency to be successful if either dependency task is successful', (done) => {
-//             const parentRule: JasperRule = {
-//                 name: 'parentRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule1: JasperRule = {
-//                 name: 'mockRule1',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule2: JasperRule = {
-//                 name: 'mockRule2',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return throwError(new Error('error'));
-//                 },
-//             };
-
-//             const engine = new JasperEngine({
-//                 parentRule,
-//                 mockRule1,
-//                 mockRule2,
-//             });
-
-//             const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
-
-//             const compositeDependency: CompositeDependency = {
-//                 name: 'test composite dependency',
-//                 operator: Operator.OR,
-//                 executionOrder: ExecutionOrder.Sequential,
-//                 rules: [
-//                     {
-//                         name: 'child dependency 1',
-//                         rule: mockRule1.name,
-//                         path: '$',
-//                     },
-//                     {
-//                         name: 'child dependency 2',
-//                         rule: mockRule2.name,
-//                         path: '$',
-//                     },
-//                 ],
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule: parentRule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<CompositeDependencyResponse>> = {};
-//             (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: CompositeDependencyResponse[]) => {
-//                         expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(false);
-//                         expect(results[0].isSkipped).toBe(false);
-//                         expect(results[0].isSuccessful).toBe(true);
-//                         expect(results[0].rules[0].hasError).toBe(false);
-//                         expect(results[0].rules[0].isSkipped).toBe(false);
-//                         expect(results[0].rules[0].isSuccessful).toBe(true);
-//                         expect(results[0].rules[1].hasError).toBe(true);
-//                         expect(results[0].rules[1].isSkipped).toBe(false);
-//                         expect(results[0].rules[1].isSuccessful).toBe(false);
-//                         done();
-//                     },
-//                 });
-//         });
-
-//         it('consider compound compendency to be unsuccessful if all dependency task are unsuccessful', (done) => {
-//             const parentRule: JasperRule = {
-//                 name: 'parentRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule1: JasperRule = {
-//                 name: 'mockRule1',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return throwError(new Error('error'));
-//                 },
-//             };
-
-//             const mockRule2: JasperRule = {
-//                 name: 'mockRule2',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return throwError(new Error('error'));
-//                 },
-//             };
-
-//             const engine = new JasperEngine({
-//                 parentRule,
-//                 mockRule1,
-//                 mockRule2,
-//             });
-
-//             const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
-
-//             const compositeDependency: CompositeDependency = {
-//                 name: 'test composite dependency',
-//                 operator: Operator.OR,
-//                 executionOrder: ExecutionOrder.Sequential,
-//                 rules: [
-//                     {
-//                         name: 'child dependency 1',
-//                         rule: mockRule1.name,
-//                         path: '$',
-//                     },
-//                     {
-//                         name: 'child dependency 2',
-//                         rule: mockRule2.name,
-//                         path: '$',
-//                     },
-//                 ],
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule: parentRule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<CompositeDependencyResponse>> = {};
-//             (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: CompositeDependencyResponse[]) => {
-//                         expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(true);
-//                         expect(results[0].isSkipped).toBe(false);
-//                         expect(results[0].isSuccessful).toBe(false);
-//                         expect(results[0].rules[0].hasError).toBe(true);
-//                         expect(results[0].rules[0].isSkipped).toBe(false);
-//                         expect(results[0].rules[0].isSuccessful).toBe(false);
-//                         expect(results[0].rules[1].hasError).toBe(true);
-//                         expect(results[0].rules[1].isSkipped).toBe(false);
-//                         expect(results[0].rules[1].isSuccessful).toBe(false);
-//                         done();
-//                     },
-//                 });
-//         });
-//     });
-
-//     describe('operator AND', () => {
-//         it('consider compound compendency to be successful if all dependency tasks are successful', (done) => {
-//             const parentRule: JasperRule = {
-//                 name: 'parentRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule1: JasperRule = {
-//                 name: 'mockRule1',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule2: JasperRule = {
-//                 name: 'mockRule2',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const engine = new JasperEngine({
-//                 parentRule,
-//                 mockRule1,
-//                 mockRule2,
-//             });
-
-//             const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
-
-//             const compositeDependency: CompositeDependency = {
-//                 name: 'test composite dependency',
-//                 operator: Operator.AND,
-//                 executionOrder: ExecutionOrder.Sequential,
-//                 rules: [
-//                     {
-//                         name: 'child dependency 1',
-//                         rule: mockRule1.name,
-//                         path: '$',
-//                     },
-//                     {
-//                         name: 'child dependency 2',
-//                         rule: mockRule2.name,
-//                         path: '$',
-//                     },
-//                 ],
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule: parentRule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<CompositeDependencyResponse>> = {};
-//             (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: CompositeDependencyResponse[]) => {
-//                         expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(false);
-//                         expect(results[0].isSkipped).toBe(false);
-//                         expect(results[0].isSuccessful).toBe(true);
-//                         expect(results[0].rules[0].hasError).toBe(false);
-//                         expect(results[0].rules[0].isSkipped).toBe(false);
-//                         expect(results[0].rules[0].isSuccessful).toBe(true);
-//                         expect(results[0].rules[1].hasError).toBe(false);
-//                         expect(results[0].rules[1].isSkipped).toBe(false);
-//                         expect(results[0].rules[1].isSuccessful).toBe(true);
-//                         done();
-//                     },
-//                 });
-//         });
-
-//         it('consider compound compendency to be unsuccessful if either dependency task is unsuccessful', (done) => {
-//             const parentRule: JasperRule = {
-//                 name: 'parentRule',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule1: JasperRule = {
-//                 name: 'mockRule1',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return of(1);
-//                 },
-//             };
-
-//             const mockRule2: JasperRule = {
-//                 name: 'mockRule2',
-//                 description: 'description for mock rule',
-//                 action: () => {
-//                     return throwError(new Error('error'));
-//                 },
-//             };
-
-//             const engine = new JasperEngine({
-//                 parentRule,
-//                 mockRule1,
-//                 mockRule2,
-//             });
-
-//             const extractCompositeDependencyTasksSpy = jest.spyOn(engine as any, 'extractCompositeDependencyTasks');
-
-//             const compositeDependency: CompositeDependency = {
-//                 name: 'test composite dependency',
-//                 operator: Operator.AND,
-//                 executionOrder: ExecutionOrder.Sequential,
-//                 rules: [
-//                     {
-//                         name: 'child dependency 1',
-//                         rule: mockRule1.name,
-//                         path: '$',
-//                     },
-//                     {
-//                         name: 'child dependency 2',
-//                         rule: mockRule2.name,
-//                         path: '$',
-//                     },
-//                 ],
-//             };
-
-//             const context: ExecutionContext = {
-//                 contextId: '1',
-//                 root: {
-//                     children: [
-//                         { id: 1, text: 'child1' },
-//                         { id: 2, text: 'child2' },
-//                     ],
-//                 },
-//                 rule: parentRule,
-//                 _process$: empty(),
-//                 contextData: {},
-//                 complete: false,
-//             };
-
-//             const accumulator: Record<string, Observable<CompositeDependencyResponse>> = {};
-//             (engine as any).extractCompositeDependencyTasks(accumulator, compositeDependency, context);
-//             const tasks = _.entries(accumulator).map((t) => t[1]);
-//             concat(...tasks)
-//                 .pipe(toArray())
-//                 .subscribe({
-//                     next: (results: CompositeDependencyResponse[]) => {
-//                         expect(extractCompositeDependencyTasksSpy).toBeCalledTimes(1);
-//                         expect(results[0].hasError).toBe(true);
-//                         expect(results[0].isSkipped).toBe(false);
-//                         expect(results[0].isSuccessful).toBe(false);
-//                         expect(results[0].rules[0].hasError).toBe(false);
-//                         expect(results[0].rules[0].isSkipped).toBe(false);
-//                         expect(results[0].rules[0].isSuccessful).toBe(true);
-//                         expect(results[0].rules[1].hasError).toBe(true);
-//                         expect(results[0].rules[1].isSkipped).toBe(false);
-//                         expect(results[0].rules[1].isSuccessful).toBe(false);
-//                         done();
-//                     },
-//                 });
-//         });
-//     });
-// });
-
-// describe('execute', () => {
-//     it('should invoke beforeAction hook', (done) => {
-//         const beforeActionMock = jest.fn().mockReturnValue(1);
-//         const actionMock = jest.fn().mockReturnValue(1);
-
-//         const rule: JasperRule = {
-//             name: 'mockRule',
-//             description: 'description for mock rule',
-//             beforeAction: () => {
-//                 return of(beforeActionMock());
-//             },
-//             action: () => {
-//                 return of(actionMock());
-//             },
-//         };
-
-//         const engine = new JasperEngine({
-//             mockRule: rule,
-//         });
-
-//         const executeSpy = jest.spyOn(engine as any, 'execute');
-
-//         const root = {
-//             children: [
-//                 { id: 1, text: 'child1' },
-//                 { id: 2, text: 'child2' },
-//             ],
-//         };
-
-//         (engine as any).execute({ root, ruleName: rule.name }).subscribe({
-//             next: (response: ExecutionResponse) => {
-//                 expect(beforeActionMock).toBeCalledTimes(1);
-//                 expect(actionMock).toBeCalledTimes(1);
-//                 expect(executeSpy).toBeCalledTimes(1);
-//                 expect(response.result).toBe(1);
-
-//                 done();
-//             },
-//         });
-//     });
-
-//     it('should invoke afterAction hook', (done) => {
-//         const afterActionMock = jest.fn().mockReturnValue(1);
-//         const actionMock = jest.fn().mockReturnValue(1);
-
-//         const rule: JasperRule = {
-//             name: 'mockRule',
-//             description: 'description for mock rule',
-//             afterAction: (response: ExecutionResponse) => {
-//                 return of(response).pipe(
-//                     tap(() => {
-//                         afterActionMock();
-//                     }),
-//                 );
-//             },
-//             action: () => {
-//                 return of(actionMock());
-//             },
-//         };
-
-//         const engine = new JasperEngine({
-//             mockRule: rule,
-//         }, {
-//             recipe: JasperEngineRecipe.ValidationRuleEngine,
-//             suppressDuplicateTasks: true,
-//             debug: true,
-//         });
-
-//         const executeSpy = jest.spyOn(engine as any, 'execute');
-
-//         const root = {
-//             children: [
-//                 { id: 1, text: 'child1' },
-//                 { id: 2, text: 'child2' },
-//             ],
-//         };
-
-//         const context: ExecutionContext = {
-//             contextId: '1',
-//             root: {
-//                 children: [
-//                     { id: 1, text: 'child1' },
-//                     { id: 2, text: 'child2' },
-//                 ],
-//             },
-//             rule,
-//             _process$: empty(),
-//             contextData: {},
-//             complete: false,
-//         };
-
-//         (engine as any).execute({ root, ruleName: rule.name, parentExecutionContext: context }).subscribe({
-//             next: (response: ExecutionResponse) => {
-//                 expect(afterActionMock).toBeCalledTimes(1);
-//                 expect(actionMock).toBeCalledTimes(1);
-//                 expect(executeSpy).toBeCalledTimes(1);
-//                 expect(response.result).toBe(1);
-
-//                 done();
-//             },
-//         });
-//     });
-
-//     it('should invoke onError hook and throw error if stream not replaced', done => {
-//         const actionMock = jest.fn().mockReturnValue(1);
-//         const errorMock = jest.fn();
-//         const rule: JasperRule = {
-//             name: 'mockRule',
-//             description: 'description for mock rule',
-//             action: () => {
-//                 actionMock();
-//                 return throwError(new Error('exception'));
-//             },
-//             onError: (err) => {
-//                 errorMock();
-//                 return throwError(err);
-//             }
-//         };
-
-//         const engine = new JasperEngine({
-//             mockRule: rule,
-//         });
-
-//         const executeSpy = jest.spyOn(engine as any, 'execute');
-
-//         const root = {
-//             children: [
-//                 { id: 1, text: 'child1' },
-//                 { id: 2, text: 'child2' },
-//             ],
-//         };
-
-//         (engine as any).execute({ root, ruleName: rule.name }).subscribe({
-//             error: (err: any) => {
-//                 expect(actionMock).toBeCalledTimes(1);
-//                 expect(errorMock).toBeCalledTimes(1);
-//                 expect(executeSpy).toBeCalledTimes(1);
-//                 expect(err).toBeTruthy();
-
-//                 done();
-//             }
-//         });
-//     });
-
-//     it('should invoke onError hook and replace the stream with what is provided', done => {
-//         const actionMock = jest.fn().mockReturnValue(1);
-//         const errorMock = jest.fn();
-//         const rule: JasperRule = {
-//             name: 'mockRule',
-//             description: 'description for mock rule',
-//             action: () => {
-//                 actionMock();
-//                 return throwError(new Error('exception'));
-//             },
-//             onError: () => {
-//                 errorMock();
-//                 return of('replaced');
-//             }
-//         };
-
-//         const engine = new JasperEngine({
-//             mockRule: rule,
-//         });
-
-//         const executeSpy = jest.spyOn(engine as any, 'execute');
-
-//         const root = {
-//             children: [
-//                 { id: 1, text: 'child1' },
-//                 { id: 2, text: 'child2' },
-//             ],
-//         };
-
-//         (engine as any).execute({ root, ruleName: rule.name }).subscribe({
-//             next: (response: ExecutionResponse) => {
-//                 expect(actionMock).toBeCalledTimes(1);
-//                 expect(errorMock).toBeCalledTimes(1);
-//                 expect(executeSpy).toBeCalledTimes(1);
-//                 expect(response.result).toBe('replaced');
-//                 done();
-//             }
-//         });
-//     });
-
-//     it('should share/multicast the action if option is set to suppress duplicate tasks', (done) => {
-//         const actionMock = jest.fn().mockReturnValue(1);
-
-//         const rule: JasperRule = {
-//             name: 'mockRule',
-//             description: 'description for mock rule',
-//             action: () => {
-//                 return of(actionMock());
-//             },
-//         };
-
-//         const engine = new JasperEngine({
-//             mockRule: rule,
-//         });
-
-//         const executeSpy = jest.spyOn(engine as any, 'execute');
-
-//         const root = {
-//             children: [
-//                 { id: 1, text: 'child1' },
-//                 { id: 2, text: 'child2' },
-//             ],
-//         };
-
-//         (engine as any).execute({ root, ruleName: rule.name }).subscribe({
-//             next: (response: ExecutionResponse) => {
-//                 expect(actionMock).toBeCalledTimes(1);
-//                 expect(executeSpy).toBeCalledTimes(1);
-//                 expect(response.result).toBe(1);
-//             },
-//         });
-
-//         (engine as any).execute({ root, ruleName: rule.name }).subscribe({
-//             next: (response: ExecutionResponse) => {
-//                 expect(actionMock).toBeCalledTimes(1);
-//                 expect(executeSpy).toBeCalledTimes(2);
-//                 expect(response.result).toBe(1);
-
-//                 done();
-//             },
-//         });
-//     });
-
-//     it('should invoke action depending on the number of subscriptions if option is set to not suppress duplicate tasks', (done) => {
-//         const actionMock = jest.fn().mockReturnValue(1);
-
-//         const rule: JasperRule = {
-//             name: 'mockRule',
-//             description: 'description for mock rule',
-//             action: () => {
-//                 return of(actionMock());
-//             },
-//         };
-
-//         const engine = new JasperEngine({
-//             mockRule: rule,
-//         }, {
-//             recipe: JasperEngineRecipe.ValidationRuleEngine,
-//             suppressDuplicateTasks: false,
-//         });
-
-//         const executeSpy = jest.spyOn(engine as any, 'execute');
-
-//         const root = {
-//             children: [
-//                 { id: 1, text: 'child1' },
-//                 { id: 2, text: 'child2' },
-//             ],
-//         };
-
-//         (engine as any).execute({ root, ruleName: rule.name }).subscribe({
-//             next: (response: ExecutionResponse) => {
-//                 expect(actionMock).toBeCalledTimes(1);
-//                 expect(executeSpy).toBeCalledTimes(1);
-//                 expect(response.result).toBe(1);
-//             },
-//         });
-
-//         (engine as any).execute({ root, ruleName: rule.name }).subscribe({
-//             next: (response: ExecutionResponse) => {
-//                 expect(actionMock).toBeCalledTimes(2);
-//                 expect(executeSpy).toBeCalledTimes(2);
-//                 expect(response.result).toBe(1);
-
-//                 done();
-//             },
-//         });
-//     });
-// });
+describe('processCompositeDependency', () => {
+    const mockRule: JasperRule = {
+        name: 'mockRule',
+        description: 'description for mock rule',
+        action: () => of(1),
+    };
+
+    const ruleStore: Record<string, JasperRule> = {};
+    ruleStore[`${mockRule.name}`] = mockRule;
+
+    const response = {
+        rule: mockRule.name,
+        hasError: false,
+        isSuccessful: false,
+        result: undefined,
+    };
+
+    it('should skip composite dependency if jsonata when expression evaluates to false', done => {
+        const engine = new JasperEngine(ruleStore);
+        const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+        };
+
+        const compositeDependency: CompositeDependency = {
+            name: 'test composite dependency',
+            when: 'children ~> $count() > 2',
+            rules: [
+                simpleDependency
+            ]
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: of(),
+            contextData: {},
+            complete: false,
+            response,
+        };
+
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+
+        const subscription = task.subscribe({
+            next: (dependencyResponse) => {
+                expect(processCompositeDependencySpy).toBeCalledTimes(1);
+                expect(dependencyResponse.isSkipped).toBe(true);
+                expect(dependencyResponse.isSuccessful).toBe(true);
+                done();
+            }
+        })
+
+        subscription.unsubscribe();
+    });
+
+    it('should skip composite dependency if observable when expression evaluates to false', done => {
+        const engine = new JasperEngine(ruleStore);
+        const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+        };
+
+        const compositeDependency: CompositeDependency = {
+            name: 'test composite dependency',
+            when: () => of(false),
+            rules: [
+                simpleDependency
+            ]
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: of(),
+            contextData: {},
+            complete: false,
+            response,
+        };
+
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+
+        const subscription = task.subscribe({
+            next: (dependencyResponse) => {
+                expect(processCompositeDependencySpy).toBeCalledTimes(1);
+                expect(dependencyResponse.isSkipped).toBe(true);
+                expect(dependencyResponse.isSuccessful).toBe(true);
+                done();
+            }
+        })
+
+        subscription.unsubscribe();
+    });
+
+    it('should return response with error if unable to evaluate path expression', (done) => {
+        const engine = new JasperEngine(ruleStore);
+        const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+        };
+
+        const compositeDependency: CompositeDependency = {
+            name: 'test composite dependency',
+            when: () => throwError(new Error('when evaluation error')),
+            rules: [
+                simpleDependency
+            ]
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: of(),
+            contextData: {},
+            complete: false,
+            response,
+        };
+
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+
+        const subscription = task.subscribe({
+            next: (dependencyResponse) => {
+                expect(processCompositeDependencySpy).toBeCalledTimes(1);
+                expect(dependencyResponse.isSkipped).toBe(false);
+                expect(dependencyResponse.isSuccessful).toBe(false);
+                expect(dependencyResponse.hasError).toBe(true);
+                done();
+            }
+        })
+
+        subscription.unsubscribe();
+    });
+
+    it('should run lifecycle hooks', done => {
+        const engine = new JasperEngine(ruleStore);
+        const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+        };
+
+        const beforeMockFn = jest.fn().mockReturnValue(1);
+        const afterMockFn = jest.fn().mockReturnValue(1);
+
+        const compositeDependency: CompositeDependency = {
+            name: 'test composite dependency',
+            beforeDependency: () => of(beforeMockFn()),
+            afterDependency: () => of(afterMockFn()),
+            rules: [
+                simpleDependency
+            ]
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: of(),
+            contextData: {},
+            complete: false,
+            response,
+        };
+
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+
+        const subscription = task.subscribe({
+            next: (dependencyResponse) => {
+                expect(processCompositeDependencySpy).toBeCalledTimes(1);
+                expect(beforeMockFn).toBeCalledTimes(1);
+                expect(afterMockFn).toBeCalledTimes(1);
+                expect(dependencyResponse.isSkipped).toBe(false);
+                expect(dependencyResponse.isSuccessful).toBe(true);
+                done();
+            }
+        })
+
+        subscription.unsubscribe();
+    });
+
+    it('should run onDependencyError if error not handled but nested dependency', done => {
+        const engine = new JasperEngine(ruleStore);
+        const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+            afterDependency: () => {
+                return throwError(new Error('afterDependency error'));
+            },
+            onDependencyError: (err) => {
+                return throwError(err);
+            },
+        };
+
+        const onDependencyErrorMockFn = jest.fn();
+        const compositeDependency: CompositeDependency = {
+            name: 'test composite dependency',
+            rules: [
+                simpleDependency
+            ],
+            onDependencyError: (err, response) => {
+                response.isSuccessful = false;
+                response.errors.push(err);
+                onDependencyErrorMockFn();
+                return of(response);
+            }
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: of(),
+            contextData: {},
+            complete: false,
+            response,
+        };
+
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+
+        const subscription = task.subscribe({
+            next: (dependencyResponse) => {
+                expect(processCompositeDependencySpy).toBeCalledTimes(1);
+                expect(onDependencyErrorMockFn).toBeCalledTimes(1);
+                expect(dependencyResponse.isSkipped).toBe(false);
+                expect(dependencyResponse.isSuccessful).toBe(false);
+                done();
+            }
+        });
+
+        subscription.unsubscribe();
+    });
+
+    describe('operator OR', () => {
+        it('consider composite compendency to be successful if either dependency task is successful', (done) => {
+            const engine = new JasperEngine(ruleStore);
+            const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+    
+            const simpleDependency: SimpleDependency = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+                afterDependency: () => {
+                    return throwError(new Error('afterDependency error'));
+                },
+                onDependencyError: (err) => {
+                    return throwError(err);
+                },
+            };
+    
+            const nestCompositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                rules: [
+                    simpleDependency,
+                ],
+            };
+
+            const simpleDependency2: SimpleDependency = {
+                name: 'test simple dependency 2',
+                path: 'children',
+                rule: mockRule.name,
+            };
+    
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                operator: Operator.OR,
+                rules: [
+                    nestCompositeDependency,
+                    simpleDependency2,
+                ],
+            };
+    
+            const context: ExecutionContext = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processCompositeDependencySpy).toBeCalledTimes(2);
+                    expect(dependencyResponse.isSuccessful).toBe(true);
+                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
+                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
+                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
+                    done();
+                }
+            });
+    
+            subscription.unsubscribe();
+        });
+
+        it('consider composite compendency to be unsuccessful if all dependency tasks are unsuccessful', (done) => {
+            const engine = new JasperEngine(ruleStore);
+            const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+    
+            const simpleDependency: SimpleDependency = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+                afterDependency: () => {
+                    return throwError(new Error('afterDependency error'));
+                },
+            };
+    
+            const nestCompositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                rules: [
+                    simpleDependency,
+                ],
+            };
+
+            const simpleDependency2: SimpleDependency = {
+                name: 'test simple dependency 2',
+                path: 'children',
+                rule: mockRule.name,
+                afterDependency: () => {
+                    return throwError(new Error('afterDependency error'));
+                },
+            };
+    
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                operator: Operator.OR,
+                rules: [
+                    nestCompositeDependency,
+                    simpleDependency2,
+                ],
+            };
+    
+            const context: ExecutionContext = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processCompositeDependencySpy).toBeCalledTimes(2);
+                    expect(dependencyResponse.isSuccessful).toBe(false);
+                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
+                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
+                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(false);
+                    done();
+                }
+            });
+    
+            subscription.unsubscribe();
+        });
+    });
+    
+    describe('operator AND', () => {
+        it('consider composite compendency to be successful if all dependency tasks are successful', (done) => {
+            const engine = new JasperEngine(ruleStore);
+            const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+    
+            const simpleDependency: SimpleDependency = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+            };
+    
+            const nestCompositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                rules: [
+                    simpleDependency,
+                ],
+            };
+
+            const simpleDependency2: SimpleDependency = {
+                name: 'test simple dependency 2',
+                path: 'children',
+                rule: mockRule.name,
+            };
+    
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                operator: Operator.AND,
+                rules: [
+                    nestCompositeDependency,
+                    simpleDependency2,
+                ],
+            };
+    
+            const context: ExecutionContext = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processCompositeDependencySpy).toBeCalledTimes(2);
+                    expect(dependencyResponse.isSuccessful).toBe(true);
+                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
+                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(true);
+                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
+                    done();
+                }
+            });
+    
+            subscription.unsubscribe();
+        });
+
+        it('consider composite compendency to be unsuccessful if either dependency task is unsuccessful', (done) => {
+            const engine = new JasperEngine(ruleStore);
+            const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
+    
+            const simpleDependency: SimpleDependency = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+                afterDependency: () => {
+                    return throwError(new Error('afterDependency error'));
+                },
+            };
+    
+            const nestCompositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                rules: [
+                    simpleDependency,
+                ],
+            };
+
+            const simpleDependency2: SimpleDependency = {
+                name: 'test simple dependency 2',
+                path: 'children',
+                rule: mockRule.name,
+            };
+    
+            const compositeDependency: CompositeDependency = {
+                name: 'test composite dependency',
+                operator: Operator.AND,
+                executionOrder: ExecutionOrder.Sequential,
+                rules: [
+                    nestCompositeDependency,
+                    simpleDependency2,
+                ],
+            };
+    
+            const context: ExecutionContext = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processCompositeDependencySpy).toBeCalledTimes(2);
+                    expect(dependencyResponse.isSuccessful).toBe(false);
+                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
+                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
+                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
+                    done();
+                }
+            });
+    
+            subscription.unsubscribe();
+        });
+    });
+
+});
+
+describe('execute', () => {
+    it('should invoke beforeAction hook', (done) => {
+        const beforeActionMock = jest.fn().mockReturnValue(1);
+        const actionMock = jest.fn().mockReturnValue(1);
+
+        const rule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            beforeAction: () => {
+                return of(beforeActionMock());
+            },
+            action: () => {
+                return of(actionMock());
+            },
+        };
+
+        const engine = new JasperEngine({
+            mockRule: rule,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(beforeActionMock).toBeCalledTimes(1);
+                expect(actionMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.result).toBe(1);
+
+                done();
+            },
+        });
+    });
+
+    it('should invoke afterAction hook', (done) => {
+        const afterActionMock = jest.fn().mockReturnValue(1);
+        const actionMock = jest.fn().mockReturnValue(1);
+
+        const mockRule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            afterAction: (context) => {
+                return of(context.response).pipe(
+                    tap(() => {
+                        afterActionMock();
+                    }),
+                );
+            },
+            action: () => {
+                return of(actionMock());
+            },
+        };
+
+        const engine = new JasperEngine({
+            mockRule,
+        }, {
+            recipe: JasperEngineRecipe.ValidationRuleEngine,
+            suppressDuplicateTasks: true,
+            debug: true,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        const context: ExecutionContext = {
+            contextId: '1',
+            root: {
+                children: [
+                    { id: 1, text: 'child1' },
+                    { id: 2, text: 'child2' },
+                ],
+            },
+            rule: mockRule,
+            _process$: empty(),
+            contextData: {},
+            complete: false,
+            response: {
+                rule: mockRule.name,
+                hasError: false,
+                isSuccessful: false,
+                result: undefined,
+            }
+        };
+
+        (engine as any).execute({ root, ruleName: mockRule.name, parentExecutionContext: context }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(afterActionMock).toBeCalledTimes(1);
+                expect(actionMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.result).toBe(1);
+
+                done();
+            },
+        });
+    });
+
+    it('should invoke onError hook and throw error if stream not replaced', done => {
+        const actionMock = jest.fn().mockReturnValue(1);
+        const errorMock = jest.fn();
+        const rule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                actionMock();
+                return throwError(new Error('exception'));
+            },
+            onError: (err) => {
+                errorMock();
+                return throwError(err);
+            }
+        };
+
+        const engine = new JasperEngine({
+            mockRule: rule,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            error: (err: any) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(errorMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(err).toBeTruthy();
+
+                done();
+            }
+        });
+    });
+
+    it('should invoke onError hook and replace the stream with what is provided', done => {
+        const actionMock = jest.fn().mockReturnValue(1);
+        const errorMock = jest.fn();
+        const rule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                actionMock();
+                return throwError(new Error('exception'));
+            },
+            onError: (_err, context) => {
+                errorMock();
+                context.response.result = 'replaced';
+                return of(context.response);
+            }
+        };
+
+        const engine = new JasperEngine({
+            mockRule: rule,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(errorMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.result).toBe('replaced');
+                done();
+            }
+        });
+    });
+
+    it('should share/multicast the action if option is set to suppress duplicate tasks', (done) => {
+        const actionMock = jest.fn().mockReturnValue(1);
+
+        const rule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                return of(actionMock());
+            },
+        };
+
+        const engine = new JasperEngine({
+            mockRule: rule,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.result).toBe(1);
+            },
+        });
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(2);
+                expect(response.result).toBe(1);
+
+                done();
+            },
+        });
+    });
+
+    it('should invoke action depending on the number of subscriptions if option is set to not suppress duplicate tasks', (done) => {
+        const actionMock = jest.fn().mockReturnValue(1);
+
+        const rule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                return of(actionMock());
+            },
+        };
+
+        const engine = new JasperEngine({
+            mockRule: rule,
+        }, {
+            recipe: JasperEngineRecipe.ValidationRuleEngine,
+            suppressDuplicateTasks: false,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.result).toBe(1);
+            },
+        });
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(2);
+                expect(executeSpy).toBeCalledTimes(2);
+                expect(response.result).toBe(1);
+
+                done();
+            },
+        });
+    });
+
+    it('should process rule with dependency', done => {
+        const actionMock = jest.fn().mockReturnValue(1);
+
+        const mockRule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                return of(actionMock());
+            },
+        };
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+        };
+
+        const compositeDependency: CompositeDependency = {
+            name: 'test composite dependency',
+            rules: [
+                simpleDependency,
+            ],
+        };
+
+        const parentRule: JasperRule = {
+            name: 'parentRule',
+            description: 'description for mock rule',
+            action: () => {
+                return of(actionMock());
+            },
+            dependencies: compositeDependency
+        };
+
+        const engine = new JasperEngine({
+            mockRule,
+            parentRule,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: parentRule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(3);
+                expect(executeSpy).toBeCalledTimes(3);
+                expect(response.result).toBe(1);
+                expect(response.isSuccessful).toBe(true);
+                expect(response?.dependency?.isSuccessful).toBe(true);
+                expect(response?.dependency?.rules[0]?.isSuccessful).toBe(true);
+                done();
+            },
+        });
+    });
+
+    it('should respect custom uniqueBy when determining object uniqueness', done => {
+        
+        const actionMock2 = jest.fn().mockReturnValue(1);
+
+        const mockRule: JasperRule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            uniqueBy: (root) => ({ name: root.name }),
+            action: () => {
+                return of(actionMock2());
+            },
+        };
+
+        const simpleDependency: SimpleDependency = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+        };
+
+        const compositeDependency: CompositeDependency = {
+            name: 'test composite dependency',
+            rules: [
+                simpleDependency,
+            ],
+        };
+
+        const actionMock = jest.fn().mockReturnValue(1);
+        const parentRule: JasperRule = {
+            name: 'parentRule',
+            description: 'description for mock rule',
+            action: () => {
+                return of(actionMock());
+            },
+            dependencies: compositeDependency
+        };
+
+        const engine = new JasperEngine({
+            mockRule,
+            parentRule,
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child1' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: parentRule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(actionMock2).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(3);
+                expect(response.result).toBe(1);
+                expect(response.isSuccessful).toBe(true);
+                expect(response?.dependency?.isSuccessful).toBe(true);
+                expect(response?.dependency?.rules[0]?.isSuccessful).toBe(true);
+                done();
+            },
+        });
+    });
+});

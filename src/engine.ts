@@ -155,7 +155,7 @@ export class JasperEngine {
             hasError: false,
             errors: [],
             isSkipped: false,
-            isSuccessful: false,
+            isSuccessful: true,
             rules: [],
             startTime: moment.utc().toDate(),
         };
@@ -256,16 +256,16 @@ export class JasperEngine {
                         dependencyResponse.hasError = !dependencyResponse.isSuccessful;
                         return of(dependencyResponse);
                     }),
-                    catchError(err => {
-                        dependencyResponse.hasError = true;
-                        dependencyResponse.errors?.push(err);
-                        dependencyResponse.isSuccessful = false;
-
-                        return compositeDependency.onDependencyError
-                        ? compositeDependency.onDependencyError(err, dependencyResponse, context)
-                        : of(dependencyResponse);
-                    }),
                 )
+            }),
+            catchError(err => {
+                dependencyResponse.hasError = true;
+                dependencyResponse.errors.push(err);
+                dependencyResponse.isSuccessful = false;
+
+                return compositeDependency.onDependencyError
+                ? compositeDependency.onDependencyError(err, dependencyResponse, context)
+                : of(dependencyResponse);
             }),
         );
     }
