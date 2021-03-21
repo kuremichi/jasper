@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "description": "Jasper Engine",
   "main": "lib/src/index.js",
+  "types": "lib/src/index.d.ts",
   "scripts": {
-    "preversion": "npm run lint",
-    "prepare": "npm run build",
-    "prepublishOnly" : "npm test && npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags",
-    "build": "tsc",
-    "start": "node lib/src/index.js",
     "test": "jest --config jest.config.json --testPathPattern \"(/__tests__/.*\\.(test|spec))\\.(jsx?|tsx?)$\"",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "build": "tsc",
+    "prepare": "npm run build",
+    "prepublishOnly" : "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version" : "npm run format && git add -A src",
+    "postversion" : "git push && git push --tags"
   },
   "repository": {
     "type": "git",
