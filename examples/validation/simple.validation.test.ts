@@ -1,6 +1,6 @@
 import { JasperEngine } from '../../src/engine';
 import { ExecutionOrder, EngineRecipe, Operator } from '../../src/enum';
-import { Rule } from '../../src/jasper.rule';
+import { Rule } from '../../src/rule';
 
 const isJasper: Rule = {
     name: 'isJasper',
@@ -17,7 +17,6 @@ const isSamoyed: Rule = {
 const isMyDog: Rule = {
     name: 'isMyDog',
     description: 'a rule to check if the dog is my dog',
-    action: 'true',
     dependencies: {
         name: 'my dog is a samoyed named Jasper',
         operator: Operator.AND,
