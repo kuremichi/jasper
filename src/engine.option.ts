@@ -1,13 +1,13 @@
 import { JasperEngineRecipe } from './enum';
 
 export interface EngineOptions {
-    suppressDuplicateTasks: boolean;
+    suppressDuplicateTasks?: boolean;
     recipe: JasperEngineRecipe;
     debug?: boolean;
 }
 
 export const DefaultEngineOptions: EngineOptions = {
-    suppressDuplicateTasks: true,
+    suppressDuplicateTasks: false,
     recipe: JasperEngineRecipe.BusinessProcessEngine,
     debug: false,
 };

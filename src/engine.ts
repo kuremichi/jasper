@@ -461,7 +461,7 @@ export class JasperEngine {
 
         let context: ExecutionContext = this.contextStore[contextId];
 
-        if (!context || this.options.suppressDuplicateTasks === false) {
+        if (!context || this.options.suppressDuplicateTasks !== true) {
             context = {
                 contextId,
                 rule,
