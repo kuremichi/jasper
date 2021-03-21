@@ -1,14 +1,13 @@
 import { JasperEngine } from '../engine';
 
-import { Observable, of, empty, forkJoin, concat, throwError } from 'rxjs';
+import { Observable, of, empty, throwError } from 'rxjs';
 import _ from 'lodash';
-import { switchMap, tap, toArray } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 
 import { JasperRule } from '../jasper.rule';
 import { ExecutionContext } from '../execution.context';
 import { ExecutionOrder, JasperEngineRecipe, Operator } from '../enum';
 import { SimpleDependency } from '../dependency/simple.dependency';
-import { SimpleDependencyExecutionResponse } from '../dependency/simple.dependency.execution.response';
 import { CompositeDependency } from '../dependency/composite.dependency';
 import { CompositeDependencyResponse } from '../dependency/composite.dependency.response';
 import { ExecutionResponse } from '../execution.response';

@@ -1,4 +1,4 @@
-import { Observable, of, from, throwError, concat } from 'rxjs';
+import { Observable, of, from, concat } from 'rxjs';
 import {
     switchMap,
     tap,
