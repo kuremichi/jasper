@@ -1,4 +1,5 @@
 - [1. Description](#1-description)
+  - [Jasper Workflow Engine](#jasper-workflow-engine)
 - [2. Quickstart](#2-quickstart)
 - [3. Rule](#3-rule)
   - [Rule](#rule)
@@ -12,28 +13,22 @@
   - [Validation Engine](#validation-engine)
 - [6. Lifecycle Hooks](#6-lifecycle-hooks)
   - [For Rule](#for-rule)
-    - [beforeAction](#beforeaction)
-    - [afterAction](#afteraction)
-  - [### onError](#-onerror)
+  - [3. onError](#3-onerror)
   - [For Simple Dependency](#for-simple-dependency)
-    - [beforeDependency](#beforedependency)
-    - [beforeEach](#beforeeach)
-    - [afterEach](#aftereach)
-    - [afterDependency](#afterdependency)
-  - [### onDependencyError](#-ondependencyerror)
+  - [5. onDependencyError](#5-ondependencyerror)
   - [For Compositive Dependency](#for-compositive-dependency)
-    - [beforeDependency](#beforedependency-1)
-    - [afterDependency](#afterdependency-1)
-    - [onDependencyError](#ondependencyerror)
 - [7. Execution Context](#7-execution-context)
 
 
 # 1. Description
-    Are you building an application that contains a lot of business rule ?   
+  ## Jasper Workflow Engine
+  Are you building an application that contains a lot of business workflow process ?   
+  Are you building an application that contains a lot of validation rules ?   
+  Here comes Jasper workflow engine.
 
 # 2. Quickstart
-    To get started  
-    npm install --save @jasper/jasper-engine  
+      To get started  
+      npm install --save @jasper/jasper-engine  
 
 ```typescript
 
@@ -58,21 +53,21 @@
 
 # 6. Lifecycle Hooks
 ## For Rule
-### beforeAction
-### afterAction
-### onError
+1. beforeAction
+2. afterAction
+3. onError
 ---
 ## For Simple Dependency
-### beforeDependency
-### beforeEach
-### afterEach
-### afterDependency
-### onDependencyError
+1. beforeDependency
+2. beforeEach
+3. afterEach
+4. afterDependency
+5. onDependencyError
 ---
 ## For Compositive Dependency
-### beforeDependency
-### afterDependency
-### onDependencyError
+1. beforeDependency
+2. afterDependency
+3. onDependencyError
 
 # 7. Execution Context
 
