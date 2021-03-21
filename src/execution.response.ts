@@ -50,4 +50,9 @@ export interface ExecutionResponse {
      * the result for the dependency evaluation if any
      */
     dependency?: CompositeDependencyResponse | undefined;
+
+    /**
+     * metadata provided on the rule
+     */
+    metadata?: Record<string, any>;
 }

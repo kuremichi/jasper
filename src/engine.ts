@@ -487,6 +487,7 @@ export class JasperEngine {
                     hasError: false,
                     isSuccessful: false,
                     result: undefined,
+                    metadata: rule.metadata,
                     debugContext: this.options.debug
                         ? {
                               contextId,
