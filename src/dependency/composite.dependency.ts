@@ -32,34 +32,38 @@ export interface CompositeDependency {
     rules: ArrayOneOrMore<CompositeDependency | SimpleDependency>;
 
     /**
-     * 
+     *
      */
     when?: string | (() => Observable<boolean>);
 
     /**
-     * 
+     *
      */
     whenDescription?: string;
 
     /**
      * lifecycle handler to run when composite dependency encounters error
      */
-     onDependencyError?: (error: any, response: CompositeDependencyResponse, context: ExecutionContext) => Observable<CompositeDependencyResponse>;
+    onDependencyError?: (
+        error: any,
+        response: CompositeDependencyResponse,
+        context: ExecutionContext
+    ) => Observable<CompositeDependencyResponse>;
 
-     /**
-      * lifecycle handler to run before the composite dependency executes
-      */
-     beforeDependency?: ((context: ExecutionContext) => Observable<any>);
- 
-     /**
-      * lifecycle handler to run after the composite dependency has executed
-      */
-     afterDependency?: ((context: ExecutionContext) => Observable<any>);
+    /**
+     * lifecycle handler to run before the composite dependency executes
+     */
+    beforeDependency?: (context: ExecutionContext) => Observable<any>;
 
-     /**
-      * the max number of direct dependencies to be evaluate at a time
-      */
-     maxCurrency?: number;
+    /**
+     * lifecycle handler to run after the composite dependency has executed
+     */
+    afterDependency?: (context: ExecutionContext) => Observable<any>;
+
+    /**
+     * the max number of direct dependencies to be evaluate at a time
+     */
+    maxCurrency?: number;
 }
 
 export function isCompositeDependency(object: any): object is CompositeDependency {

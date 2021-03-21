@@ -4,7 +4,6 @@ import { ExecutionContext } from '../execution.context';
 import { SimpleDependencyExecutionResponse } from './simple.dependency.execution.response';
 import { SimpleDependencyResponse } from './simple.dependency.response';
 
-
 export interface SimpleDependency {
     /**
      * a name or description for a dependency
@@ -40,34 +39,42 @@ export interface SimpleDependency {
     executionOrder?: ExecutionOrder;
 
     /**
-     * 
+     *
      */
-    onDependencyError?: (error: any, response: SimpleDependencyResponse, context: ExecutionContext) => Observable<SimpleDependencyResponse>;
+    onDependencyError?: (
+        error: any,
+        response: SimpleDependencyResponse,
+        context: ExecutionContext
+    ) => Observable<SimpleDependencyResponse>;
 
     /**
      * the logic to run before the simple dependency is executed
      */
-    beforeDependency?: ((context: ExecutionContext) => Observable<any>);
+    beforeDependency?: (context: ExecutionContext) => Observable<any>;
 
     /**
      * the logic to run before each dependency match is executed
      */
-    beforeEach?: ((pathObject: any, index: number, context: ExecutionContext) => Observable<any>);
+    beforeEach?: (pathObject: any, index: number, context: ExecutionContext) => Observable<any>;
 
     /**
-     * 
+     *
      */
-    onEachError?: ((error: any, response: SimpleDependencyExecutionResponse, context: ExecutionContext) => Observable<SimpleDependencyExecutionResponse>);
-    
+    onEachError?: (
+        error: any,
+        response: SimpleDependencyExecutionResponse,
+        context: ExecutionContext
+    ) => Observable<SimpleDependencyExecutionResponse>;
+
     /**
      * the logic to run after each dependency match is executed
      */
-    afterEach?: ((pathObject: any, index: number, context: ExecutionContext) => Observable<any>);
+    afterEach?: (pathObject: any, index: number, context: ExecutionContext) => Observable<any>;
 
     /**
      * the logic to run after the simple dependency is executed
      */
-    afterDependency?: ((context: ExecutionContext) => Observable<any>);
+    afterDependency?: (context: ExecutionContext) => Observable<any>;
 
     /**
      * the maximum current execution to run for matches.

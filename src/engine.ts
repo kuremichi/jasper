@@ -1,15 +1,5 @@
 import { Observable, of, from, concat } from 'rxjs';
-import {
-    switchMap,
-    tap,
-    toArray,
-    share,
-    catchError,
-    shareReplay,
-    map,
-    switchMapTo,
-    mergeAll,
-} from 'rxjs/operators';
+import { switchMap, tap, toArray, share, catchError, shareReplay, map, switchMapTo, mergeAll } from 'rxjs/operators';
 import jsonata from 'jsonata';
 import hash from 'object-hash';
 import _ from 'lodash';
@@ -138,15 +128,15 @@ export class JasperEngine {
 
     /**
      * Process a composite dependency
-     * @param compositeDependency 
-     * @param context 
+     * @param compositeDependency
+     * @param context
      * @returns
      * the execution response for the composite dependency
      */
     private processCompositeDependency(
         compositeDependency: CompositeDependency,
         context: ExecutionContext
-    ) : Observable<CompositeDependencyResponse> {
+    ): Observable<CompositeDependencyResponse> {
         const operator = compositeDependency.operator || Operator.AND;
         const executionOrder = compositeDependency.executionOrder || ExecutionOrder.Parallel;
 
@@ -193,89 +183,74 @@ export class JasperEngine {
                 }
 
                 // before dependency
-                return (
-                    compositeDependency.beforeDependency
+                return (compositeDependency.beforeDependency
                     ? compositeDependency.beforeDependency(context)
                     : of(null)
                 ).pipe(
                     // run dependency
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     switchMap((beforeDependencyResult) => {
-                        const tasks = _.map(compositeDependency.rules, rule => {
+                        const tasks = _.map(compositeDependency.rules, (rule) => {
                             if (isSimpleDependency(rule)) {
-                                return this.processSimpleDependency(
-                                    rule,
-                                    context,
-                                );
+                                return this.processSimpleDependency(rule, context);
                             }
 
-                            return this.processCompositeDependency(
-                                rule,
-                                context,
-                            );
+                            return this.processCompositeDependency(rule, context);
                         });
 
-                        return (
-                            executionOrder == ExecutionOrder.Sequential
-                            ? concat(...tasks).pipe(
-                                toArray(),
-                            )
-                            : from(tasks).pipe(
-                                mergeAll(compositeDependency.maxCurrency),
-                                toArray(),
-                            )
+                        return (executionOrder == ExecutionOrder.Sequential
+                            ? concat(...tasks).pipe(toArray())
+                            : from(tasks).pipe(mergeAll(compositeDependency.maxCurrency), toArray())
                         ).pipe(
                             switchMap((responses: (SimpleDependencyResponse | CompositeDependencyResponse)[]) => {
                                 dependencyResponse.rules = responses;
                                 return of(dependencyResponse);
-                            }),
+                            })
                         );
                     }),
                     // after dependency
                     switchMap(() => {
-                        return (
-                            compositeDependency.afterDependency
+                        return compositeDependency.afterDependency
                             ? compositeDependency.afterDependency(context)
-                            : of(null)
-                        )
+                            : of(null);
                     }),
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     switchMap((afterDependencyResult) => {
                         dependencyResponse.isSuccessful =
                             operator === Operator.AND
                                 ? _.every(
-                                    dependencyResponse.rules,
-                                    (result: SimpleDependencyResponse | CompositeDependencyResponse) =>
-                                        result.isSuccessful
-                                )
+                                      dependencyResponse.rules,
+                                      (result: SimpleDependencyResponse | CompositeDependencyResponse) =>
+                                          result.isSuccessful
+                                  )
                                 : _.some(
-                                    dependencyResponse.rules,
-                                    (result: SimpleDependencyResponse | CompositeDependencyResponse) =>
-                                        result.isSuccessful
-                                );
+                                      dependencyResponse.rules,
+                                      (result: SimpleDependencyResponse | CompositeDependencyResponse) =>
+                                          result.isSuccessful
+                                  );
                         dependencyResponse.hasError = !dependencyResponse.isSuccessful;
                         return of(dependencyResponse);
-                    }),
-                )
+                    })
+                );
             }),
-            catchError(err => {
+            catchError((err) => {
                 dependencyResponse.hasError = true;
                 dependencyResponse.errors.push(err);
                 dependencyResponse.isSuccessful = false;
 
                 return compositeDependency.onDependencyError
-                ? compositeDependency.onDependencyError(err, dependencyResponse, context)
-                : of(dependencyResponse);
-            }),
+                    ? compositeDependency.onDependencyError(err, dependencyResponse, context)
+                    : of(dependencyResponse);
+            })
         );
     }
 
     /**
      * Process a simple dependency
      * it will execute the path expression and for each match schedule an observables and add to the accumulator
-     * @param simpleDependency 
+     * @param simpleDependency
      * @param context the current execution context
-     * @returns 
+     * @returns
      */
     private processSimpleDependency(
         simpleDependency: SimpleDependency,
@@ -300,7 +275,7 @@ export class JasperEngine {
               )
             : of(true)
         ).pipe(
-            switchMap(run => {
+            switchMap((run) => {
                 dependencyResponse.isSkipped = !run;
                 if (dependencyResponse.isSkipped) {
                     /* istanbul ignore next */
@@ -335,9 +310,9 @@ export class JasperEngine {
                                         // before each match
                                         switchMap((pathObject: any) => {
                                             executionResponse.startTime = moment.utc().toDate();
-                                            return simpleDependency.beforeEach ?
-                                                simpleDependency.beforeEach(pathObject, index, context) : 
-                                                of(null);
+                                            return simpleDependency.beforeEach
+                                                ? simpleDependency.beforeEach(pathObject, index, context)
+                                                : of(null);
                                         }),
                                         // execute
                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -363,19 +338,27 @@ export class JasperEngine {
                                             }
                                         }),
                                         switchMap((response: ExecutionResponse) => {
-                                            if (executionResponse.hasError && executionResponse.error && simpleDependency.onEachError) {
-                                                return simpleDependency.onEachError(response.error, executionResponse, context);
+                                            if (
+                                                executionResponse.hasError &&
+                                                executionResponse.error &&
+                                                simpleDependency.onEachError
+                                            ) {
+                                                return simpleDependency.onEachError(
+                                                    response.error,
+                                                    executionResponse,
+                                                    context
+                                                );
                                             }
 
                                             return of(dependencyResponse);
                                         }),
                                         // after each match
                                         switchMap(() => {
-                                            return simpleDependency.afterEach ?
-                                                simpleDependency.afterEach(pathObject, index, context).pipe(
-                                                    switchMapTo(of(executionResponse)),
-                                                ) :
-                                                of(executionResponse);
+                                            return simpleDependency.afterEach
+                                                ? simpleDependency
+                                                      .afterEach(pathObject, index, context)
+                                                      .pipe(switchMapTo(of(executionResponse)))
+                                                : of(executionResponse);
                                         }),
                                         tap(() => {
                                             executionResponse.completeTime = moment.utc().toDate();
@@ -387,52 +370,56 @@ export class JasperEngine {
                                             executionResponse.isSuccessful = false;
                                             executionResponse.completeTime = moment.utc().toDate();
                                             return of(executionResponse);
-                                        }),
+                                        })
                                     );
                                     return task;
                                 });
 
                                 return executeOrder == ExecutionOrder.Sequential
-                                    ? concat(...tasks).pipe(
-                                        toArray(),
-                                    )
-                                    : from(tasks).pipe(
-                                        mergeAll(simpleDependency.maxCurrency),
-                                        toArray(),
-                                    );
+                                    ? concat(...tasks).pipe(toArray())
+                                    : from(tasks).pipe(mergeAll(simpleDependency.maxCurrency), toArray());
                             }),
                             switchMap((responses: SimpleDependencyExecutionResponse[]) => {
-                                return (
-                                    simpleDependency.afterDependency
+                                return (simpleDependency.afterDependency
                                     ? simpleDependency.afterDependency(context).pipe(
-                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                        switchMap(afterDependencyResult => {
-                                            return of(responses);
-                                        }),
-                                    )
+                                          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                          switchMap((afterDependencyResult) => {
+                                              return of(responses);
+                                          })
+                                      )
                                     : of(responses)
                                 ).pipe(
                                     switchMap((responses: SimpleDependencyExecutionResponse[]) => {
                                         dependencyResponse.completeTime = moment.utc().toDate();
                                         const executionErrors = _.chain(responses)
-                                            .filter(response => response.hasError && response.error)
-                                            .map(response => response.error)
+                                            .filter((response) => response.hasError && response.error)
+                                            .map((response) => response.error)
                                             .value();
 
-                                        dependencyResponse.errors = _.concat(dependencyResponse.errors, executionErrors);
+                                        dependencyResponse.errors = _.concat(
+                                            dependencyResponse.errors,
+                                            executionErrors
+                                        );
                                         dependencyResponse.hasError = dependencyResponse.errors.length > 0;
-                                        dependencyResponse.isSuccessful = _.every(responses, response => response.isSuccessful);
-                                        
-                                        dependencyResponse.matches = _.orderBy(dependencyResponse.matches, ['index'], ['asc']);
+                                        dependencyResponse.isSuccessful = _.every(
+                                            responses,
+                                            (response) => response.isSuccessful
+                                        );
+
+                                        dependencyResponse.matches = _.orderBy(
+                                            dependencyResponse.matches,
+                                            ['index'],
+                                            ['asc']
+                                        );
                                         return of(dependencyResponse);
-                                    }),
+                                    })
                                 );
                             })
                         );
-                    }),
+                    })
                 );
             }),
-            catchError((err) => { 
+            catchError((err) => {
                 dependencyResponse.hasError = true;
                 dependencyResponse.isSuccessful = false;
                 dependencyResponse.completeTime = moment.utc().toDate();
@@ -440,14 +427,14 @@ export class JasperEngine {
                 return simpleDependency.onDependencyError
                     ? simpleDependency.onDependencyError(err, dependencyResponse, context)
                     : of(dependencyResponse).pipe(
-                        tap(dependencyResponse => {
-                            // push the error by default
-                            // for custom handled, the onDependencyError handler
-                            // should make a decision whether it should be pushed.
-                            dependencyResponse.errors.push(err);
-                        }),
-                    );
-            }),
+                          tap((dependencyResponse) => {
+                              // push the error by default
+                              // for custom handled, the onDependencyError handler
+                              // should make a decision whether it should be pushed.
+                              dependencyResponse.errors.push(err);
+                          })
+                      );
+            })
         );
     }
 
@@ -468,7 +455,7 @@ export class JasperEngine {
         const ruleHash = hash(params.ruleName);
         const objectHash = hash(rule.uniqueBy ? rule.uniqueBy(params.root) : params.root);
         const contextHash = ruleHash + objectHash;
-        
+
         const dedupId = this.options.suppressDuplicateTasks ? '' : `-${_.random(0, 10000)}`;
         const contextId = `${contextHash}${dedupId}`;
 
@@ -548,14 +535,14 @@ export class JasperEngine {
             }),
             // call dependency rules
             switchMap(() => {
-                return rule.dependencies 
+                return rule.dependencies
                     ? this.processCompositeDependency(rule.dependencies, context).pipe(
-                        tap((dependencyResponse: CompositeDependencyResponse) => {
-                            response.dependency = dependencyResponse;
-                            response.isSuccessful = response.isSuccessful && dependencyResponse.isSuccessful;
-                        }),
-                        switchMapTo(of(response)),
-                    )
+                          tap((dependencyResponse: CompositeDependencyResponse) => {
+                              response.dependency = dependencyResponse;
+                              response.isSuccessful = response.isSuccessful && dependencyResponse.isSuccessful;
+                          }),
+                          switchMapTo(of(response))
+                      )
                     : of(response);
             }),
             // call afterAction
@@ -603,7 +590,7 @@ export class JasperEngine {
                 }
 
                 return of(response);
-            }),
+            })
         );
 
         if (this.options.suppressDuplicateTasks) {

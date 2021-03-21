@@ -13,7 +13,6 @@ import { CompositeDependencyResponse } from '../dependency/composite.dependency.
 import { ExecutionResponse } from '../execution.response';
 import { SimpleDependencyResponse } from '../dependency/simple.dependency.response';
 
-
 describe('processExpression', () => {
     const mockRule: JasperRule = {
         name: 'mockRule',
@@ -67,11 +66,12 @@ describe('processExpression', () => {
         };
 
         const ob: Observable<any[]> = (engine as any).processExpression(
-            () => of(true).pipe(
-                switchMap(() => {
-                    return of(_.get(context.root, 'children'));
-                })
-            ),
+            () =>
+                of(true).pipe(
+                    switchMap(() => {
+                        return of(_.get(context.root, 'children'));
+                    })
+                ),
             context
         );
 
@@ -261,7 +261,7 @@ describe('processSimpleDependency', () => {
         result: undefined,
     };
 
-    it('should skip simple dependency if jsonata when expression evaluates to false', done => {
+    it('should skip simple dependency if jsonata when expression evaluates to false', (done) => {
         const engine = new JasperEngine(ruleStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
@@ -287,7 +287,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -295,13 +298,13 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.isSkipped).toBe(true);
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
-    it('should skip simple dependency if observable when expression evaluates to false', done => {
+    it('should skip simple dependency if observable when expression evaluates to false', (done) => {
         const engine = new JasperEngine(ruleStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
@@ -327,7 +330,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -335,8 +341,8 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.isSkipped).toBe(true);
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
@@ -367,7 +373,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -376,8 +385,8 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.isSuccessful).toBe(false);
                 expect(dependencyResponse.hasError).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
@@ -395,7 +404,7 @@ describe('processSimpleDependency', () => {
                 response.hasError = false;
                 response.isSuccessful = true;
                 return of(response);
-            }
+            },
         };
 
         const context: ExecutionContext = {
@@ -413,7 +422,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -422,13 +434,13 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 expect(dependencyResponse.hasError).toBe(false);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
-    it('should not execute dependency rule if no object found by path expression', done => {
+    it('should not execute dependency rule if no object found by path expression', (done) => {
         const mockFn = jest.fn().mockReturnValue(1);
         const mockRule: JasperRule = {
             name: 'mockRule',
@@ -438,7 +450,7 @@ describe('processSimpleDependency', () => {
                 return of(1);
             },
         };
-    
+
         const ruleStore: Record<string, JasperRule> = {};
         ruleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(ruleStore);
@@ -466,7 +478,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -475,13 +490,13 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.isSkipped).toBe(false);
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
-    it('should run simpleDependency hooks', done => {
+    it('should run simpleDependency hooks', (done) => {
         const mockFn = jest.fn().mockReturnValue(1);
         const mockRule: JasperRule = {
             name: 'mockRule',
@@ -491,7 +506,7 @@ describe('processSimpleDependency', () => {
                 return of(1);
             },
         };
-    
+
         const ruleStore: Record<string, JasperRule> = {};
         ruleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(ruleStore);
@@ -521,7 +536,7 @@ describe('processSimpleDependency', () => {
             },
             afterDependency: () => {
                 return of(afterDependencyFn());
-            }
+            },
         };
 
         const context: ExecutionContext = {
@@ -539,7 +554,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -553,16 +571,18 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 expect(dependencyResponse.matches).toHaveLength(2);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
     it('should return response with error if failed to run dependency rule for any path object', (done) => {
-        const mockFn = jest.fn().mockReturnValueOnce(1)
+        const mockFn = jest
+            .fn()
+            .mockReturnValueOnce(1)
             .mockImplementationOnce(() => {
-                throw new Error('error'); 
+                throw new Error('error');
             });
 
         const mockRule: JasperRule = {
@@ -573,7 +593,7 @@ describe('processSimpleDependency', () => {
                 return of(1);
             },
         };
-    
+
         const myRuleStore: Record<string, JasperRule> = {};
         myRuleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(myRuleStore);
@@ -601,7 +621,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -611,16 +634,18 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.hasError).toBe(true);
                 expect(dependencyResponse.errors).toHaveLength(1);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
     it('should return response without error if failed to run dependency rule for any path object but handled by onEachError Hook', (done) => {
-        const mockFn = jest.fn().mockReturnValueOnce(1)
+        const mockFn = jest
+            .fn()
+            .mockReturnValueOnce(1)
             .mockImplementationOnce(() => {
-                throw new Error('error'); 
+                throw new Error('error');
             });
 
         const mockRule: JasperRule = {
@@ -631,7 +656,7 @@ describe('processSimpleDependency', () => {
                 return of(1);
             },
         };
-    
+
         const myRuleStore: Record<string, JasperRule> = {};
         myRuleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(myRuleStore);
@@ -642,11 +667,11 @@ describe('processSimpleDependency', () => {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
-            onEachError: (_err, response,) => {
+            onEachError: (_err, response) => {
                 response.isSuccessful = true;
                 response.hasError = false;
                 return of(response);
-            }
+            },
         };
 
         const context: ExecutionContext = {
@@ -664,7 +689,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -674,16 +702,18 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.hasError).toBe(false);
                 expect(dependencyResponse.errors).toHaveLength(0);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
     it('should return response with error if failed to run dependency rule for any path object but not handled by onEachError Hook', (done) => {
-        const mockFn = jest.fn().mockReturnValueOnce(1)
+        const mockFn = jest
+            .fn()
+            .mockReturnValueOnce(1)
             .mockImplementationOnce(() => {
-                throw new Error('error'); 
+                throw new Error('error');
             });
 
         const mockRule: JasperRule = {
@@ -694,7 +724,7 @@ describe('processSimpleDependency', () => {
                 return of(1);
             },
         };
-    
+
         const myRuleStore: Record<string, JasperRule> = {};
         myRuleStore[`${mockRule.name}`] = mockRule;
         const engine = new JasperEngine(myRuleStore);
@@ -705,11 +735,11 @@ describe('processSimpleDependency', () => {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
-            onEachError: (_err, response,) => {
+            onEachError: (_err, response) => {
                 response.isSuccessful = true;
                 response.hasError = false;
                 return throwError(new Error('another error'));
-            }
+            },
         };
 
         const context: ExecutionContext = {
@@ -727,7 +757,10 @@ describe('processSimpleDependency', () => {
             response,
         };
 
-        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(simpleDependency, context);
+        const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+            simpleDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -737,12 +770,11 @@ describe('processSimpleDependency', () => {
                 expect(dependencyResponse.hasError).toBe(true);
                 expect(dependencyResponse.errors).toHaveLength(1);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
-    
 });
 
 describe('processCompositeDependency', () => {
@@ -762,7 +794,7 @@ describe('processCompositeDependency', () => {
         result: undefined,
     };
 
-    it('should skip composite dependency if jsonata when expression evaluates to false', done => {
+    it('should skip composite dependency if jsonata when expression evaluates to false', (done) => {
         const engine = new JasperEngine(ruleStore);
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
@@ -775,9 +807,7 @@ describe('processCompositeDependency', () => {
         const compositeDependency: CompositeDependency = {
             name: 'test composite dependency',
             when: 'children ~> $count() > 2',
-            rules: [
-                simpleDependency
-            ]
+            rules: [simpleDependency],
         };
 
         const context: ExecutionContext = {
@@ -795,7 +825,10 @@ describe('processCompositeDependency', () => {
             response,
         };
 
-        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+            compositeDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -803,13 +836,13 @@ describe('processCompositeDependency', () => {
                 expect(dependencyResponse.isSkipped).toBe(true);
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
-    it('should skip composite dependency if observable when expression evaluates to false', done => {
+    it('should skip composite dependency if observable when expression evaluates to false', (done) => {
         const engine = new JasperEngine(ruleStore);
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
@@ -822,9 +855,7 @@ describe('processCompositeDependency', () => {
         const compositeDependency: CompositeDependency = {
             name: 'test composite dependency',
             when: () => of(false),
-            rules: [
-                simpleDependency
-            ]
+            rules: [simpleDependency],
         };
 
         const context: ExecutionContext = {
@@ -842,7 +873,10 @@ describe('processCompositeDependency', () => {
             response,
         };
 
-        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+            compositeDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -850,8 +884,8 @@ describe('processCompositeDependency', () => {
                 expect(dependencyResponse.isSkipped).toBe(true);
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
@@ -869,9 +903,7 @@ describe('processCompositeDependency', () => {
         const compositeDependency: CompositeDependency = {
             name: 'test composite dependency',
             when: () => throwError(new Error('when evaluation error')),
-            rules: [
-                simpleDependency
-            ]
+            rules: [simpleDependency],
         };
 
         const context: ExecutionContext = {
@@ -889,7 +921,10 @@ describe('processCompositeDependency', () => {
             response,
         };
 
-        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+            compositeDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -898,13 +933,13 @@ describe('processCompositeDependency', () => {
                 expect(dependencyResponse.isSuccessful).toBe(false);
                 expect(dependencyResponse.hasError).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
-    it('should run lifecycle hooks', done => {
+    it('should run lifecycle hooks', (done) => {
         const engine = new JasperEngine(ruleStore);
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
@@ -921,9 +956,7 @@ describe('processCompositeDependency', () => {
             name: 'test composite dependency',
             beforeDependency: () => of(beforeMockFn()),
             afterDependency: () => of(afterMockFn()),
-            rules: [
-                simpleDependency
-            ]
+            rules: [simpleDependency],
         };
 
         const context: ExecutionContext = {
@@ -941,7 +974,10 @@ describe('processCompositeDependency', () => {
             response,
         };
 
-        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+            compositeDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -951,13 +987,13 @@ describe('processCompositeDependency', () => {
                 expect(dependencyResponse.isSkipped).toBe(false);
                 expect(dependencyResponse.isSuccessful).toBe(true);
                 done();
-            }
-        })
+            },
+        });
 
         subscription.unsubscribe();
     });
 
-    it('should run onDependencyError if error not handled but nested dependency', done => {
+    it('should run onDependencyError if error not handled but nested dependency', (done) => {
         const engine = new JasperEngine(ruleStore);
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
@@ -976,15 +1012,13 @@ describe('processCompositeDependency', () => {
         const onDependencyErrorMockFn = jest.fn();
         const compositeDependency: CompositeDependency = {
             name: 'test composite dependency',
-            rules: [
-                simpleDependency
-            ],
+            rules: [simpleDependency],
             onDependencyError: (err, response) => {
                 response.isSuccessful = false;
                 response.errors.push(err);
                 onDependencyErrorMockFn();
                 return of(response);
-            }
+            },
         };
 
         const context: ExecutionContext = {
@@ -1002,7 +1036,10 @@ describe('processCompositeDependency', () => {
             response,
         };
 
-        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
+        const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+            compositeDependency,
+            context
+        );
 
         const subscription = task.subscribe({
             next: (dependencyResponse) => {
@@ -1011,7 +1048,7 @@ describe('processCompositeDependency', () => {
                 expect(dependencyResponse.isSkipped).toBe(false);
                 expect(dependencyResponse.isSuccessful).toBe(false);
                 done();
-            }
+            },
         });
 
         subscription.unsubscribe();
@@ -1021,7 +1058,7 @@ describe('processCompositeDependency', () => {
         it('consider composite compendency to be successful if either dependency task is successful', (done) => {
             const engine = new JasperEngine(ruleStore);
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
-    
+
             const simpleDependency: SimpleDependency = {
                 name: 'test simple dependency',
                 path: 'children',
@@ -1033,12 +1070,10 @@ describe('processCompositeDependency', () => {
                     return throwError(err);
                 },
             };
-    
+
             const nestCompositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
-                rules: [
-                    simpleDependency,
-                ],
+                rules: [simpleDependency],
             };
 
             const simpleDependency2: SimpleDependency = {
@@ -1046,16 +1081,13 @@ describe('processCompositeDependency', () => {
                 path: 'children',
                 rule: mockRule.name,
             };
-    
+
             const compositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
                 operator: Operator.OR,
-                rules: [
-                    nestCompositeDependency,
-                    simpleDependency2,
-                ],
+                rules: [nestCompositeDependency, simpleDependency2],
             };
-    
+
             const context: ExecutionContext = {
                 contextId: '1',
                 root: {
@@ -1070,28 +1102,37 @@ describe('processCompositeDependency', () => {
                 complete: false,
                 response,
             };
-    
-            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
-    
+
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+                compositeDependency,
+                context
+            );
+
             const subscription = task.subscribe({
                 next: (dependencyResponse) => {
                     expect(processCompositeDependencySpy).toBeCalledTimes(2);
                     expect(dependencyResponse.isSuccessful).toBe(true);
-                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
-                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    const nestedCompositeDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === nestCompositeDependency.name
+                    );
+                    const nestedSimpleDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === simpleDependency2.name
+                    );
                     expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
                     expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
                     done();
-                }
+                },
             });
-    
+
             subscription.unsubscribe();
         });
 
         it('consider composite compendency to be unsuccessful if all dependency tasks are unsuccessful', (done) => {
             const engine = new JasperEngine(ruleStore);
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
-    
+
             const simpleDependency: SimpleDependency = {
                 name: 'test simple dependency',
                 path: 'children',
@@ -1100,12 +1141,10 @@ describe('processCompositeDependency', () => {
                     return throwError(new Error('afterDependency error'));
                 },
             };
-    
+
             const nestCompositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
-                rules: [
-                    simpleDependency,
-                ],
+                rules: [simpleDependency],
             };
 
             const simpleDependency2: SimpleDependency = {
@@ -1116,16 +1155,13 @@ describe('processCompositeDependency', () => {
                     return throwError(new Error('afterDependency error'));
                 },
             };
-    
+
             const compositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
                 operator: Operator.OR,
-                rules: [
-                    nestCompositeDependency,
-                    simpleDependency2,
-                ],
+                rules: [nestCompositeDependency, simpleDependency2],
             };
-    
+
             const context: ExecutionContext = {
                 contextId: '1',
                 root: {
@@ -1140,41 +1176,48 @@ describe('processCompositeDependency', () => {
                 complete: false,
                 response,
             };
-    
-            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
-    
+
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+                compositeDependency,
+                context
+            );
+
             const subscription = task.subscribe({
                 next: (dependencyResponse) => {
                     expect(processCompositeDependencySpy).toBeCalledTimes(2);
                     expect(dependencyResponse.isSuccessful).toBe(false);
-                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
-                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    const nestedCompositeDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === nestCompositeDependency.name
+                    );
+                    const nestedSimpleDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === simpleDependency2.name
+                    );
                     expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
                     expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(false);
                     done();
-                }
+                },
             });
-    
+
             subscription.unsubscribe();
         });
     });
-    
+
     describe('operator AND', () => {
         it('consider composite compendency to be successful if all dependency tasks are successful', (done) => {
             const engine = new JasperEngine(ruleStore);
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
-    
+
             const simpleDependency: SimpleDependency = {
                 name: 'test simple dependency',
                 path: 'children',
                 rule: mockRule.name,
             };
-    
+
             const nestCompositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
-                rules: [
-                    simpleDependency,
-                ],
+                rules: [simpleDependency],
             };
 
             const simpleDependency2: SimpleDependency = {
@@ -1182,16 +1225,13 @@ describe('processCompositeDependency', () => {
                 path: 'children',
                 rule: mockRule.name,
             };
-    
+
             const compositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
                 operator: Operator.AND,
-                rules: [
-                    nestCompositeDependency,
-                    simpleDependency2,
-                ],
+                rules: [nestCompositeDependency, simpleDependency2],
             };
-    
+
             const context: ExecutionContext = {
                 contextId: '1',
                 root: {
@@ -1206,28 +1246,37 @@ describe('processCompositeDependency', () => {
                 complete: false,
                 response,
             };
-    
-            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
-    
+
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+                compositeDependency,
+                context
+            );
+
             const subscription = task.subscribe({
                 next: (dependencyResponse) => {
                     expect(processCompositeDependencySpy).toBeCalledTimes(2);
                     expect(dependencyResponse.isSuccessful).toBe(true);
-                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
-                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    const nestedCompositeDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === nestCompositeDependency.name
+                    );
+                    const nestedSimpleDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === simpleDependency2.name
+                    );
                     expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(true);
                     expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
                     done();
-                }
+                },
             });
-    
+
             subscription.unsubscribe();
         });
 
         it('consider composite compendency to be unsuccessful if either dependency task is unsuccessful', (done) => {
             const engine = new JasperEngine(ruleStore);
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
-    
+
             const simpleDependency: SimpleDependency = {
                 name: 'test simple dependency',
                 path: 'children',
@@ -1236,12 +1285,10 @@ describe('processCompositeDependency', () => {
                     return throwError(new Error('afterDependency error'));
                 },
             };
-    
+
             const nestCompositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
-                rules: [
-                    simpleDependency,
-                ],
+                rules: [simpleDependency],
             };
 
             const simpleDependency2: SimpleDependency = {
@@ -1249,17 +1296,14 @@ describe('processCompositeDependency', () => {
                 path: 'children',
                 rule: mockRule.name,
             };
-    
+
             const compositeDependency: CompositeDependency = {
                 name: 'test composite dependency',
                 operator: Operator.AND,
                 executionOrder: ExecutionOrder.Sequential,
-                rules: [
-                    nestCompositeDependency,
-                    simpleDependency2,
-                ],
+                rules: [nestCompositeDependency, simpleDependency2],
             };
-    
+
             const context: ExecutionContext = {
                 contextId: '1',
                 root: {
@@ -1274,25 +1318,33 @@ describe('processCompositeDependency', () => {
                 complete: false,
                 response,
             };
-    
-            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(compositeDependency, context);
-    
+
+            const task: Observable<CompositeDependencyResponse> = (engine as any).processCompositeDependency(
+                compositeDependency,
+                context
+            );
+
             const subscription = task.subscribe({
                 next: (dependencyResponse) => {
                     expect(processCompositeDependencySpy).toBeCalledTimes(2);
                     expect(dependencyResponse.isSuccessful).toBe(false);
-                    const nestedCompositeDependencyResponse = _.find(dependencyResponse.rules, r => r.name === nestCompositeDependency.name);
-                    const nestedSimpleDependencyResponse = _.find(dependencyResponse.rules, r => r.name === simpleDependency2.name);
+                    const nestedCompositeDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === nestCompositeDependency.name
+                    );
+                    const nestedSimpleDependencyResponse = _.find(
+                        dependencyResponse.rules,
+                        (r) => r.name === simpleDependency2.name
+                    );
                     expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
                     expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
                     done();
-                }
+                },
             });
-    
+
             subscription.unsubscribe();
         });
     });
-
 });
 
 describe('execute', () => {
@@ -1347,7 +1399,7 @@ describe('execute', () => {
                 return of(context.response).pipe(
                     tap(() => {
                         afterActionMock();
-                    }),
+                    })
                 );
             },
             action: () => {
@@ -1355,13 +1407,16 @@ describe('execute', () => {
             },
         };
 
-        const engine = new JasperEngine({
-            mockRule,
-        }, {
-            recipe: JasperEngineRecipe.ValidationRuleEngine,
-            suppressDuplicateTasks: true,
-            debug: true,
-        });
+        const engine = new JasperEngine(
+            {
+                mockRule,
+            },
+            {
+                recipe: JasperEngineRecipe.ValidationRuleEngine,
+                suppressDuplicateTasks: true,
+                debug: true,
+            }
+        );
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 
@@ -1389,7 +1444,7 @@ describe('execute', () => {
                 hasError: false,
                 isSuccessful: false,
                 result: undefined,
-            }
+            },
         };
 
         (engine as any).execute({ root, ruleName: mockRule.name, parentExecutionContext: context }).subscribe({
@@ -1404,7 +1459,7 @@ describe('execute', () => {
         });
     });
 
-    it('should invoke onError hook and throw error if stream not replaced', done => {
+    it('should invoke onError hook and throw error if stream not replaced', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
         const errorMock = jest.fn();
         const rule: JasperRule = {
@@ -1417,7 +1472,7 @@ describe('execute', () => {
             onError: (err) => {
                 errorMock();
                 return throwError(err);
-            }
+            },
         };
 
         const engine = new JasperEngine({
@@ -1441,11 +1496,11 @@ describe('execute', () => {
                 expect(err).toBeTruthy();
 
                 done();
-            }
+            },
         });
     });
 
-    it('should invoke onError hook and replace the stream with what is provided', done => {
+    it('should invoke onError hook and replace the stream with what is provided', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
         const errorMock = jest.fn();
         const rule: JasperRule = {
@@ -1459,7 +1514,7 @@ describe('execute', () => {
                 errorMock();
                 context.response.result = 'replaced';
                 return of(context.response);
-            }
+            },
         };
 
         const engine = new JasperEngine({
@@ -1482,7 +1537,7 @@ describe('execute', () => {
                 expect(executeSpy).toBeCalledTimes(1);
                 expect(response.result).toBe('replaced');
                 done();
-            }
+            },
         });
     });
 
@@ -1540,12 +1595,15 @@ describe('execute', () => {
             },
         };
 
-        const engine = new JasperEngine({
-            mockRule: rule,
-        }, {
-            recipe: JasperEngineRecipe.ValidationRuleEngine,
-            suppressDuplicateTasks: false,
-        });
+        const engine = new JasperEngine(
+            {
+                mockRule: rule,
+            },
+            {
+                recipe: JasperEngineRecipe.ValidationRuleEngine,
+                suppressDuplicateTasks: false,
+            }
+        );
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 
@@ -1575,7 +1633,7 @@ describe('execute', () => {
         });
     });
 
-    it('should process rule with dependency', done => {
+    it('should process rule with dependency', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 
         const mockRule: JasperRule = {
@@ -1594,9 +1652,7 @@ describe('execute', () => {
 
         const compositeDependency: CompositeDependency = {
             name: 'test composite dependency',
-            rules: [
-                simpleDependency,
-            ],
+            rules: [simpleDependency],
         };
 
         const parentRule: JasperRule = {
@@ -1605,7 +1661,7 @@ describe('execute', () => {
             action: () => {
                 return of(actionMock());
             },
-            dependencies: compositeDependency
+            dependencies: compositeDependency,
         };
 
         const engine = new JasperEngine({
@@ -1635,8 +1691,7 @@ describe('execute', () => {
         });
     });
 
-    it('should respect custom uniqueBy when determining object uniqueness', done => {
-        
+    it('should respect custom uniqueBy when determining object uniqueness', (done) => {
         const actionMock2 = jest.fn().mockReturnValue(1);
 
         const mockRule: JasperRule = {
@@ -1656,9 +1711,7 @@ describe('execute', () => {
 
         const compositeDependency: CompositeDependency = {
             name: 'test composite dependency',
-            rules: [
-                simpleDependency,
-            ],
+            rules: [simpleDependency],
         };
 
         const actionMock = jest.fn().mockReturnValue(1);
@@ -1668,7 +1721,7 @@ describe('execute', () => {
             action: () => {
                 return of(actionMock());
             },
-            dependencies: compositeDependency
+            dependencies: compositeDependency,
         };
 
         const engine = new JasperEngine({

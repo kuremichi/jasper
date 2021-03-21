@@ -3,10 +3,10 @@ import { ExecutionResponse } from '../execution.response';
 /**
  * response for each of the simple dependency match result
  */
- export interface SimpleDependencyExecutionResponse extends ExecutionResponse {
+export interface SimpleDependencyExecutionResponse extends ExecutionResponse {
     /**
-     * 
-     */ 
+     *
+     */
     name: string;
 
     /**
@@ -15,6 +15,6 @@ import { ExecutionResponse } from '../execution.response';
     index: number;
     /**
      * the dependency rule name
-     */ 
+     */
     rule: string;
 }

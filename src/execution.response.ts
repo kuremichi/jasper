@@ -1,7 +1,6 @@
 import { DebugContext } from './execution.context';
 import { CompositeDependencyResponse } from './dependency/composite.dependency.response';
 
-
 export interface ExecutionResponse {
     /**
      * the name of the rule that has been evaluated
