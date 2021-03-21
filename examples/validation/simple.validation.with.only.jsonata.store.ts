@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import _ from 'lodash';
 import { tap, mapTo } from 'rxjs/operators';
-import { Rule } from '../../src/jasper.rule';
+import { Rule } from '../../src/rule';
 import { ExecutionContext } from '../../src/execution.context';
 import { ExecutionOrder } from '../../src/enum';
 

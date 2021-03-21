@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Rule } from './jasper.rule';
+import { Rule } from './rule';
 import { EngineOptions } from './engine.option';
 import { ExecutionResponse } from './execution.response';
 export declare class JasperEngine {

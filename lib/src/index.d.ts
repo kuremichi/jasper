@@ -3,7 +3,7 @@ export { DefaultEngineOptions, EngineOptions } from './engine.option';
 export { ExecutionOrder, EngineRecipe, Operator } from './enum';
 export { DebugContext, ExecutionContext } from './execution.context';
 export { ExecutionResponse } from './execution.response';
-export { Rule } from './jasper.rule';
+export { Rule } from './rule';
 export { CompositeDependency, isCompositeDependency } from './dependency/composite.dependency';
 export { CompositeDependencyResponse } from './dependency/composite.dependency.response';
 export { SimpleDependency, isSimpleDependency } from './dependency/simple.dependency';

@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import _ from 'lodash';
 import { tap, switchMap } from 'rxjs/operators';
-import { Rule } from '../../src/jasper.rule';
+import { Rule } from '../../src/rule';
 import { ExecutionContext } from '../../src/execution.context';
 
 const store: Rule[] = [
@@ -76,13 +76,13 @@ const store: Rule[] = [
                             console.log(`[${contextId}] before welcome user`);
                         }),
                     ),
-                    beforeEach: (userObject, index, context) => of(context.contextId).pipe(
+                    beforeEach: (_userObject: any, index: number, context: ExecutionContext) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] before sending ${index+1} email`);
                         }),
                     ),
                     rule: 'send email',
-                    afterEach: (userObject, index, context) => of(context.contextId).pipe(
+                    afterEach: (_userObject: any, index: number, context: ExecutionContext) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] after sending ${index+1} email`);
                         }),
