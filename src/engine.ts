@@ -28,11 +28,7 @@ export class JasperEngine {
      * @param options options
      * @param logger logger
      */
-    constructor(
-        ruleStore: IRuleStore,
-        options: EngineOptions = DefaultEngineOptions,
-        logger = console
-    ) {
+    constructor(ruleStore: IRuleStore, options: EngineOptions = DefaultEngineOptions, logger = console) {
         this.options = options;
         this.contextStore = {};
         this.ruleStore = ruleStore;
@@ -451,24 +447,24 @@ export class JasperEngine {
         parentExecutionContext?: ExecutionContext;
     }): Observable<ExecutionResponse> {
         const debugContext = this.options.debug
-            /* istanbul ignore next */
-            ? {
-                contextId: '',
-                root: params.root,
-                ruleName: params.ruleName,
-            }
+            ? /* istanbul ignore next */
+              {
+                  contextId: '',
+                  root: params.root,
+                  ruleName: params.ruleName,
+              }
             : undefined;
 
         const response: ExecutionResponse = {
             rule: params.ruleName,
             hasError: false,
             isSuccessful: true,
-            result: undefined,                        
+            result: undefined,
             debugContext,
         };
-        
+
         return this.ruleStore.get(params.ruleName).pipe(
-            catchError(err => {
+            catchError((err) => {
                 response.error = err;
                 return of(undefined);
             }),
@@ -485,17 +481,16 @@ export class JasperEngine {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const objectHash = hash(rule!.uniqueBy ? rule!.uniqueBy(params.root) : params.root);
                         const contextHash = ruleHash + objectHash;
-                
+
                         const dedupId = this.options.suppressDuplicateTasks ? '' : `-${_.random(0, 10000)}`;
                         const contextId = `${contextHash}${dedupId}`;
-                
+
                         let context: ExecutionContext = this.contextStore[contextId];
 
                         if (!context || this.options.suppressDuplicateTasks !== true) {
                             response.metadata = rule.metadata;
                             if (debugContext) {
                                 debugContext.contextId = contextId;
-
                             }
                             context = {
                                 contextId,
@@ -506,17 +501,16 @@ export class JasperEngine {
                                 contextData: {},
                                 response,
                             };
-                
+
                             if (this.options.debug) {
                                 context.contextData.objectHash = objectHash;
                             }
-                
+
                             this.contextStore[contextId] = context;
                             if (params.parentExecutionContext) {
                                 context.parentContext = params.parentExecutionContext;
-                                (params.parentExecutionContext.childrenContexts = params.parentExecutionContext.childrenContexts || {})[
-                                    context.contextId
-                                ] = context;
+                                (params.parentExecutionContext.childrenContexts =
+                                    params.parentExecutionContext.childrenContexts || {})[context.contextId] = context;
                             }
 
                             context._process$ = of(true).pipe(
@@ -539,13 +533,13 @@ export class JasperEngine {
                                 }),
                                 // execute the main action
                                 switchMap(() => {
-                                    if(rule.action) {
+                                    if (rule.action) {
                                         return this.executeAction({
                                             action: rule.action,
                                             context,
                                         });
                                     }
-                                    
+
                                     return this.options.recipe === EngineRecipe.BusinessProcessEngine
                                         ? of(null)
                                         : of(true);
@@ -562,7 +556,8 @@ export class JasperEngine {
                                         ? this.processCompositeDependency(rule.dependencies, context).pipe(
                                               tap((dependencyResponse: CompositeDependencyResponse) => {
                                                   context.response.dependency = dependencyResponse;
-                                                  context.response.isSuccessful = context.response.isSuccessful && dependencyResponse.isSuccessful;
+                                                  context.response.isSuccessful =
+                                                      context.response.isSuccessful && dependencyResponse.isSuccessful;
                                               }),
                                               switchMapTo(of(context.response))
                                           )
@@ -575,7 +570,7 @@ export class JasperEngine {
                                     if (this.options.recipe === EngineRecipe.ValidationRuleEngine) {
                                         response.isSuccessful = response.isSuccessful && response.result === true;
                                     }
-                    
+
                                     if (rule.afterAction) {
                                         return rule.afterAction(context).pipe(
                                             tap(() => {
@@ -611,11 +606,11 @@ export class JasperEngine {
                                             })
                                         );
                                     }
-                    
+
                                     return of(context.response);
                                 })
                             );
-                    
+
                             if (this.options.suppressDuplicateTasks) {
                                 context._process$ = context._process$.pipe(shareReplay(1));
                             } else {
@@ -626,10 +621,10 @@ export class JasperEngine {
                         }
 
                         return context._process$;
-                    }),
+                    })
                 );
-            }),
-        )
+            })
+        );
     }
 
     /* istanbul ignore next */

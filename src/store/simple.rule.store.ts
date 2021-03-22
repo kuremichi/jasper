@@ -16,29 +16,28 @@ export class SimpleRuleStore implements IRuleStore {
     }
 
     /**
-     * 
-     * @param ruleName 
+     *
+     * @param ruleName
      */
     get(ruleName: string): Observable<Rule | undefined> {
         return of(this.rules[ruleName]);
     }
 
-
     /**
-     * 
-     * @param rules 
-     * @param overrideIfExists 
+     *
+     * @param rules
+     * @param overrideIfExists
      */
     registerRuleArray(rules: Rule[], overrideIfExists = false): void {
-        _.each(rules, rule => {
-           this.register(rule, overrideIfExists);
+        _.each(rules, (rule) => {
+            this.register(rule, overrideIfExists);
         });
     }
 
     /**
-     * 
+     *
      * @param dictionary
-     * @param overrideIfExists 
+     * @param overrideIfExists
      */
     registerRuleDictionary(dictionary: Record<string, Rule>, overrideIfExists = false): void {
         const configs = _.entries(dictionary);
@@ -48,10 +47,10 @@ export class SimpleRuleStore implements IRuleStore {
     }
 
     /**
-     * 
-     * @param rule 
-     * @param overrideIfExists 
-     * @param alternativeRuleName 
+     *
+     * @param rule
+     * @param overrideIfExists
+     * @param alternativeRuleName
      */
     register(rule: Rule, overrideIfExists = false, alternativeRuleName?: string): void {
         const ruleName = alternativeRuleName || rule.name;

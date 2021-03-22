@@ -27,7 +27,7 @@ it('should not throw exception if rule exists already but set to override', () =
     }).not.toThrow();
 });
 
-it('should register rules if provided as a dictionary', done => {
+it('should register rules if provided as a dictionary', (done) => {
     const rule1: Rule = {
         name: 'rule1',
         description: 'description for mock rule',
@@ -44,11 +44,11 @@ it('should register rules if provided as a dictionary', done => {
         store.registerRuleDictionary({ rule1, rule2 });
     }).not.toThrow();
 
-    const sub1 = store.get(rule1.name).subscribe(rule => {
+    const sub1 = store.get(rule1.name).subscribe((rule) => {
         expect(rule).toBe(rule1);
     });
 
-    const sub2 = store.get(rule2.name).subscribe(rule => {
+    const sub2 = store.get(rule2.name).subscribe((rule) => {
         expect(rule).toBe(rule2);
         done();
     });
