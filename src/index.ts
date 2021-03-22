@@ -9,3 +9,5 @@ export { CompositeDependencyResponse } from './dependency/composite.dependency.r
 export { SimpleDependency, isSimpleDependency } from './dependency/simple.dependency';
 export { SimpleDependencyResponse } from './dependency/simple.dependency.response';
 export { SimpleDependencyExecutionResponse } from './dependency/simple.dependency.execution.response';
+export { IRuleStore } from './store/rule.store.interfafce';
+export { SimpleRuleStore } from './store/simple.rule.store';
