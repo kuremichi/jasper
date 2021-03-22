@@ -14,10 +14,11 @@ import { SimpleDependencyResponse } from './dependency/simple.dependency.respons
 import { CompositeDependencyResponse } from './dependency/composite.dependency.response';
 import { ExecutionResponse } from './execution.response';
 import { SimpleDependencyExecutionResponse } from './dependency/simple.dependency.execution.response';
+import { IRuleStore, RuleNotFoundException } from './store/rule.store.interfafce';
 
 export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
-    private ruleStore: Record<string, Rule>;
+    private ruleStore: IRuleStore;
     private readonly options: EngineOptions;
     private logger: any;
 
@@ -28,7 +29,7 @@ export class JasperEngine {
      * @param logger logger
      */
     constructor(
-        ruleStore: Record<string, Rule>,
+        ruleStore: IRuleStore,
         options: EngineOptions = DefaultEngineOptions,
         logger = console
     ) {
@@ -449,10 +450,25 @@ export class JasperEngine {
         ruleName: string;
         parentExecutionContext?: ExecutionContext;
     }): Observable<ExecutionResponse> {
-        const rule: Rule = this.ruleStore[params.ruleName];
+        // const rule: Rule = this.ruleStore[params.ruleName];
+
+        let rule: Rule;
+        const ruleSubscription = this.ruleStore.get(params.ruleName).subscribe({
+            next: (resolved) => { 
+                if (!resolved) {
+                    throw new RuleNotFoundException(params.ruleName);
+                }
+
+                rule = resolved;
+            },
+        });
+
+        ruleSubscription.unsubscribe();
+
 
         const ruleHash = hash(params.ruleName);
-        const objectHash = hash(rule.uniqueBy ? rule.uniqueBy(params.root) : params.root);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const objectHash = hash(rule!.uniqueBy ? rule!.uniqueBy(params.root) : params.root);
         const contextHash = ruleHash + objectHash;
 
         const dedupId = this.options.suppressDuplicateTasks ? '' : `-${_.random(0, 10000)}`;
