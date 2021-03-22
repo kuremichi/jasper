@@ -1,8 +1,8 @@
 export interface ILogger {
-    log(message: string, ...optionsParams: any[]): any;
-    error(message: string, ...optionsParams: any[]): any;
-    warn(message: string, ...optionsParams: any[]): any;
-    debug(message: string, ...optionsParams: any[]): any;
-    verbose(message: string, ...optionsParams: any[]): any;
+    log(message: string, ...optionalParams: any[]): any;
+    error(message: string, ...optionalParams: any[]): any;
+    warn(message: string, ...optionalParams: any[]): any;
+    debug(message: string, ...optionalParams: any[]): any;
+    verbose(message: string, ...optionalParams: any[]): any;
 }
 export declare const DummyLogger: ILogger;
