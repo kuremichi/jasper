@@ -2,7 +2,7 @@ import { JasperEngine } from '../engine';
 
 import { Observable, of, empty, throwError } from 'rxjs';
 import _ from 'lodash';
-import { switchMap, tap } from 'rxjs/operators';
+import { subscribeOn, switchMap, tap } from 'rxjs/operators';
 
 import { Rule } from '../rule';
 import { ExecutionContext } from '../execution.context';
@@ -1343,7 +1343,7 @@ describe('processCompositeDependency', () => {
 });
 
 describe('execute', () => {
-    it('should return failure if unable to locate rule', (done) => {
+    it('should return failure if rule not found', (done) => {
         
         const rule: Rule = {
             name: 'mockRule',
@@ -1367,6 +1367,43 @@ describe('execute', () => {
         (engine as any).execute({ root, ruleName: notfoundrule }).subscribe({
             next: (response: ExecutionResponse) => {
                 const error = new RuleNotFoundException(notfoundrule)
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.hasError).toBe(true);
+                expect(response.result).toBe(undefined);
+                expect(response.isSuccessful).toBe(false);
+                expect(response.error).toMatchObject(error);
+
+                done();
+            },
+        });
+    });
+
+    it('should return failure if unable to get rule', (done) => {
+        const error = new Error('unable to get rule');
+        const store = {
+            get(): Observable<Rule> {
+                return new Observable(subscriber => {
+                    setTimeout(() => {
+                        subscriber.error(error);
+                    }, 800);
+                })
+            }
+        };
+
+        const engine = new JasperEngine(store);
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        const notfoundrule = 'notfound-rule';
+        (engine as any).execute({ root, ruleName: notfoundrule }).subscribe({
+            next: (response: ExecutionResponse) => {
                 expect(executeSpy).toBeCalledTimes(1);
                 expect(response.hasError).toBe(true);
                 expect(response.result).toBe(undefined);

@@ -450,24 +450,33 @@ export class JasperEngine {
         ruleName: string;
         parentExecutionContext?: ExecutionContext;
     }): Observable<ExecutionResponse> {
+        const debugContext = this.options.debug
+            /* istanbul ignore next */
+            ? {
+                contextId: '',
+                root: params.root,
+                ruleName: params.ruleName,
+            }
+            : undefined;
+
+        const response: ExecutionResponse = {
+            rule: params.ruleName,
+            hasError: false,
+            isSuccessful: true,
+            result: undefined,                        
+            debugContext,
+        };
+        
         return this.ruleStore.get(params.ruleName).pipe(
+            catchError(err => {
+                response.error = err;
+                return of(undefined);
+            }),
             switchMap((rule: Rule | undefined) => {
                 if (!rule) {
-                    const response: ExecutionResponse = {
-                        rule: params.ruleName,
-                        hasError: true,
-                        error: new RuleNotFoundException(params.ruleName),
-                        isSuccessful: false,
-                        result: undefined,                        
-                        debugContext: this.options.debug
-                            /* istanbul ignore next */
-                            ? {
-                                  contextId: '',
-                                  root: params.root,
-                                  ruleName: params.ruleName,
-                              }
-                            : undefined,
-                    };
+                    response.error = response.error || new RuleNotFoundException(params.ruleName);
+                    response.hasError = true;
+                    response.isSuccessful = false;
                     return of(response);
                 }
                 return of(rule).pipe(
@@ -483,6 +492,11 @@ export class JasperEngine {
                         let context: ExecutionContext = this.contextStore[contextId];
 
                         if (!context || this.options.suppressDuplicateTasks !== true) {
+                            response.metadata = rule.metadata;
+                            if (debugContext) {
+                                debugContext.contextId = contextId;
+
+                            }
                             context = {
                                 contextId,
                                 rule,
@@ -490,20 +504,7 @@ export class JasperEngine {
                                 _process$: of(null),
                                 complete: false,
                                 contextData: {},
-                                response: {
-                                    rule: params.ruleName,
-                                    hasError: false,
-                                    isSuccessful: false,
-                                    result: undefined,
-                                    metadata: rule.metadata,
-                                    debugContext: this.options.debug
-                                        ? {
-                                              contextId,
-                                              root: params.root,
-                                              ruleName: rule.name,
-                                          }
-                                        : undefined,
-                                },
+                                response,
                             };
                 
                             if (this.options.debug) {
