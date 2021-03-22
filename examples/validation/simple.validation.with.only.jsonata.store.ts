@@ -5,7 +5,7 @@ import { Rule } from '../../src/rule';
 import { ExecutionContext } from '../../src/execution.context';
 import { ExecutionOrder } from '../../src/enum';
 
-const store: Rule[] = [
+export const rules: Rule[] = [
     {
         name: 'is payment on time ?',
         description: 'a payment is late if its payment date is greater than dueDate',
@@ -54,11 +54,3 @@ const store: Rule[] = [
     },
 ];
 
-export const StaticRuleStore = _.reduce(
-    store,
-    (acc: any, rule) => {
-        acc[rule.name] = rule;
-        return acc;
-    },
-    {}
-);

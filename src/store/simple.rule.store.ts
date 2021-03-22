@@ -3,12 +3,16 @@ import { Observable, of } from 'rxjs';
 import { Rule } from '../rule';
 import _ from 'lodash';
 
-
-export class StaticRuleStore implements IRuleStore {
+/**
+ * a simple rule store implementation that keeps a local copy of rules
+ */
+export class SimpleRuleStore implements IRuleStore {
     private rules: Record<string, Rule>;
 
-    constructor() {
-        this.rules = {}
+    constructor(...rules: Rule[]) {
+        this.rules = {};
+
+        this.registerRuleArray(rules);
     }
 
     /**
@@ -25,7 +29,7 @@ export class StaticRuleStore implements IRuleStore {
      * @param rules 
      * @param overrideIfExists 
      */
-    registerRuleArray(rules: Rule[] = [], overrideIfExists = false): void {
+    registerRuleArray(rules: Rule[], overrideIfExists = false): void {
         _.each(rules, rule => {
            this.register(rule, overrideIfExists);
         });

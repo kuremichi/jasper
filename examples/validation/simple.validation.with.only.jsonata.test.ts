@@ -2,7 +2,8 @@ import moment from 'moment';
 import { JasperEngine } from '../../src/engine';
 import { EngineOptions } from '../../src/engine.option';
 import { EngineRecipe } from '../../src/enum';
-import { StaticRuleStore } from './simple.validation.with.only.jsonata.store';
+import { SimpleRuleStore } from '../../src/store/simple.rule.store';
+import { rules } from './simple.validation.with.only.jsonata.store';
 
 /**
  * Rule to consider if a customer account is in good standing
@@ -19,7 +20,9 @@ it('should run', (done) => {
         suppressDuplicateTasks: true,
         debug: true,
     };
-    const engine = new JasperEngine(StaticRuleStore, options);
+
+    const store = new SimpleRuleStore(...rules);
+    const engine = new JasperEngine(store, options);
 
     const now = moment.utc();
 
