@@ -1704,6 +1704,78 @@ describe('execute', () => {
         });
     });
 
+    it('should invoke onError hook (jsonata expression) and replace the error with what is returned', (done) => {
+        const actionMock = jest.fn().mockReturnValue(1);
+        const rule: Rule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                actionMock();
+                return throwError(new Error('exception'));
+            },
+            onError: 'children.text ~> $join(", ")',
+        };
+
+        const store = new SimpleRuleStore(rule);
+        const engine = new JasperEngine(store);
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.error).toBe('child1, child2');
+                expect(response.hasError).toBe(true);
+                expect(response.isSuccessful).toBe(false);
+                done();
+            },
+        });
+    });
+
+    it('should invoke onError hook (jsonata expression) and try error if expression has issue', (done) => {
+        const actionMock = jest.fn().mockReturnValue(1);
+        const rule: Rule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            action: () => {
+                actionMock();
+                return throwError(new Error('exception'));
+            },
+            onError: '[',
+        };
+
+        const store = new SimpleRuleStore(rule);
+        const engine = new JasperEngine(store);
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: rule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.error).toMatchObject({ message: 'Expected "]" before end of expression' });
+                expect(response.hasError).toBe(true);
+                expect(response.isSuccessful).toBe(false);
+                done();
+            },
+        });
+    });
+
     it('should share/multicast the action if option is set to suppress duplicate tasks', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 

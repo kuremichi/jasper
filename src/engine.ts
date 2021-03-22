@@ -581,6 +581,23 @@ export class JasperEngine {
                                     context.response.error = err;
                                     context.response.completeTime = new Date();
                                     if (rule.onError) {
+                                        /**
+                                         * if the onError expression is jsonata, evaluate it against the
+                                         * root object and provide user with a custom error
+                                         */
+                                        if (typeof rule.onError === 'string') {
+                                            this.logger.error(err);
+                                            try {
+                                                const errExpression = jsonata(rule.onError);
+                                                const result = errExpression.evaluate(context.root);
+                                                context.response.error = result;
+                                            } catch (error) {
+                                                context.response.error = error;
+                                            }
+
+                                            return of(context.response);
+                                        }
+
                                         /* if a custom onError handler is specified
                                            let it decide if we should replace the the stream 
                                            or let it fail

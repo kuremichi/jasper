@@ -1,5 +1,5 @@
 {
-  "name": "jasper-engine",
+  "name": "@kuremichi/jasper-engine",
   "version": "0.1.4",
   "description": "Jasper Rule Engine",
   "main": "lib/src/index.js",
