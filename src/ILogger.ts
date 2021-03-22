@@ -5,7 +5,7 @@ export interface ILogger {
     error(message: string, ...optionalParams: any[]): any;
     warn(message: string, ...optionalParams: any[]): any;
     debug(message: string, ...optionalParams: any[]): any;
-    verbose(message: string, ...optionalParams: any[]): any;
+    trace(message: string, ...optionalParams: any[]): any;
 }
 
 /* istanbul ignore next */
@@ -14,5 +14,5 @@ export const DummyLogger: ILogger = {
     error: (_message: string) => {},
     warn: (_message: string) => {},
     debug: (_message: string) => {},
-    verbose: (_message: string) => {},
+    trace: (_message: string) => {},
 };

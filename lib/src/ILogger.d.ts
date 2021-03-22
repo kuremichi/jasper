@@ -3,6 +3,6 @@ export interface ILogger {
     error(message: string, ...optionalParams: any[]): any;
     warn(message: string, ...optionalParams: any[]): any;
     debug(message: string, ...optionalParams: any[]): any;
-    verbose(message: string, ...optionalParams: any[]): any;
+    trace(message: string, ...optionalParams: any[]): any;
 }
 export declare const DummyLogger: ILogger;
