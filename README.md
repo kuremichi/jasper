@@ -28,7 +28,8 @@
       To get started  
       npm install --save @kuremichi/jasper
 
-      Also, you might want to install rxjs as Jasper Rule Engine heavily depends on Observable to configure its rule.
+      Also, you might want to install rxjs as Jasper Rule Engine heavily depends on Observable  
+      to configure its rule.
       npm install --save rxjs
 
 ```typescript
