@@ -4,7 +4,7 @@ import { tap, switchMap } from 'rxjs/operators';
 import { Rule } from '../../src/rule';
 import { ExecutionContext } from '../../src/execution.context';
 
-const store: Rule[] = [
+export const rules: Rule[] = [
     {
         name: 'send email',
         description: 'send an email to the user',
@@ -97,12 +97,3 @@ const store: Rule[] = [
         },
     },
 ];
-
-export const StaticRuleStore = _.reduce(
-    store,
-    (acc: any, rule) => {
-        acc[rule.name] = rule;
-        return acc;
-    },
-    {}
-);

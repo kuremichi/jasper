@@ -14,10 +14,11 @@ import { SimpleDependencyResponse } from './dependency/simple.dependency.respons
 import { CompositeDependencyResponse } from './dependency/composite.dependency.response';
 import { ExecutionResponse } from './execution.response';
 import { SimpleDependencyExecutionResponse } from './dependency/simple.dependency.execution.response';
+import { IRuleStore, RuleNotFoundException } from './store/rule.store.interfafce';
 
 export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
-    private ruleStore: Record<string, Rule>;
+    private ruleStore: IRuleStore;
     private readonly options: EngineOptions;
     private logger: any;
 
@@ -28,7 +29,7 @@ export class JasperEngine {
      * @param logger logger
      */
     constructor(
-        ruleStore: Record<string, Rule>,
+        ruleStore: IRuleStore,
         options: EngineOptions = DefaultEngineOptions,
         logger = console
     ) {
@@ -449,162 +450,186 @@ export class JasperEngine {
         ruleName: string;
         parentExecutionContext?: ExecutionContext;
     }): Observable<ExecutionResponse> {
-        const rule: Rule = this.ruleStore[params.ruleName];
-
-        const ruleHash = hash(params.ruleName);
-        const objectHash = hash(rule.uniqueBy ? rule.uniqueBy(params.root) : params.root);
-        const contextHash = ruleHash + objectHash;
-
-        const dedupId = this.options.suppressDuplicateTasks ? '' : `-${_.random(0, 10000)}`;
-        const contextId = `${contextHash}${dedupId}`;
-
-        let context: ExecutionContext = this.contextStore[contextId];
-
-        if (!context || this.options.suppressDuplicateTasks !== true) {
-            context = {
-                contextId,
-                rule,
+        const debugContext = this.options.debug
+            /* istanbul ignore next */
+            ? {
+                contextId: '',
                 root: params.root,
-                _process$: of(null),
-                complete: false,
-                contextData: {},
-                response: {
-                    rule: params.ruleName,
-                    hasError: false,
-                    isSuccessful: false,
-                    result: undefined,
-                    metadata: rule.metadata,
-                    debugContext: this.options.debug
-                        ? {
-                              contextId,
-                              root: params.root,
-                              ruleName: rule.name,
-                          }
-                        : undefined,
-                },
-            };
-
-            if (this.options.debug) {
-                context.contextData.objectHash = objectHash;
+                ruleName: params.ruleName,
             }
+            : undefined;
 
-            this.contextStore[contextId] = context;
-            if (params.parentExecutionContext) {
-                context.parentContext = params.parentExecutionContext;
-                (params.parentExecutionContext.childrenContexts = params.parentExecutionContext.childrenContexts || {})[
-                    context.contextId
-                ] = context;
-            }
-        } else {
-            return context._process$;
-        }
-
-        const response = context.response;
-
-        context._process$ = of(true).pipe(
-            // call beforeAction
-            switchMap((x) => {
-                response.startTime = new Date();
-                if (rule.beforeAction) {
-                    return rule.beforeAction(context).pipe(
-                        tap(() => {
-                            /* istanbul ignore next */
-                            if (this.options.debug) {
-                                this.logger.debug(
-                                    `before action executed for rule ${rule.name} - context ${context.contextId}`
-                                );
-                            }
-                        })
-                    );
-                }
-                return of(x);
-            }),
-            // execute the main action
-            switchMap(() => {
-                if(rule.action) {
-                    return this.executeAction({
-                        action: rule.action,
-                        context,
-                    });
-                }
-                
-                return this.options.recipe === EngineRecipe.BusinessProcessEngine
-                    ? of(null)
-                    : of(true);
-            }),
-            tap((result) => {
-                context.complete = true;
-                response.isSuccessful = true;
-                response.result = result;
-                response.completeTime = new Date();
-            }),
-            // call dependency rules
-            switchMap(() => {
-                return rule.dependencies
-                    ? this.processCompositeDependency(rule.dependencies, context).pipe(
-                          tap((dependencyResponse: CompositeDependencyResponse) => {
-                              response.dependency = dependencyResponse;
-                              response.isSuccessful = response.isSuccessful && dependencyResponse.isSuccessful;
-                          }),
-                          switchMapTo(of(response))
-                      )
-                    : of(response);
-            }),
-            // call afterAction
-            switchMap((response) => {
-                // validation recipe expect the result for the rule to be boolean
-                // and in order for the rule to be valid, the result needs to true
-                if (this.options.recipe === EngineRecipe.ValidationRuleEngine) {
-                    response.isSuccessful = response.isSuccessful && response.result === true;
-                }
-
-                if (rule.afterAction) {
-                    return rule.afterAction(context).pipe(
-                        tap(() => {
-                            /* istanbul ignore next */
-                            if (this.options.debug) {
-                                this.logger.debug(
-                                    `after action executed for rule ${rule.name} - context ${context.contextId}`
-                                );
-                            }
-                        })
-                    );
-                }
-                return of(response);
-            }),
-            catchError((err) => {
-                response.isSuccessful = false;
-                response.hasError = true;
+        const response: ExecutionResponse = {
+            rule: params.ruleName,
+            hasError: false,
+            isSuccessful: true,
+            result: undefined,                        
+            debugContext,
+        };
+        
+        return this.ruleStore.get(params.ruleName).pipe(
+            catchError(err => {
                 response.error = err;
-                response.completeTime = new Date();
-                if (rule.onError) {
-                    /* if a custom onError handler is specified
-                       let it decide if we should replace the the stream 
-                       or let it fail
-                    */
-                    return rule.onError(err, context).pipe(
-                        tap(() => {
-                            /* istanbul ignore next */
-                            if (this.options.debug) {
-                                this.logger.debug(
-                                    `onError executed for rule ${rule.name} - context ${context.contextId}`
-                                );
-                            }
-                        })
-                    );
+                return of(undefined);
+            }),
+            switchMap((rule: Rule | undefined) => {
+                if (!rule) {
+                    response.error = response.error || new RuleNotFoundException(params.ruleName);
+                    response.hasError = true;
+                    response.isSuccessful = false;
+                    return of(response);
                 }
+                return of(rule).pipe(
+                    switchMap((rule: Rule) => {
+                        const ruleHash = hash(params.ruleName);
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const objectHash = hash(rule!.uniqueBy ? rule!.uniqueBy(params.root) : params.root);
+                        const contextHash = ruleHash + objectHash;
+                
+                        const dedupId = this.options.suppressDuplicateTasks ? '' : `-${_.random(0, 10000)}`;
+                        const contextId = `${contextHash}${dedupId}`;
+                
+                        let context: ExecutionContext = this.contextStore[contextId];
 
-                return of(response);
-            })
-        );
+                        if (!context || this.options.suppressDuplicateTasks !== true) {
+                            response.metadata = rule.metadata;
+                            if (debugContext) {
+                                debugContext.contextId = contextId;
 
-        if (this.options.suppressDuplicateTasks) {
-            context._process$ = context._process$.pipe(shareReplay(1));
-        } else {
-            context._process$ = context._process$.pipe(share());
-        }
+                            }
+                            context = {
+                                contextId,
+                                rule,
+                                root: params.root,
+                                _process$: of(null),
+                                complete: false,
+                                contextData: {},
+                                response,
+                            };
+                
+                            if (this.options.debug) {
+                                context.contextData.objectHash = objectHash;
+                            }
+                
+                            this.contextStore[contextId] = context;
+                            if (params.parentExecutionContext) {
+                                context.parentContext = params.parentExecutionContext;
+                                (params.parentExecutionContext.childrenContexts = params.parentExecutionContext.childrenContexts || {})[
+                                    context.contextId
+                                ] = context;
+                            }
 
-        return context._process$;
+                            context._process$ = of(true).pipe(
+                                // call beforeAction
+                                switchMap(() => {
+                                    context.response.startTime = new Date();
+                                    if (rule.beforeAction) {
+                                        return rule.beforeAction(context).pipe(
+                                            tap(() => {
+                                                /* istanbul ignore next */
+                                                if (this.options.debug) {
+                                                    this.logger.debug(
+                                                        `before action executed for rule ${rule.name} - context ${context.contextId}`
+                                                    );
+                                                }
+                                            })
+                                        );
+                                    }
+                                    return of(null);
+                                }),
+                                // execute the main action
+                                switchMap(() => {
+                                    if(rule.action) {
+                                        return this.executeAction({
+                                            action: rule.action,
+                                            context,
+                                        });
+                                    }
+                                    
+                                    return this.options.recipe === EngineRecipe.BusinessProcessEngine
+                                        ? of(null)
+                                        : of(true);
+                                }),
+                                tap((result) => {
+                                    context.complete = true;
+                                    context.response.isSuccessful = true;
+                                    context.response.result = result;
+                                    context.response.completeTime = new Date();
+                                }),
+                                // call dependency rules
+                                switchMap(() => {
+                                    return rule.dependencies
+                                        ? this.processCompositeDependency(rule.dependencies, context).pipe(
+                                              tap((dependencyResponse: CompositeDependencyResponse) => {
+                                                  context.response.dependency = dependencyResponse;
+                                                  context.response.isSuccessful = context.response.isSuccessful && dependencyResponse.isSuccessful;
+                                              }),
+                                              switchMapTo(of(context.response))
+                                          )
+                                        : of(context.response);
+                                }),
+                                // call afterAction
+                                switchMap((response) => {
+                                    // validation recipe expect the result for the rule to be boolean
+                                    // and in order for the rule to be valid, the result needs to true
+                                    if (this.options.recipe === EngineRecipe.ValidationRuleEngine) {
+                                        response.isSuccessful = response.isSuccessful && response.result === true;
+                                    }
+                    
+                                    if (rule.afterAction) {
+                                        return rule.afterAction(context).pipe(
+                                            tap(() => {
+                                                /* istanbul ignore next */
+                                                if (this.options.debug) {
+                                                    this.logger.debug(
+                                                        `after action executed for rule ${rule.name} - context ${context.contextId}`
+                                                    );
+                                                }
+                                            })
+                                        );
+                                    }
+                                    return of(response);
+                                }),
+                                catchError((err) => {
+                                    context.response.isSuccessful = false;
+                                    context.response.hasError = true;
+                                    context.response.error = err;
+                                    context.response.completeTime = new Date();
+                                    if (rule.onError) {
+                                        /* if a custom onError handler is specified
+                                           let it decide if we should replace the the stream 
+                                           or let it fail
+                                        */
+                                        return rule.onError(err, context).pipe(
+                                            tap(() => {
+                                                /* istanbul ignore next */
+                                                if (this.options.debug) {
+                                                    this.logger.debug(
+                                                        `onError executed for rule ${rule.name} - context ${context.contextId}`
+                                                    );
+                                                }
+                                            })
+                                        );
+                                    }
+                    
+                                    return of(context.response);
+                                })
+                            );
+                    
+                            if (this.options.suppressDuplicateTasks) {
+                                context._process$ = context._process$.pipe(shareReplay(1));
+                            } else {
+                                context._process$ = context._process$.pipe(share());
+                            }
+
+                            return context._process$;
+                        }
+
+                        return context._process$;
+                    }),
+                );
+            }),
+        )
     }
 
     /* istanbul ignore next */

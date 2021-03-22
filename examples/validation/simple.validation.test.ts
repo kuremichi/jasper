@@ -1,6 +1,7 @@
 import { JasperEngine } from '../../src/engine';
 import { ExecutionOrder, EngineRecipe, Operator } from '../../src/enum';
 import { Rule } from '../../src/rule';
+import { SimpleRuleStore } from '../../src/store/simple.rule.store';
 
 const isJasper: Rule = {
     name: 'isJasper',
@@ -36,11 +37,7 @@ const isMyDog: Rule = {
     },
 };
 
-const ruleStore: Record<string, Rule> = 
-    [isJasper, isSamoyed, isMyDog].reduce((accumulator: any, rule) => {
-        accumulator[`${rule.name}`] = rule;
-        return accumulator;
-    }, {});
+const ruleStore = new SimpleRuleStore(isJasper, isSamoyed, isMyDog);
 
 it('should run', (done) => {
     const engine = new JasperEngine(ruleStore, {

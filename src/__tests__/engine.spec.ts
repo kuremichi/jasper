@@ -2,7 +2,7 @@ import { JasperEngine } from '../engine';
 
 import { Observable, of, empty, throwError } from 'rxjs';
 import _ from 'lodash';
-import { switchMap, tap } from 'rxjs/operators';
+import { subscribeOn, switchMap, tap } from 'rxjs/operators';
 
 import { Rule } from '../rule';
 import { ExecutionContext } from '../execution.context';
@@ -12,6 +12,8 @@ import { CompositeDependency } from '../dependency/composite.dependency';
 import { CompositeDependencyResponse } from '../dependency/composite.dependency.response';
 import { ExecutionResponse } from '../execution.response';
 import { SimpleDependencyResponse } from '../dependency/simple.dependency.response';
+import { SimpleRuleStore } from '../store/simple.rule.store';
+import { RuleNotFoundException } from '../store/rule.store.interfafce';
 
 describe('processExpression', () => {
     const mockRule: Rule = {
@@ -25,9 +27,10 @@ describe('processExpression', () => {
         isSuccessful: false,
         result: undefined,
     };
+    const simpleStore = new SimpleRuleStore(mockRule);
 
     it('should handle jsonata path expression', (done) => {
-        const engine = new JasperEngine({});
+        const engine = new JasperEngine(simpleStore);
         const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
         const context: ExecutionContext = {
             contextId: '1',
@@ -53,7 +56,7 @@ describe('processExpression', () => {
     });
 
     it('should handle observable path expression', (done) => {
-        const engine = new JasperEngine({});
+        const engine = new JasperEngine(simpleStore);
         const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
         const context: ExecutionContext = {
             contextId: '1',
@@ -87,7 +90,7 @@ describe('processExpression', () => {
     });
 
     it('should return [] otherwise', (done) => {
-        const engine = new JasperEngine({});
+        const engine = new JasperEngine(simpleStore);
         const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
         const context: ExecutionContext = {
             contextId: '1',
@@ -126,8 +129,10 @@ describe('executeAction', () => {
         result: undefined,
     };
 
+    const testStore = new SimpleRuleStore(mockRule);
+
     it('should handle jsonata action expression', (done) => {
-        const engine = new JasperEngine({});
+        const engine = new JasperEngine(testStore);
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
         const context: ExecutionContext = {
             contextId: '1',
@@ -160,7 +165,7 @@ describe('executeAction', () => {
     });
 
     it('should handle String jsonata action expression', (done) => {
-        const engine = new JasperEngine({});
+        const engine = new JasperEngine(testStore);
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
         const context: ExecutionContext = {
             contextId: '1',
@@ -193,7 +198,7 @@ describe('executeAction', () => {
     });
 
     it('should handle observable action expression', (done) => {
-        const engine = new JasperEngine({});
+        const engine = new JasperEngine(testStore);
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
         const context: ExecutionContext = {
             contextId: '1',
@@ -226,7 +231,7 @@ describe('executeAction', () => {
     });
 
     it('should return null if invalid expression passed', (done) => {
-        const engine = new JasperEngine({});
+        const engine = new JasperEngine(testStore);
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
 
         const action = 1;
@@ -251,8 +256,7 @@ describe('processSimpleDependency', () => {
         action: () => of(1),
     };
 
-    const ruleStore: Record<string, Rule> = {};
-    ruleStore[`${mockRule.name}`] = mockRule;
+    const testStore = new SimpleRuleStore(mockRule);
 
     const response = {
         rule: mockRule.name,
@@ -262,7 +266,7 @@ describe('processSimpleDependency', () => {
     };
 
     it('should skip simple dependency if jsonata when expression evaluates to false', (done) => {
-        const engine = new JasperEngine(ruleStore);
+        const engine = new JasperEngine(testStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
         const simpleDependency: SimpleDependency = {
@@ -305,7 +309,7 @@ describe('processSimpleDependency', () => {
     });
 
     it('should skip simple dependency if observable when expression evaluates to false', (done) => {
-        const engine = new JasperEngine(ruleStore);
+        const engine = new JasperEngine(testStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
         const simpleDependency: SimpleDependency = {
@@ -348,7 +352,7 @@ describe('processSimpleDependency', () => {
     });
 
     it('should return response with error if unable to evaluate path expression', (done) => {
-        const engine = new JasperEngine(ruleStore);
+        const engine = new JasperEngine(testStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
         const simpleDependency: SimpleDependency = {
@@ -392,7 +396,7 @@ describe('processSimpleDependency', () => {
     });
 
     it('should return response without error if unable to evaluate path expression but handled by onDependencyError hook', (done) => {
-        const engine = new JasperEngine(ruleStore);
+        const engine = new JasperEngine(testStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
         const simpleDependency: SimpleDependency = {
@@ -451,12 +455,10 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const ruleStore: Record<string, Rule> = {};
-        ruleStore[`${mockRule.name}`] = mockRule;
+        const ruleStore = new SimpleRuleStore(mockRule);
         const engine = new JasperEngine(ruleStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        ruleStore[`${mockRule.name}`] = mockRule;
         const simpleDependency: SimpleDependency = {
             name: 'test simple dependency',
             path: 'notfound',
@@ -507,12 +509,9 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const ruleStore: Record<string, Rule> = {};
-        ruleStore[`${mockRule.name}`] = mockRule;
+        const ruleStore = new SimpleRuleStore(mockRule);
         const engine = new JasperEngine(ruleStore);
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
-
-        ruleStore[`${mockRule.name}`] = mockRule;
 
         const beforeEachFn = jest.fn().mockReturnValue(1);
         const afterEachFn = jest.fn().mockReturnValue(1);
@@ -594,9 +593,8 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const myRuleStore: Record<string, Rule> = {};
-        myRuleStore[`${mockRule.name}`] = mockRule;
-        const engine = new JasperEngine(myRuleStore);
+        const ruleStore = new SimpleRuleStore(mockRule);
+        const engine = new JasperEngine(ruleStore);
 
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
@@ -657,9 +655,8 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const myRuleStore: Record<string, Rule> = {};
-        myRuleStore[`${mockRule.name}`] = mockRule;
-        const engine = new JasperEngine(myRuleStore);
+        const ruleStore = new SimpleRuleStore(mockRule);
+        const engine = new JasperEngine(ruleStore);
 
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
@@ -725,9 +722,8 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const myRuleStore: Record<string, Rule> = {};
-        myRuleStore[`${mockRule.name}`] = mockRule;
-        const engine = new JasperEngine(myRuleStore);
+        const ruleStore = new SimpleRuleStore(mockRule);
+        const engine = new JasperEngine(ruleStore);
 
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
@@ -784,8 +780,7 @@ describe('processCompositeDependency', () => {
         action: () => of(1),
     };
 
-    const ruleStore: Record<string, Rule> = {};
-    ruleStore[`${mockRule.name}`] = mockRule;
+    const ruleStore = new SimpleRuleStore(mockRule);
 
     const response = {
         rule: mockRule.name,
@@ -1348,6 +1343,78 @@ describe('processCompositeDependency', () => {
 });
 
 describe('execute', () => {
+    it('should return failure if rule not found', (done) => {
+        
+        const rule: Rule = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+        };
+
+        const store = new SimpleRuleStore(rule);
+
+        const engine = new JasperEngine(store);
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        const notfoundrule = 'notfound-rule';
+        (engine as any).execute({ root, ruleName: notfoundrule }).subscribe({
+            next: (response: ExecutionResponse) => {
+                const error = new RuleNotFoundException(notfoundrule)
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.hasError).toBe(true);
+                expect(response.result).toBe(undefined);
+                expect(response.isSuccessful).toBe(false);
+                expect(response.error).toMatchObject(error);
+
+                done();
+            },
+        });
+    });
+
+    it('should return failure if unable to get rule', (done) => {
+        const error = new Error('unable to get rule');
+        const store = {
+            get(): Observable<Rule> {
+                return new Observable(subscriber => {
+                    setTimeout(() => {
+                        subscriber.error(error);
+                    }, 800);
+                })
+            }
+        };
+
+        const engine = new JasperEngine(store);
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child2' },
+            ],
+        };
+
+        const notfoundrule = 'notfound-rule';
+        (engine as any).execute({ root, ruleName: notfoundrule }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect(executeSpy).toBeCalledTimes(1);
+                expect(response.hasError).toBe(true);
+                expect(response.result).toBe(undefined);
+                expect(response.isSuccessful).toBe(false);
+                expect(response.error).toMatchObject(error);
+
+                done();
+            },
+        });
+    });
+
     it('should invoke beforeAction hook', (done) => {
         const beforeActionMock = jest.fn().mockReturnValue(1);
         const actionMock = jest.fn().mockReturnValue(1);
@@ -1363,9 +1430,9 @@ describe('execute', () => {
             },
         };
 
-        const engine = new JasperEngine({
-            mockRule: rule,
-        });
+        const store = new SimpleRuleStore(rule);
+
+        const engine = new JasperEngine(store);
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 
@@ -1407,10 +1474,10 @@ describe('execute', () => {
             },
         };
 
+        const store = new SimpleRuleStore(mockRule);
+
         const engine = new JasperEngine(
-            {
-                mockRule,
-            },
+            store,
             {
                 recipe: EngineRecipe.ValidationRuleEngine,
                 suppressDuplicateTasks: true,
@@ -1465,10 +1532,9 @@ describe('execute', () => {
             description: 'description for mock rule',
         };
 
+        const store = new SimpleRuleStore(mockRule);
         const engine = new JasperEngine(
-            {
-                mockRule,
-            },
+            store,
             {
                 recipe: EngineRecipe.ValidationRuleEngine,
                 suppressDuplicateTasks: true,
@@ -1520,10 +1586,9 @@ describe('execute', () => {
             description: 'description for mock rule',
         };
 
+        const store = new SimpleRuleStore(mockRule);
         const engine = new JasperEngine(
-            {
-                mockRule,
-            },
+            store,
             {
                 recipe: EngineRecipe.BusinessProcessEngine,
                 suppressDuplicateTasks: true,
@@ -1585,9 +1650,8 @@ describe('execute', () => {
             },
         };
 
-        const engine = new JasperEngine({
-            mockRule: rule,
-        });
+        const store = new SimpleRuleStore(rule);
+        const engine = new JasperEngine(store);
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 
@@ -1627,9 +1691,8 @@ describe('execute', () => {
             },
         };
 
-        const engine = new JasperEngine({
-            mockRule: rule,
-        });
+        const store = new SimpleRuleStore(rule);
+        const engine = new JasperEngine(store);
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 
@@ -1661,11 +1724,9 @@ describe('execute', () => {
                 return of(actionMock());
             },
         };
-
+        const store = new SimpleRuleStore(rule);
         const engine = new JasperEngine(
-            {
-                mockRule: rule,
-            },
+            store,
             {
                 recipe: EngineRecipe.BusinessProcessEngine,
                 suppressDuplicateTasks: true,
@@ -1711,10 +1772,9 @@ describe('execute', () => {
             },
         };
 
+        const store = new SimpleRuleStore(rule);
         const engine = new JasperEngine(
-            {
-                mockRule: rule,
-            },
+            store,
             {
                 recipe: EngineRecipe.ValidationRuleEngine,
                 suppressDuplicateTasks: false,
@@ -1780,10 +1840,8 @@ describe('execute', () => {
             dependencies: compositeDependency,
         };
 
-        const engine = new JasperEngine({
-            mockRule,
-            parentRule,
-        });
+        const store = new SimpleRuleStore(mockRule, parentRule);
+        const engine = new JasperEngine(store);
 
         const executeSpy = jest.spyOn(engine as any, 'execute');
 
@@ -1840,11 +1898,9 @@ describe('execute', () => {
             dependencies: compositeDependency,
         };
 
+        const store = new SimpleRuleStore(mockRule, parentRule);
         const engine = new JasperEngine(
-            {
-                mockRule,
-                parentRule,
-            },
+            store,
             {
                 recipe: EngineRecipe.BusinessProcessEngine,
                 suppressDuplicateTasks: true,

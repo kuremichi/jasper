@@ -1,15 +1,18 @@
 import { JasperEngine } from '../../src/engine';
 import { EngineOptions } from '../../src/engine.option';
 import { EngineRecipe } from '../../src/enum';
-import { StaticRuleStore } from './user.registrator.rule.store';
+import { SimpleRuleStore } from '../../src/store/simple.rule.store';
+import { rules } from './user.registrator.rule.store';
 jest.setTimeout(15000);
+
 it('should run', (done) => {
     const options: EngineOptions = {
         recipe: EngineRecipe.ValidationRuleEngine,
         suppressDuplicateTasks: true,
         debug: true,
     };
-    const engine = new JasperEngine(StaticRuleStore, options);
+    const store = new SimpleRuleStore(...rules);
+    const engine = new JasperEngine(store, options);
 
     engine
         .run({
