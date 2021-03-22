@@ -45,13 +45,7 @@ export class JasperEngine {
      * executeAction('jsonataExpression', context)
      *
      * @example observable
-     * executeAction(of(1), context)
-     *
-     * @example async function
-     * executeAction(async (context) => {}, context)
-     *
-     * @example function
-     * executeAction((context) => {}, context)
+     * executeAction((context) => of(1), context)
      */
     private executeAction(params: {
         action: string | ((context: ExecutionContext) => Observable<any>);
@@ -61,10 +55,6 @@ export class JasperEngine {
             const expression = jsonata(params.action as string);
             const result = expression.evaluate(params.context.root);
             return of(result);
-        }
-
-        if (params.action instanceof Observable) {
-            return from(params.action);
         }
 
         if (params.action instanceof Function) {

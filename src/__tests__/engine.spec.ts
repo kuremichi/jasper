@@ -215,7 +215,7 @@ describe('executeAction', () => {
             response,
         };
 
-        const action = of(123);
+        const action = () => of(123);
 
         const ob: Observable<any> = (engine as any).executeAction({ action, context });
 
