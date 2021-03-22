@@ -2,7 +2,6 @@
   - [Jasper Rule Engine](#jasper-rule-engine)
 - [2. Quickstart](#2-quickstart)
 - [3. Rule](#3-rule)
-  - [Rule](#rule)
 - [4. Dependencies](#4-dependencies)
   - [Simple Dependency](#simple-dependency)
   - [Composite Dependency](#composite-dependency)
@@ -13,9 +12,7 @@
   - [Validation Engine](#validation-engine)
 - [6. Lifecycle Hooks](#6-lifecycle-hooks)
   - [For Rule](#for-rule)
-  - [3. onError](#3-onerror)
   - [For Simple Dependency](#for-simple-dependency)
-  - [5. onDependencyError](#5-ondependencyerror)
   - [For Compositive Dependency](#for-compositive-dependency)
 - [7. Execution Context](#7-execution-context)
 
@@ -32,6 +29,7 @@
       npm install --save jasper-engine rxjs jsonata
 
 ```typescript
+import { Rule, JasperEngine, SimpleRuleStore, Operator, ExecutionOrder } from 'jasper-engine';
 /*
   Define your rules
 */
@@ -53,7 +51,6 @@ const isSamoyed: Rule = {
 const isMyDog: Rule = {
     name: 'isMyDog',
     description: 'a rule to check if the dog is my dog',
-    action: 'true',
     dependencies: {
         name: 'my dog is a samoyed named Jasper',
         operator: Operator.AND,
@@ -76,12 +73,7 @@ const isMyDog: Rule = {
 /*
   compile your rules
 */
-const ruleStore: Record<string, Rule> = 
-    [isJasper, isSamoyed, isMyDog].reduce((accumulator: any, rule) => {
-        accumulator[`${rule.name}`] = rule;
-        return accumulator;
-    }, {});
-
+const ruleStore = new SimpleRuleStore(isJasper, isSamoyed, isMyDog);
 
 /*
 * execute to figure out if the dog is Jasper.
@@ -107,7 +99,7 @@ engine
 ```
 
 # 3. Rule
-## Rule
+
 
 # 4. Dependencies
 ## Simple Dependency
@@ -124,21 +116,22 @@ engine
 
 # 6. Lifecycle Hooks
 ## For Rule
-1. beforeAction
-2. afterAction
-3. onError
----
+* beforeAction
+* afterAction
+* onError
+
 ## For Simple Dependency
-1. beforeDependency
-2. beforeEach
-3. afterEach
-4. afterDependency
-5. onDependencyError
----
+* beforeDependency
+* beforeEach
+* afterEach
+* onEachError
+* afterDependency
+* onDependencyError
+
 ## For Compositive Dependency
-1. beforeDependency
-2. afterDependency
-3. onDependencyError
+* beforeDependency
+* afterDependency
+* onDependencyError
 
 # 7. Execution Context
 
