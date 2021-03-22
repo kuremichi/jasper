@@ -11,3 +11,4 @@ export { SimpleDependencyResponse } from './dependency/simple.dependency.respons
 export { SimpleDependencyExecutionResponse } from './dependency/simple.dependency.execution.response';
 export { IRuleStore } from './store/rule.store.interfafce';
 export { SimpleRuleStore } from './store/simple.rule.store';
+export { ILogger } from './ILogger';
