@@ -78,7 +78,7 @@ const ruleStore = new SimpleRuleStore(isJasper, isSamoyed, isMyDog);
 /*
 * execute to figure out if the dog is Jasper.
 */
-const engine = new JasperEngine(ruleStore);
+const engine = new JasperEngine({ ruleStore });
 const dog = {
     name: 'Jasper',
     breed: 'Samoyed',

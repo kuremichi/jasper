@@ -21,8 +21,8 @@ it('should run', (done) => {
         debug: true,
     };
 
-    const store = new SimpleRuleStore(...rules);
-    const engine = new JasperEngine(store, options);
+    const ruleStore = new SimpleRuleStore(...rules);
+    const engine = new JasperEngine({ruleStore, options});
 
     const now = moment.utc();
 

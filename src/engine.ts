@@ -15,24 +15,27 @@ import { CompositeDependencyResponse } from './dependency/composite.dependency.r
 import { ExecutionResponse } from './execution.response';
 import { SimpleDependencyExecutionResponse } from './dependency/simple.dependency.execution.response';
 import { IRuleStore, RuleNotFoundException } from './store/rule.store.interfafce';
+import { ILogger, DummyLogger } from './ILogger';
 
 export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
     private ruleStore: IRuleStore;
     private readonly options: EngineOptions;
-    private logger: any;
+    private logger: ILogger;
 
     /**
-     *
-     * @param ruleStore a dictionary of all rules
-     * @param options options
-     * @param logger logger
+     * 
+     * @param param
+     * @param param.ruleStore the store that contains your rules
+     * @param param.options engine options
+     * @param param.logger a logger instance that implementation ILogger interface. e.g. console
      */
-    constructor(ruleStore: IRuleStore, options: EngineOptions = DefaultEngineOptions, logger = console) {
-        this.options = options;
+    constructor({ ruleStore, options, logger }: { ruleStore: IRuleStore; options?: EngineOptions; logger?: ILogger }) {
+        // constructor(ruleStore: IRuleStore, options: EngineOptions = DefaultEngineOptions, logger: ILogger) {
+        this.options = options || DefaultEngineOptions;
         this.contextStore = {};
         this.ruleStore = ruleStore;
-        this.logger = logger;
+        this.logger = logger || DummyLogger;
     }
 
     /**

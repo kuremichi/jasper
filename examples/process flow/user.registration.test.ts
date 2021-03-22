@@ -11,8 +11,8 @@ it('should run', (done) => {
         suppressDuplicateTasks: true,
         debug: true,
     };
-    const store = new SimpleRuleStore(...rules);
-    const engine = new JasperEngine(store, options);
+    const ruleStore = new SimpleRuleStore(...rules);
+    const engine = new JasperEngine({ ruleStore, options });
 
     engine
         .run({
