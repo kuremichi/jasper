@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { JasperEngine } from '../engine';
 
 import { Observable, of, empty, throwError } from 'rxjs';
@@ -1115,8 +1116,10 @@ describe('processCompositeDependency', () => {
                         dependencyResponse.rules,
                         (r) => r.name === simpleDependency2.name
                     );
-                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
-                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    expect(nestedCompositeDependencyResponse!.isSuccessful).toBe(false);
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    expect(nestedSimpleDependencyResponse!.isSuccessful).toBe(true);
                     done();
                 },
             });
@@ -1189,8 +1192,10 @@ describe('processCompositeDependency', () => {
                         dependencyResponse.rules,
                         (r) => r.name === simpleDependency2.name
                     );
-                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
-                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(false);
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    expect(nestedCompositeDependencyResponse!.isSuccessful).toBe(false);
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    expect(nestedSimpleDependencyResponse!.isSuccessful).toBe(false);
                     done();
                 },
             });
@@ -1259,8 +1264,8 @@ describe('processCompositeDependency', () => {
                         dependencyResponse.rules,
                         (r) => r.name === simpleDependency2.name
                     );
-                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(true);
-                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
+                    expect(nestedCompositeDependencyResponse!.isSuccessful).toBe(true);
+                    expect(nestedSimpleDependencyResponse!.isSuccessful).toBe(true);
                     done();
                 },
             });
@@ -1331,8 +1336,8 @@ describe('processCompositeDependency', () => {
                         dependencyResponse.rules,
                         (r) => r.name === simpleDependency2.name
                     );
-                    expect(nestedCompositeDependencyResponse?.isSuccessful).toBe(false);
-                    expect(nestedSimpleDependencyResponse?.isSuccessful).toBe(true);
+                    expect(nestedCompositeDependencyResponse!.isSuccessful).toBe(false);
+                    expect(nestedSimpleDependencyResponse!.isSuccessful).toBe(true);
                     done();
                 },
             });
@@ -1929,8 +1934,8 @@ describe('execute', () => {
                 expect(executeSpy).toBeCalledTimes(3);
                 expect(response.result).toBe(1);
                 expect(response.isSuccessful).toBe(true);
-                expect(response?.dependency?.isSuccessful).toBe(true);
-                expect(response?.dependency?.rules[0]?.isSuccessful).toBe(true);
+                expect(response!.dependency!.isSuccessful).toBe(true);
+                expect(response!.dependency!.rules[0]!.isSuccessful).toBe(true);
                 done();
             },
         });
@@ -1994,8 +1999,8 @@ describe('execute', () => {
                 expect(executeSpy).toBeCalledTimes(3);
                 expect(response.result).toBe(1);
                 expect(response.isSuccessful).toBe(true);
-                expect(response?.dependency?.isSuccessful).toBe(true);
-                expect(response?.dependency?.rules[0]?.isSuccessful).toBe(true);
+                expect(response!.dependency!.isSuccessful).toBe(true);
+                expect(response!.dependency!.rules[0]!.isSuccessful).toBe(true);
                 done();
             },
         });
