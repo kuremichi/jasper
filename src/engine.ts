@@ -24,7 +24,7 @@ export class JasperEngine {
     private logger: ILogger;
 
     /**
-     * 
+     *
      * @param param
      * @param param.ruleStore the store that contains your rules
      * @param param.options engine options
