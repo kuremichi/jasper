@@ -40,7 +40,7 @@ export interface Rule {
     /**
      * lifecycle hook after the action has error
      */
-    onError?: (error: any, context: ExecutionContext) => Observable<ExecutionResponse>;
+    onError?: string | ((error: any, context: ExecutionContext) => Observable<ExecutionResponse>);
 
     /**
      * the dependencies of the rule that will be executed

@@ -1,0 +1,337 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@kuremichi/jasper</title>
+	<meta name="description" content="Documentation for @kuremichi/jasper">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@kuremichi/jasper</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>@kuremichi/jasper</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<ul>
+					<li><a href="#1-description">1. Description</a><ul>
+							<li><a href="#jasper-rule-engine">Jasper Rule Engine</a></li>
+						</ul>
+					</li>
+					<li><a href="#2-quickstart">2. Quickstart</a></li>
+					<li><a href="#3-rule">3. Rule</a></li>
+					<li><a href="#4-dependencies">4. Dependencies</a><ul>
+							<li><a href="#simple-dependency">Simple Dependency</a></li>
+							<li><a href="#composite-dependency">Composite Dependency</a></li>
+							<li><a href="#executionorder">ExecutionOrder</a></li>
+							<li><a href="#operator">Operator</a></li>
+						</ul>
+					</li>
+					<li><a href="#5-recipe">5. Recipe</a><ul>
+							<li><a href="#process-engine">Process Engine</a></li>
+							<li><a href="#validation-engine">Validation Engine</a></li>
+						</ul>
+					</li>
+					<li><a href="#6-lifecycle-hooks">6. Lifecycle Hooks</a><ul>
+							<li><a href="#for-rule">For Rule</a></li>
+							<li><a href="#for-simple-dependency">For Simple Dependency</a></li>
+							<li><a href="#for-compositive-dependency">For Compositive Dependency</a></li>
+						</ul>
+					</li>
+					<li><a href="#7-execution-context">7. Execution Context</a></li>
+				</ul>
+				<a href="#1-description" id="1-description" style="color: inherit; text-decoration: none;">
+					<h1>1. Description</h1>
+				</a>
+				<a href="#jasper-rule-engine" id="jasper-rule-engine" style="color: inherit; text-decoration: none;">
+					<h2>Jasper Rule Engine</h2>
+				</a>
+				<p>  Are you building an application that contains a lot of validation rules ?<br>  Are you building an application that contains a lot of business workflow process ?   </p>
+				<p>  Here comes Jasper Rule Engine.</p>
+				<a href="#2-quickstart" id="2-quickstart" style="color: inherit; text-decoration: none;">
+					<h1>2. Quickstart</h1>
+				</a>
+				<pre><code><span style="color: #000000">  </span><span style="color: #001080">To</span><span style="color: #000000"> </span><span style="color: #001080">get</span><span style="color: #000000"> </span><span style="color: #001080">started</span><span style="color: #000000">  </span>
+<span style="color: #000000">  </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> --</span><span style="color: #001080">save</span><span style="color: #000000"> </span><span style="color: #001080">jasper</span><span style="color: #000000">-</span><span style="color: #001080">engine</span><span style="color: #000000"> </span><span style="color: #001080">rxjs</span><span style="color: #000000"> </span><span style="color: #001080">jsonata</span>
+</code></pre>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">Rule</span><span style="color: #000000">, </span><span style="color: #001080">JasperEngine</span><span style="color: #000000">, </span><span style="color: #001080">SimpleRuleStore</span><span style="color: #000000">, </span><span style="color: #001080">Operator</span><span style="color: #000000">, </span><span style="color: #001080">ExecutionOrder</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;jasper-engine&#039;</span><span style="color: #000000">;</span>
+<span style="color: #008000">/*</span>
+<span style="color: #008000">  Define your rules</span>
+<span style="color: #008000">*/</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isJasper</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #008000">// the name of the rule</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isJasper&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #008000">// a description for your rule. (documentation purpose only)</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;a rule to check if the dog is named Jasper&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #008000">// a jsonata expression to test if rule is true/false</span>
+<span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;name = &quot;Jasper&quot;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">};</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isSamoyed</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isSamoyed&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;a rule to check if the dog is of breed samoyed&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;breed = &quot;Samoyed&quot;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">};</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isMyDog</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isMyDog&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;a rule to check if the dog is my dog&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">dependencies:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;my dog is a samoyed named Jasper&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">operator:</span><span style="color: #000000"> </span><span style="color: #001080">Operator</span><span style="color: #000000">.</span><span style="color: #0070C1">AND</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">executionOrder:</span><span style="color: #000000"> </span><span style="color: #001080">ExecutionOrder</span><span style="color: #000000">.</span><span style="color: #001080">Parallel</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">rules:</span><span style="color: #000000"> [</span>
+<span style="color: #000000">            {</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;name should be jasper&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">isJasper</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">            },</span>
+<span style="color: #000000">            {</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;breed should be samoyed&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">isSamoyed</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">            },</span>
+<span style="color: #000000">        ],</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">};</span>
+
+<span style="color: #008000">/*</span>
+<span style="color: #008000">  compile your rules</span>
+<span style="color: #008000">*/</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ruleStore</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">SimpleRuleStore</span><span style="color: #000000">(</span><span style="color: #001080">isJasper</span><span style="color: #000000">, </span><span style="color: #001080">isSamoyed</span><span style="color: #000000">, </span><span style="color: #001080">isMyDog</span><span style="color: #000000">);</span>
+
+<span style="color: #008000">/*</span>
+<span style="color: #008000">* execute to figure out if the dog is Jasper.</span>
+<span style="color: #008000">*/</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">engine</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">JasperEngine</span><span style="color: #000000">({</span>
+<span style="color: #000000">    </span><span style="color: #001080">ruleStore</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">options:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">recipe:</span><span style="color: #000000"> </span><span style="color: #001080">EngineRecipe</span><span style="color: #000000">.</span><span style="color: #001080">ValidationRuleEngine</span><span style="color: #000000">,</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">});</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">dog</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Jasper&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">breed:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Samoyed&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">};</span>
+
+<span style="color: #001080">engine</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">run</span><span style="color: #000000">({</span>
+<span style="color: #000000">        </span><span style="color: #001080">root:</span><span style="color: #000000"> </span><span style="color: #001080">dog</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">ruleName:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isMyDog&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    })</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">subscribe</span><span style="color: #000000">({</span>
+<span style="color: #000000">        </span><span style="color: #795E26">next</span><span style="color: #001080">:</span><span style="color: #000000"> (</span><span style="color: #001080">response</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">            </span><span style="color: #008000">//expect(response.isSuccessful).toBe(true);</span>
+<span style="color: #000000">        },</span>
+<span style="color: #000000">    });</span>
+
+</code></pre>
+				<a href="#3-rule" id="3-rule" style="color: inherit; text-decoration: none;">
+					<h1>3. Rule</h1>
+				</a>
+				<a href="#4-dependencies" id="4-dependencies" style="color: inherit; text-decoration: none;">
+					<h1>4. Dependencies</h1>
+				</a>
+				<a href="#simple-dependency" id="simple-dependency" style="color: inherit; text-decoration: none;">
+					<h2>Simple Dependency</h2>
+				</a>
+				<a href="#composite-dependency" id="composite-dependency" style="color: inherit; text-decoration: none;">
+					<h2>Composite Dependency</h2>
+				</a>
+				<a href="#executionorder" id="executionorder" style="color: inherit; text-decoration: none;">
+					<h2>ExecutionOrder</h2>
+				</a>
+				<a href="#operator" id="operator" style="color: inherit; text-decoration: none;">
+					<h2>Operator</h2>
+				</a>
+				<a href="#5-recipe" id="5-recipe" style="color: inherit; text-decoration: none;">
+					<h1>5. Recipe</h1>
+				</a>
+				<a href="#process-engine" id="process-engine" style="color: inherit; text-decoration: none;">
+					<h2>Process Engine</h2>
+				</a>
+				<a href="#validation-engine" id="validation-engine" style="color: inherit; text-decoration: none;">
+					<h2>Validation Engine</h2>
+				</a>
+				<a href="#6-lifecycle-hooks" id="6-lifecycle-hooks" style="color: inherit; text-decoration: none;">
+					<h1>6. Lifecycle Hooks</h1>
+				</a>
+				<a href="#for-rule" id="for-rule" style="color: inherit; text-decoration: none;">
+					<h2>For Rule</h2>
+				</a>
+				<ul>
+					<li>beforeAction</li>
+					<li>afterAction</li>
+					<li>onError</li>
+				</ul>
+				<a href="#for-simple-dependency" id="for-simple-dependency" style="color: inherit; text-decoration: none;">
+					<h2>For Simple Dependency</h2>
+				</a>
+				<ul>
+					<li>beforeDependency</li>
+					<li>beforeEach</li>
+					<li>afterEach</li>
+					<li>onEachError</li>
+					<li>afterDependency</li>
+					<li>onDependencyError</li>
+				</ul>
+				<a href="#for-compositive-dependency" id="for-compositive-dependency" style="color: inherit; text-decoration: none;">
+					<h2>For Compositive Dependency</h2>
+				</a>
+				<ul>
+					<li>beforeDependency</li>
+					<li>afterDependency</li>
+					<li>onDependencyError</li>
+				</ul>
+				<a href="#7-execution-context" id="7-execution-context" style="color: inherit; text-decoration: none;">
+					<h1>7. Execution Context</h1>
+				</a>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/enginerecipe.html" class="tsd-kind-icon">Engine<wbr>Recipe</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/executionorder.html" class="tsd-kind-icon">Execution<wbr>Order</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/operator.html" class="tsd-kind-icon">Operator</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/jasperengine.html" class="tsd-kind-icon">Jasper<wbr>Engine</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/simplerulestore.html" class="tsd-kind-icon">Simple<wbr>Rule<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/compositedependency.html" class="tsd-kind-icon">Composite<wbr>Dependency</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/compositedependencyresponse.html" class="tsd-kind-icon">Composite<wbr>Dependency<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/debugcontext.html" class="tsd-kind-icon">Debug<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/engineoptions.html" class="tsd-kind-icon">Engine<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/executioncontext.html" class="tsd-kind-icon">Execution<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/executionresponse.html" class="tsd-kind-icon">Execution<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilogger.html" class="tsd-kind-icon">ILogger</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/irulestore.html" class="tsd-kind-icon">IRule<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/rule.html" class="tsd-kind-icon">Rule</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/simpledependency.html" class="tsd-kind-icon">Simple<wbr>Dependency</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/simpledependencyexecutionresponse.html" class="tsd-kind-icon">Simple<wbr>Dependency<wbr>Execution<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/simpledependencyresponse.html" class="tsd-kind-icon">Simple<wbr>Dependency<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#defaultengineoptions" class="tsd-kind-icon">Default<wbr>Engine<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#iscompositedependency" class="tsd-kind-icon">is<wbr>Composite<wbr>Dependency</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#issimpledependency" class="tsd-kind-icon">is<wbr>Simple<wbr>Dependency</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

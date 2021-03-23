@@ -15,24 +15,27 @@ import { CompositeDependencyResponse } from './dependency/composite.dependency.r
 import { ExecutionResponse } from './execution.response';
 import { SimpleDependencyExecutionResponse } from './dependency/simple.dependency.execution.response';
 import { IRuleStore, RuleNotFoundException } from './store/rule.store.interfafce';
+import { ILogger, DummyLogger } from './ILogger';
 
 export class JasperEngine {
     private contextStore: Record<string, ExecutionContext>;
     private ruleStore: IRuleStore;
     private readonly options: EngineOptions;
-    private logger: any;
+    private logger: ILogger;
 
     /**
      *
-     * @param ruleStore a dictionary of all rules
-     * @param options options
-     * @param logger logger
+     * @param param
+     * @param param.ruleStore the store that contains your rules
+     * @param param.options engine options
+     * @param param.logger a logger instance that implementation ILogger interface. e.g. console
      */
-    constructor(ruleStore: IRuleStore, options: EngineOptions = DefaultEngineOptions, logger = console) {
-        this.options = options;
+    constructor({ ruleStore, options, logger }: { ruleStore: IRuleStore; options?: EngineOptions; logger?: ILogger }) {
+        // constructor(ruleStore: IRuleStore, options: EngineOptions = DefaultEngineOptions, logger: ILogger) {
+        this.options = options || DefaultEngineOptions;
         this.contextStore = {};
         this.ruleStore = ruleStore;
-        this.logger = logger;
+        this.logger = logger || DummyLogger;
     }
 
     /**
@@ -45,13 +48,7 @@ export class JasperEngine {
      * executeAction('jsonataExpression', context)
      *
      * @example observable
-     * executeAction(of(1), context)
-     *
-     * @example async function
-     * executeAction(async (context) => {}, context)
-     *
-     * @example function
-     * executeAction((context) => {}, context)
+     * executeAction((context) => of(1), context)
      */
     private executeAction(params: {
         action: string | ((context: ExecutionContext) => Observable<any>);
@@ -61,10 +58,6 @@ export class JasperEngine {
             const expression = jsonata(params.action as string);
             const result = expression.evaluate(params.context.root);
             return of(result);
-        }
-
-        if (params.action instanceof Observable) {
-            return from(params.action);
         }
 
         if (params.action instanceof Function) {
@@ -591,6 +584,23 @@ export class JasperEngine {
                                     context.response.error = err;
                                     context.response.completeTime = new Date();
                                     if (rule.onError) {
+                                        /**
+                                         * if the onError expression is jsonata, evaluate it against the
+                                         * root object and provide user with a custom error
+                                         */
+                                        if (typeof rule.onError === 'string') {
+                                            this.logger.error(err);
+                                            try {
+                                                const errExpression = jsonata(rule.onError);
+                                                const result = errExpression.evaluate(context.root);
+                                                context.response.error = result;
+                                            } catch (error) {
+                                                context.response.error = error;
+                                            }
+
+                                            return of(context.response);
+                                        }
+
                                         /* if a custom onError handler is specified
                                            let it decide if we should replace the the stream 
                                            or let it fail

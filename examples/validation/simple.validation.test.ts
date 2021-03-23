@@ -40,8 +40,11 @@ const isMyDog: Rule = {
 const ruleStore = new SimpleRuleStore(isJasper, isSamoyed, isMyDog);
 
 it('should run', (done) => {
-    const engine = new JasperEngine(ruleStore, {
-        recipe: EngineRecipe.ValidationRuleEngine,
+    const engine = new JasperEngine({
+        ruleStore,
+        options: {
+            recipe: EngineRecipe.ValidationRuleEngine,
+        }
     });
 
     const dog = {
