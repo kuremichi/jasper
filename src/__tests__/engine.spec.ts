@@ -270,7 +270,7 @@ describe('processSimpleDependency', () => {
         const engine = new JasperEngine({ ruleStore: testStore });
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -313,7 +313,7 @@ describe('processSimpleDependency', () => {
         const engine = new JasperEngine({ ruleStore: testStore });
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -356,7 +356,7 @@ describe('processSimpleDependency', () => {
         const engine = new JasperEngine({ ruleStore: testStore });
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -400,7 +400,7 @@ describe('processSimpleDependency', () => {
         const engine = new JasperEngine({ ruleStore: testStore });
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -460,7 +460,7 @@ describe('processSimpleDependency', () => {
         const engine = new JasperEngine({ ruleStore });
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'notfound',
             rule: mockRule.name,
@@ -519,7 +519,7 @@ describe('processSimpleDependency', () => {
         const beforeDependencyFn = jest.fn().mockReturnValue(1);
         const afterDependencyFn = jest.fn().mockReturnValue(1);
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -599,7 +599,7 @@ describe('processSimpleDependency', () => {
 
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -661,7 +661,7 @@ describe('processSimpleDependency', () => {
 
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -728,7 +728,7 @@ describe('processSimpleDependency', () => {
 
         const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -794,13 +794,13 @@ describe('processCompositeDependency', () => {
         const engine = new JasperEngine({ ruleStore });
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
         };
 
-        const compositeDependency: CompositeDependency = {
+        const compositeDependency: CompositeDependency<any> = {
             name: 'test composite dependency',
             when: 'children ~> $count() > 2',
             rules: [simpleDependency],
@@ -842,13 +842,13 @@ describe('processCompositeDependency', () => {
         const engine = new JasperEngine({ ruleStore });
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
         };
 
-        const compositeDependency: CompositeDependency = {
+        const compositeDependency: CompositeDependency<any> = {
             name: 'test composite dependency',
             when: () => of(false),
             rules: [simpleDependency],
@@ -890,13 +890,13 @@ describe('processCompositeDependency', () => {
         const engine = new JasperEngine({ ruleStore });
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
         };
 
-        const compositeDependency: CompositeDependency = {
+        const compositeDependency: CompositeDependency<any> = {
             name: 'test composite dependency',
             when: () => throwError(new Error('when evaluation error')),
             rules: [simpleDependency],
@@ -939,7 +939,7 @@ describe('processCompositeDependency', () => {
         const engine = new JasperEngine({ ruleStore });
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -948,7 +948,7 @@ describe('processCompositeDependency', () => {
         const beforeMockFn = jest.fn().mockReturnValue(1);
         const afterMockFn = jest.fn().mockReturnValue(1);
 
-        const compositeDependency: CompositeDependency = {
+        const compositeDependency: CompositeDependency<any> = {
             name: 'test composite dependency',
             beforeDependency: () => of(beforeMockFn()),
             afterDependency: () => of(afterMockFn()),
@@ -993,7 +993,7 @@ describe('processCompositeDependency', () => {
         const engine = new JasperEngine({ ruleStore });
         const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
@@ -1006,7 +1006,7 @@ describe('processCompositeDependency', () => {
         };
 
         const onDependencyErrorMockFn = jest.fn();
-        const compositeDependency: CompositeDependency = {
+        const compositeDependency: CompositeDependency<any> = {
             name: 'test composite dependency',
             rules: [simpleDependency],
             onDependencyError: (err, response) => {
@@ -1055,7 +1055,7 @@ describe('processCompositeDependency', () => {
             const engine = new JasperEngine({ ruleStore });
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-            const simpleDependency: SimpleDependency = {
+            const simpleDependency: SimpleDependency<any> = {
                 name: 'test simple dependency',
                 path: 'children',
                 rule: mockRule.name,
@@ -1067,18 +1067,18 @@ describe('processCompositeDependency', () => {
                 },
             };
 
-            const nestCompositeDependency: CompositeDependency = {
+            const nestCompositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 rules: [simpleDependency],
             };
 
-            const simpleDependency2: SimpleDependency = {
+            const simpleDependency2: SimpleDependency<any> = {
                 name: 'test simple dependency 2',
                 path: 'children',
                 rule: mockRule.name,
             };
 
-            const compositeDependency: CompositeDependency = {
+            const compositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 operator: Operator.OR,
                 rules: [nestCompositeDependency, simpleDependency2],
@@ -1131,7 +1131,7 @@ describe('processCompositeDependency', () => {
             const engine = new JasperEngine({ ruleStore });
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-            const simpleDependency: SimpleDependency = {
+            const simpleDependency: SimpleDependency<any> = {
                 name: 'test simple dependency',
                 path: 'children',
                 rule: mockRule.name,
@@ -1140,12 +1140,12 @@ describe('processCompositeDependency', () => {
                 },
             };
 
-            const nestCompositeDependency: CompositeDependency = {
+            const nestCompositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 rules: [simpleDependency],
             };
 
-            const simpleDependency2: SimpleDependency = {
+            const simpleDependency2: SimpleDependency<any> = {
                 name: 'test simple dependency 2',
                 path: 'children',
                 rule: mockRule.name,
@@ -1154,7 +1154,7 @@ describe('processCompositeDependency', () => {
                 },
             };
 
-            const compositeDependency: CompositeDependency = {
+            const compositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 operator: Operator.OR,
                 rules: [nestCompositeDependency, simpleDependency2],
@@ -1209,24 +1209,24 @@ describe('processCompositeDependency', () => {
             const engine = new JasperEngine({ ruleStore });
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-            const simpleDependency: SimpleDependency = {
+            const simpleDependency: SimpleDependency<any> = {
                 name: 'test simple dependency',
                 path: 'children',
                 rule: mockRule.name,
             };
 
-            const nestCompositeDependency: CompositeDependency = {
+            const nestCompositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 rules: [simpleDependency],
             };
 
-            const simpleDependency2: SimpleDependency = {
+            const simpleDependency2: SimpleDependency<any> = {
                 name: 'test simple dependency 2',
                 path: 'children',
                 rule: mockRule.name,
             };
 
-            const compositeDependency: CompositeDependency = {
+            const compositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 operator: Operator.AND,
                 rules: [nestCompositeDependency, simpleDependency2],
@@ -1277,7 +1277,7 @@ describe('processCompositeDependency', () => {
             const engine = new JasperEngine({ ruleStore });
             const processCompositeDependencySpy = jest.spyOn(engine as any, 'processCompositeDependency');
 
-            const simpleDependency: SimpleDependency = {
+            const simpleDependency: SimpleDependency<any> = {
                 name: 'test simple dependency',
                 path: 'children',
                 rule: mockRule.name,
@@ -1286,18 +1286,18 @@ describe('processCompositeDependency', () => {
                 },
             };
 
-            const nestCompositeDependency: CompositeDependency = {
+            const nestCompositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 rules: [simpleDependency],
             };
 
-            const simpleDependency2: SimpleDependency = {
+            const simpleDependency2: SimpleDependency<any> = {
                 name: 'test simple dependency 2',
                 path: 'children',
                 rule: mockRule.name,
             };
 
-            const compositeDependency: CompositeDependency = {
+            const compositeDependency: CompositeDependency<any> = {
                 name: 'test composite dependency',
                 operator: Operator.AND,
                 executionOrder: ExecutionOrder.Sequential,
@@ -1896,13 +1896,13 @@ describe('execute', () => {
             },
         };
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
         };
 
-        const compositeDependency: CompositeDependency = {
+        const compositeDependency: CompositeDependency<any> = {
             name: 'test composite dependency',
             rules: [simpleDependency],
         };
@@ -1953,13 +1953,13 @@ describe('execute', () => {
             },
         };
 
-        const simpleDependency: SimpleDependency = {
+        const simpleDependency: SimpleDependency<any> = {
             name: 'test simple dependency',
             path: 'children',
             rule: mockRule.name,
         };
 
-        const compositeDependency: CompositeDependency = {
+        const compositeDependency: CompositeDependency<any> = {
             name: 'test composite dependency',
             rules: [simpleDependency],
         };
