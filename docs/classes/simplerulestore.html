@@ -106,7 +106,7 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="simplerulestore.html#get" class="tsd-kind-icon">get</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="simplerulestore.html#register" class="tsd-kind-icon">register</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="simplerulestore.html#register" class="tsd-kind-icon">register</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="simplerulestore.html#registerrulearray" class="tsd-kind-icon">register<wbr>Rule<wbr>Array</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="simplerulestore.html#registerruledictionary" class="tsd-kind-icon">register<wbr>Rule<wbr>Dictionary</a></li>
 							</ul>
@@ -120,19 +120,19 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Simple<wbr>Rule<wbr>Store<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>rules<span class="tsd-signature-symbol">: </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="simplerulestore.html" class="tsd-signature-type" data-tsd-kind="Class">SimpleRuleStore</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Simple<wbr>Rule<wbr>Store<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>rules<span class="tsd-signature-symbol">: </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="simplerulestore.html" class="tsd-signature-type" data-tsd-kind="Class">SimpleRuleStore</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in store/simple.rule.store.ts:10</li>
+									<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/store/simple.rule.store.ts#L10">store/simple.rule.store.ts:10</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>rules: <a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">[]</span></h5>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>rules: <a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="simplerulestore.html" class="tsd-signature-type" data-tsd-kind="Class">SimpleRuleStore</a></h4>
@@ -145,10 +145,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="rules" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> rules</h3>
-					<div class="tsd-signature tsd-kind-icon">rules<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">rules<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in store/simple.rule.store.ts:10</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/store/simple.rule.store.ts#L10">store/simple.rule.store.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -159,14 +159,14 @@
 					<a name="get" class="tsd-anchor"></a>
 					<h3>get</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>ruleName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>ruleName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/irulestore.html">IRuleStore</a>.<a href="../interfaces/irulestore.html#get">get</a></p>
 								<ul>
-									<li>Defined in store/simple.rule.store.ts:22</li>
+									<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/store/simple.rule.store.ts#L22">store/simple.rule.store.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -177,27 +177,33 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 					<a name="register" class="tsd-anchor"></a>
 					<h3>register</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">register<span class="tsd-signature-symbol">(</span>rule<span class="tsd-signature-symbol">: </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a>, overrideIfExists<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, alternativeRuleName<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">register&lt;T&gt;<span class="tsd-signature-symbol">(</span>rule<span class="tsd-signature-symbol">: </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, overrideIfExists<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, alternativeRuleName<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in store/simple.rule.store.ts:55</li>
+									<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/store/simple.rule.store.ts#L55">store/simple.rule.store.ts:55</a></li>
 								</ul>
 							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>rule: <a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a></h5>
+									<h5>rule: <a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
 									<h5>overrideIfExists: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
@@ -216,19 +222,19 @@
 					<a name="registerrulearray" class="tsd-anchor"></a>
 					<h3>register<wbr>Rule<wbr>Array</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">register<wbr>Rule<wbr>Array<span class="tsd-signature-symbol">(</span>rules<span class="tsd-signature-symbol">: </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">[]</span>, overrideIfExists<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">register<wbr>Rule<wbr>Array<span class="tsd-signature-symbol">(</span>rules<span class="tsd-signature-symbol">: </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span>, overrideIfExists<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in store/simple.rule.store.ts:31</li>
+									<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/store/simple.rule.store.ts#L31">store/simple.rule.store.ts:31</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>rules: <a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>rules: <a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 								<li>
 									<h5>overrideIfExists: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
@@ -244,19 +250,19 @@
 					<a name="registerruledictionary" class="tsd-anchor"></a>
 					<h3>register<wbr>Rule<wbr>Dictionary</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">register<wbr>Rule<wbr>Dictionary<span class="tsd-signature-symbol">(</span>dictionary<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&gt;</span>, overrideIfExists<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">register<wbr>Rule<wbr>Dictionary<span class="tsd-signature-symbol">(</span>dictionary<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span>, overrideIfExists<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in store/simple.rule.store.ts:42</li>
+									<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/store/simple.rule.store.ts#L42">store/simple.rule.store.ts:42</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>dictionary: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>dictionary: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../interfaces/rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
 									<h5>overrideIfExists: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
@@ -306,7 +312,7 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="simplerulestore.html#get" class="tsd-kind-icon">get</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
 								<a href="simplerulestore.html#register" class="tsd-kind-icon">register</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
@@ -319,7 +325,7 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="../interfaces/compositedependency.html" class="tsd-kind-icon">Composite<wbr>Dependency</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -331,7 +337,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="../interfaces/engineoptions.html" class="tsd-kind-icon">Engine<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="../interfaces/executioncontext.html" class="tsd-kind-icon">Execution<wbr>Context</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -343,10 +349,10 @@
 					<li class=" tsd-kind-interface">
 						<a href="../interfaces/irulestore.html" class="tsd-kind-icon">IRule<wbr>Store</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="../interfaces/rule.html" class="tsd-kind-icon">Rule</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="../interfaces/simpledependency.html" class="tsd-kind-icon">Simple<wbr>Dependency</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -383,7 +389,6 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 		</div>
 	</div>
