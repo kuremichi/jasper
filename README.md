@@ -3,10 +3,11 @@
 - [2. Quickstart](#2-quickstart)
 - [3. Rule](#3-rule)
 - [4. Dependencies](#4-dependencies)
-    - [Simple Dependency](#simple-dependency)
-    - [Composite Dependency](#composite-dependency)
-    - [ExecutionOrder](#executionorder)
-    - [Operator](#operator)
+    - [**Simple Dependency**](#simple-dependency)
+    - [**Composite Dependency**](#composite-dependency)
+    - [**ExecutionOrder**](#executionorder)
+      - [Concurrency](#concurrency)
+    - [**Operator**](#operator)
 - [5. Recipe](#5-recipe)
 - [6. Lifecycle Hooks](#6-lifecycle-hooks)
   - [For Rule](#for-rule)
@@ -160,26 +161,36 @@ const validateCreditCard: rule
 ```
 
 # 4. Dependencies
-### Simple Dependency
+### **Simple Dependency**
 A simple dependency is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.
 
-### Composite Dependency
+### **Composite Dependency**
 As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.
 
-### ExecutionOrder
+### **ExecutionOrder**
 When it comes to execute dependency tasks. Jasper Engine supports two Execution, Parallel and Sequential.  
 * For Composite Dependency, this means each dependency configured in the rules array will be executed in parallel or in order.
 * For Simple Dependency, this means the results (an array) returned by the **Path** expression will be executed in parallel or in order.
 
-The default is **Parallel**.
+#### Concurrency  
+When executing a dependency **in parallel**, you might want to limit the number of dependencies to be executed at the same time. You can do so by specifying the maxConcurrency on the dependency config.
 
-### Operator
+
+|  Type   | Note  |
+| ------- | ---- |
+| Composite Dependency | all dependencies defined will be executed in parallel but not more than **N** at a time. |
+| Simple Dependency    | executions against all object returned by **PATH** will be executed in parallel but not more than **N** at a time. |
+
+** N is the value set for maxConcurrency.
+
+### **Operator**
 When determining if the dependency execution is successful, you can specify **AND** or **OR**. 
 
 |  Type   | AND  | OR   |
 | ------- | ---- | ---- |
 | Composite Dependency | all dependencies defined under rules have to be successful. | at least one dependency defined under rules needs to be successful. |
 | Simple Dependency    | executions against all object returned by **PATH** need to successful | Not Supported |
+
 
 
 The default is **AND**.

@@ -16,7 +16,7 @@ export interface SimpleDependency<T> {
     onEachError?: (error: any, response: SimpleDependencyExecutionResponse, context: ExecutionContext<T>) => Observable<SimpleDependencyExecutionResponse>;
     afterEach?: (pathObject: any, index: number, context: ExecutionContext<T>) => Observable<any>;
     afterDependency?: (context: ExecutionContext<T>) => Observable<any>;
-    maxCurrency?: number;
+    maxConcurrency?: number;
     retry?: number;
 }
 export declare function isSimpleDependency(object: any): object is SimpleDependency<any>;

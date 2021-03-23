@@ -63,7 +63,7 @@ export interface CompositeDependency<T> {
     /**
      * the max number of direct dependencies to be evaluate at a time
      */
-    maxCurrency?: number;
+    maxConcurrency?: number;
 }
 
 export function isCompositeDependency(object: any): object is CompositeDependency<any> {

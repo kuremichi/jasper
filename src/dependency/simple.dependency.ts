@@ -80,7 +80,7 @@ export interface SimpleDependency<T> {
      * the maximum current execution to run for matches.
      * Default is -1 unlimited
      */
-    maxCurrency?: number;
+    maxConcurrency?: number;
 
     /**
      * TODO: to implement
