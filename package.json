@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/kuremichi/jasper/issues"
   },
-  "homepage": "https://github.com/kuremichi/jasper#readme",
+  "homepage": "https://kuremichi.github.io/jasper",
   "dependencies": {
     "jsonata": "^1.8.4",
     "lodash": "^4.17.21",

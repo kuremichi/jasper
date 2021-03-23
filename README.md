@@ -35,7 +35,7 @@ import { EngineRecipe, JasperEngine, Rule, SimpleRuleStore } from "@kuremichi/ja
 import { iif, of } from "rxjs";
 
 
-const _21YoRule: Rule = {
+const _21YoRule: Rule<any> = {
     name: 'can buy alcohol at the age of 21+',
     description: 'check if a person has reached the legal age to buy an alcohol',
     action: 'age >= 21'
@@ -124,7 +124,7 @@ const person = {
     }
 }
 
-const subscription = engine
+engine
     .run({
         root: person,
         ruleName: alcoholRule.name,
@@ -135,14 +135,15 @@ const subscription = engine
         console.log(`${person.name} can${response.isSuccessful ? '' : 'not'} buy alcohol in ${person.currentLocation.stateOrProvince}, ${person.currentLocation.country}`);
     });
 
-subscription.unsubscribe();
 
 
 ```
 
 # 3. Rule
-A rule is a simple piece of logic. It could be a validation logic, a workflow process, a http request. A simple rule could look like below.
+A rule is a simple piece of logic.  
+It could be a validation logic, a workflow process, a http request.  
 
+A simple rule could look like below.
 ```typescript
 
 
