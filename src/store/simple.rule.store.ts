@@ -7,9 +7,9 @@ import _ from 'lodash';
  * a simple rule store implementation that keeps a local copy of rules
  */
 export class SimpleRuleStore implements IRuleStore {
-    private rules: Record<string, Rule>;
+    private rules: Record<string, Rule<any>>;
 
-    constructor(...rules: Rule[]) {
+    constructor(...rules: Rule<any>[]) {
         this.rules = {};
 
         this.registerRuleArray(rules);
@@ -19,7 +19,7 @@ export class SimpleRuleStore implements IRuleStore {
      *
      * @param ruleName
      */
-    get(ruleName: string): Observable<Rule | undefined> {
+    get(ruleName: string): Observable<Rule<any> | undefined> {
         return of(this.rules[ruleName]);
     }
 
@@ -28,7 +28,7 @@ export class SimpleRuleStore implements IRuleStore {
      * @param rules
      * @param overrideIfExists
      */
-    registerRuleArray(rules: Rule[], overrideIfExists = false): void {
+    registerRuleArray(rules: Rule<any>[], overrideIfExists = false): void {
         _.each(rules, (rule) => {
             this.register(rule, overrideIfExists);
         });
@@ -39,9 +39,9 @@ export class SimpleRuleStore implements IRuleStore {
      * @param dictionary
      * @param overrideIfExists
      */
-    registerRuleDictionary(dictionary: Record<string, Rule>, overrideIfExists = false): void {
+    registerRuleDictionary(dictionary: Record<string, Rule<any>>, overrideIfExists = false): void {
         const configs = _.entries(dictionary);
-        _.each(configs, ([ruleName, rule]: [string, Rule]) => {
+        _.each(configs, ([ruleName, rule]: [string, Rule<any>]) => {
             this.register(rule, overrideIfExists, ruleName);
         });
     }
@@ -52,7 +52,7 @@ export class SimpleRuleStore implements IRuleStore {
      * @param overrideIfExists
      * @param alternativeRuleName
      */
-    register(rule: Rule, overrideIfExists = false, alternativeRuleName?: string): void {
+    register<T>(rule: Rule<T>, overrideIfExists = false, alternativeRuleName?: string): void {
         const ruleName = alternativeRuleName || rule.name;
         const existingRule = this.rules[ruleName];
         if (existingRule && !overrideIfExists) {

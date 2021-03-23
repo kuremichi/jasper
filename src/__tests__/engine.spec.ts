@@ -17,7 +17,7 @@ import { SimpleRuleStore } from '../store/simple.rule.store';
 import { RuleNotFoundException } from '../store/rule.store.interfafce';
 
 describe('processExpression', () => {
-    const mockRule: Rule = {
+    const mockRule: Rule<any> = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
@@ -33,7 +33,7 @@ describe('processExpression', () => {
     it('should handle jsonata path expression', (done) => {
         const engine = new JasperEngine({ ruleStore: simpleStore });
         const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
             rule: mockRule,
@@ -59,7 +59,7 @@ describe('processExpression', () => {
     it('should handle observable path expression', (done) => {
         const engine = new JasperEngine({ ruleStore: simpleStore });
         const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
             rule: mockRule,
@@ -93,7 +93,7 @@ describe('processExpression', () => {
     it('should return [] otherwise', (done) => {
         const engine = new JasperEngine({ ruleStore: simpleStore });
         const processExpressionSpy = jest.spyOn(engine as any, 'processExpression');
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: { children: [{ id: 1 }, { id: 2 }] },
             rule: mockRule,
@@ -118,7 +118,7 @@ describe('processExpression', () => {
 });
 
 describe('executeAction', () => {
-    const mockRule: Rule = {
+    const mockRule: Rule<any> = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
@@ -135,7 +135,7 @@ describe('executeAction', () => {
     it('should handle jsonata action expression', (done) => {
         const engine = new JasperEngine({ ruleStore: testStore });
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -168,7 +168,7 @@ describe('executeAction', () => {
     it('should handle String jsonata action expression', (done) => {
         const engine = new JasperEngine({ ruleStore: testStore });
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -201,7 +201,7 @@ describe('executeAction', () => {
     it('should handle observable action expression', (done) => {
         const engine = new JasperEngine({ ruleStore: testStore });
         const executeActionSpy = jest.spyOn(engine as any, 'executeAction');
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -251,7 +251,7 @@ describe('executeAction', () => {
 });
 
 describe('processSimpleDependency', () => {
-    const mockRule: Rule = {
+    const mockRule: Rule<any> = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
@@ -277,7 +277,7 @@ describe('processSimpleDependency', () => {
             when: 'children ~> $count() > 2',
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -320,7 +320,7 @@ describe('processSimpleDependency', () => {
             when: () => of(false),
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -363,7 +363,7 @@ describe('processSimpleDependency', () => {
             when: () => throwError(new Error('error evaluating when')),
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -412,7 +412,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -447,7 +447,7 @@ describe('processSimpleDependency', () => {
 
     it('should not execute dependency rule if no object found by path expression', (done) => {
         const mockFn = jest.fn().mockReturnValue(1);
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -466,7 +466,7 @@ describe('processSimpleDependency', () => {
             rule: mockRule.name,
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -501,7 +501,7 @@ describe('processSimpleDependency', () => {
 
     it('should run simpleDependency hooks', (done) => {
         const mockFn = jest.fn().mockReturnValue(1);
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -539,7 +539,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -585,7 +585,7 @@ describe('processSimpleDependency', () => {
                 throw new Error('error');
             });
 
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -605,7 +605,7 @@ describe('processSimpleDependency', () => {
             rule: mockRule.name,
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -647,7 +647,7 @@ describe('processSimpleDependency', () => {
                 throw new Error('error');
             });
 
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -672,7 +672,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -714,7 +714,7 @@ describe('processSimpleDependency', () => {
                 throw new Error('error');
             });
 
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -739,7 +739,7 @@ describe('processSimpleDependency', () => {
             },
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -775,7 +775,7 @@ describe('processSimpleDependency', () => {
 });
 
 describe('processCompositeDependency', () => {
-    const mockRule: Rule = {
+    const mockRule: Rule<any> = {
         name: 'mockRule',
         description: 'description for mock rule',
         action: () => of(1),
@@ -806,7 +806,7 @@ describe('processCompositeDependency', () => {
             rules: [simpleDependency],
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -854,7 +854,7 @@ describe('processCompositeDependency', () => {
             rules: [simpleDependency],
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -902,7 +902,7 @@ describe('processCompositeDependency', () => {
             rules: [simpleDependency],
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -955,7 +955,7 @@ describe('processCompositeDependency', () => {
             rules: [simpleDependency],
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -1017,7 +1017,7 @@ describe('processCompositeDependency', () => {
             },
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -1084,7 +1084,7 @@ describe('processCompositeDependency', () => {
                 rules: [nestCompositeDependency, simpleDependency2],
             };
 
-            const context: ExecutionContext = {
+            const context: ExecutionContext<any> = {
                 contextId: '1',
                 root: {
                     children: [
@@ -1160,7 +1160,7 @@ describe('processCompositeDependency', () => {
                 rules: [nestCompositeDependency, simpleDependency2],
             };
 
-            const context: ExecutionContext = {
+            const context: ExecutionContext<any> = {
                 contextId: '1',
                 root: {
                     children: [
@@ -1232,7 +1232,7 @@ describe('processCompositeDependency', () => {
                 rules: [nestCompositeDependency, simpleDependency2],
             };
 
-            const context: ExecutionContext = {
+            const context: ExecutionContext<any> = {
                 contextId: '1',
                 root: {
                     children: [
@@ -1304,7 +1304,7 @@ describe('processCompositeDependency', () => {
                 rules: [nestCompositeDependency, simpleDependency2],
             };
 
-            const context: ExecutionContext = {
+            const context: ExecutionContext<any> = {
                 contextId: '1',
                 root: {
                     children: [
@@ -1349,7 +1349,7 @@ describe('processCompositeDependency', () => {
 
 describe('execute', () => {
     it('should return failure if rule not found', (done) => {
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
         };
@@ -1385,7 +1385,7 @@ describe('execute', () => {
     it('should return failure if unable to get rule', (done) => {
         const error = new Error('unable to get rule');
         const store = {
-            get(): Observable<Rule> {
+            get(): Observable<Rule<any>> {
                 return new Observable((subscriber) => {
                     setTimeout(() => {
                         subscriber.error(error);
@@ -1423,7 +1423,7 @@ describe('execute', () => {
         const beforeActionMock = jest.fn().mockReturnValue(1);
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             beforeAction: () => {
@@ -1463,7 +1463,7 @@ describe('execute', () => {
         const afterActionMock = jest.fn().mockReturnValue(1);
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             afterAction: (context) => {
@@ -1498,7 +1498,7 @@ describe('execute', () => {
             ],
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -1531,7 +1531,7 @@ describe('execute', () => {
     });
 
     it('should return true by default if action is not provided for Validation recipe', (done) => {
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
         };
@@ -1554,7 +1554,7 @@ describe('execute', () => {
             ],
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -1585,7 +1585,7 @@ describe('execute', () => {
     });
 
     it('should return null by default if action is not provided for BusinessProcess recipe', (done) => {
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
         };
@@ -1608,7 +1608,7 @@ describe('execute', () => {
             ],
         };
 
-        const context: ExecutionContext = {
+        const context: ExecutionContext<any> = {
             contextId: '1',
             root: {
                 children: [
@@ -1641,7 +1641,7 @@ describe('execute', () => {
     it('should invoke onError hook and throw error if stream not replaced', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
         const errorMock = jest.fn();
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1681,7 +1681,7 @@ describe('execute', () => {
     it('should invoke onError hook and replace the stream with what is provided', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
         const errorMock = jest.fn();
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1720,7 +1720,7 @@ describe('execute', () => {
 
     it('should invoke onError hook (jsonata expression) and replace the error with what is returned', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1756,7 +1756,7 @@ describe('execute', () => {
 
     it('should invoke onError hook (jsonata expression) and try error if expression has issue', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1793,7 +1793,7 @@ describe('execute', () => {
     it('should share/multicast the action if option is set to suppress duplicate tasks', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1840,7 +1840,7 @@ describe('execute', () => {
     it('should invoke action depending on the number of subscriptions if option is set to not suppress duplicate tasks', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const rule: Rule = {
+        const rule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1888,7 +1888,7 @@ describe('execute', () => {
     it('should process rule with dependency', (done) => {
         const actionMock = jest.fn().mockReturnValue(1);
 
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             action: () => {
@@ -1907,7 +1907,7 @@ describe('execute', () => {
             rules: [simpleDependency],
         };
 
-        const parentRule: Rule = {
+        const parentRule: Rule<any> = {
             name: 'parentRule',
             description: 'description for mock rule',
             action: () => {
@@ -1944,7 +1944,7 @@ describe('execute', () => {
     it('should respect custom uniqueBy when determining object uniqueness', (done) => {
         const actionMock2 = jest.fn().mockReturnValue(1);
 
-        const mockRule: Rule = {
+        const mockRule: Rule<any> = {
             name: 'mockRule',
             description: 'description for mock rule',
             uniqueBy: (root) => ({ name: root.name }),
@@ -1965,7 +1965,7 @@ describe('execute', () => {
         };
 
         const actionMock = jest.fn().mockReturnValue(1);
-        const parentRule: Rule = {
+        const parentRule: Rule<any> = {
             name: 'parentRule',
             description: 'description for mock rule',
             action: () => {

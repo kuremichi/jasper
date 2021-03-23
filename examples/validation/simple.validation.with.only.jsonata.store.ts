@@ -4,7 +4,11 @@ import { Rule } from '../../src/rule';
 import { ExecutionContext } from '../../src/execution.context';
 import { ExecutionOrder } from '../../src/enum';
 
-export const rules: Rule[] = [
+export interface User {
+    name: string;
+}
+
+export const rules: Rule<any>[] = [
     {
         name: 'is payment on time ?',
         description: 'a payment is late if its payment date is greater than dueDate',
@@ -16,7 +20,7 @@ export const rules: Rule[] = [
         metadata: {
             entity: 'account',
         },
-        action: (context: ExecutionContext) =>
+        action: (context: ExecutionContext<User>) =>
             of({
                 id: 1,
                 name: context.root.name,

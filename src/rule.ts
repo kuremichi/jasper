@@ -3,7 +3,7 @@ import { CompositeDependency } from './dependency/composite.dependency';
 import { ExecutionContext } from './execution.context';
 import { ExecutionResponse } from './execution.response';
 
-export interface Rule {
+export interface Rule<T> {
     /**
      * the name of the rule
      */
@@ -19,33 +19,33 @@ export interface Rule {
      * by default Jasper Workflow Engine will hash the root object provided to the rule to determine its uniqueness
      * if you don't want the entire object to be considered and want to provide your own uniqueness algorithm, use this extension
      */
-    uniqueBy?: (root: any) => any;
+    uniqueBy?: (root: T) => any;
 
     /**
      * lifecycle hook before the action is executed
      */
-    beforeAction?: (context: ExecutionContext) => Observable<any>;
+    beforeAction?: (context: ExecutionContext<T>) => Observable<any>;
 
     /**
      * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
      */
-    action?: string | ((context: ExecutionContext) => Observable<unknown>);
+    action?: string | ((context: ExecutionContext<T>) => Observable<unknown>);
 
     /**
      * lifecycle hook after the action has been executing executed
      */
-    afterAction?: (context: ExecutionContext) => Observable<ExecutionResponse>;
+    afterAction?: (context: ExecutionContext<T>) => Observable<ExecutionResponse>;
 
     /**
      * lifecycle hook after the action has error
      */
-    onError?: string | ((error: any, context: ExecutionContext) => Observable<any>);
+    onError?: string | ((error: any, context: ExecutionContext<T>) => Observable<any>);
 
     /**
      * the dependencies of the rule that will be executed
      */
-    dependencies?: CompositeDependency | undefined;
+    dependencies?: CompositeDependency<T> | undefined;
 
     /**
      * custom meta data defined by user

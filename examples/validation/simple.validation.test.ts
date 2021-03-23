@@ -3,19 +3,19 @@ import { ExecutionOrder, EngineRecipe, Operator } from '../../src/enum';
 import { Rule } from '../../src/rule';
 import { SimpleRuleStore } from '../../src/store/simple.rule.store';
 
-const isJasper: Rule = {
+const isJasper: Rule<any> = {
     name: 'isJasper',
     description: 'a rule to check if the dog is named Jasper',
     action: 'name = "Jasper"',
 };
 
-const isSamoyed: Rule = {
+const isSamoyed: Rule<any> = {
     name: 'isSamoyed',
     description: 'a rule to check if the dog is of breed samoyed',
     action: 'breed = "Samoyed"',
 };
 
-const isMyDog: Rule = {
+const isMyDog: Rule<any> = {
     name: 'isMyDog',
     description: 'a rule to check if the dog is my dog',
     dependencies: {
