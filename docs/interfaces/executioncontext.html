@@ -58,13 +58,21 @@
 					<a href="executioncontext.html">ExecutionContext</a>
 				</li>
 			</ul>
-			<h1>Interface ExecutionContext</h1>
+			<h1>Interface ExecutionContext&lt;T&gt;</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>T</h4>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -102,17 +110,17 @@
 					<div class="tsd-signature tsd-kind-icon">_process$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:12</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L12">execution.context.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="childrencontexts" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> children<wbr>Contexts</h3>
-					<div class="tsd-signature tsd-kind-icon">children<wbr>Contexts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">children<wbr>Contexts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:11</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L11">execution.context.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -122,7 +130,7 @@
 					<div class="tsd-signature tsd-kind-icon">complete<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:13</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L13">execution.context.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -132,7 +140,7 @@
 					<div class="tsd-signature tsd-kind-icon">context<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:14</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L14">execution.context.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -142,17 +150,17 @@
 					<div class="tsd-signature tsd-kind-icon">context<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:7</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L7">execution.context.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="parentcontext" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> parent<wbr>Context</h3>
-					<div class="tsd-signature tsd-kind-icon">parent<wbr>Context<span class="tsd-signature-symbol">:</span> <a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a></div>
+					<div class="tsd-signature tsd-kind-icon">parent<wbr>Context<span class="tsd-signature-symbol">:</span> <a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:10</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L10">execution.context.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -162,27 +170,27 @@
 					<div class="tsd-signature tsd-kind-icon">response<span class="tsd-signature-symbol">:</span> <a href="executionresponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionResponse</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:15</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L15">execution.context.ts:15</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="root" class="tsd-anchor"></a>
 					<h3>root</h3>
-					<div class="tsd-signature tsd-kind-icon">root<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<div class="tsd-signature tsd-kind-icon">root<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:8</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L8">execution.context.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="rule" class="tsd-anchor"></a>
 					<h3>rule</h3>
-					<div class="tsd-signature tsd-kind-icon">rule<span class="tsd-signature-symbol">:</span> <a href="rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a></div>
+					<div class="tsd-signature tsd-kind-icon">rule<span class="tsd-signature-symbol">:</span> <a href="rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in execution.context.ts:9</li>
+							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L9">execution.context.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -213,7 +221,7 @@
 					<li class=" tsd-kind-class">
 						<a href="../classes/simplerulestore.html" class="tsd-kind-icon">Simple<wbr>Rule<wbr>Store</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="compositedependency.html" class="tsd-kind-icon">Composite<wbr>Dependency</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -227,7 +235,7 @@
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
+					<li class="current tsd-kind-interface tsd-has-type-parameter">
 						<a href="executioncontext.html" class="tsd-kind-icon">Execution<wbr>Context</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
@@ -270,10 +278,10 @@
 					<li class=" tsd-kind-interface">
 						<a href="irulestore.html" class="tsd-kind-icon">IRule<wbr>Store</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="rule.html" class="tsd-kind-icon">Rule</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="simpledependency.html" class="tsd-kind-icon">Simple<wbr>Dependency</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -310,7 +318,6 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 		</div>
 	</div>

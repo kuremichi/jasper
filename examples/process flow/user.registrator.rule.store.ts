@@ -3,11 +3,15 @@ import { tap, switchMap } from 'rxjs/operators';
 import { Rule } from '../../src/rule';
 import { ExecutionContext } from '../../src/execution.context';
 
-export const rules: Rule[] = [
+export interface User {
+    name: string;
+}
+
+export const rules: Rule<any>[] = [
     {
         name: 'send email',
         description: 'send an email to the user',
-        action: (context: ExecutionContext) =>
+        action: (context: ExecutionContext<any>) =>
             new Observable((subsriber) => {
                 console.log(`[${context.contextId}] sending email for....`);
                 // email body
@@ -25,7 +29,7 @@ export const rules: Rule[] = [
         metadata: {
             entity: 'account',
         },
-        action: (context: ExecutionContext) =>
+        action: (context: ExecutionContext<any>) =>
             of({
                 id: 1,
                 name: context.root.name,
@@ -39,7 +43,7 @@ export const rules: Rule[] = [
             rules: [
                 {
                     name: 'welcome user',
-                    path: (context: ExecutionContext) => {
+                    path: (context: ExecutionContext<User>) => {
                         return of(context.root).pipe(
                             switchMap((userObject) => {
                                 return of(`
@@ -75,13 +79,13 @@ export const rules: Rule[] = [
                             console.log(`[${contextId}] before welcome user`);
                         }),
                     ),
-                    beforeEach: (_userObject: any, index: number, context: ExecutionContext) => of(context.contextId).pipe(
+                    beforeEach: (_userObject: any, index: number, context: ExecutionContext<any>) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] before sending ${index+1} email`);
                         }),
                     ),
                     rule: 'send email',
-                    afterEach: (_userObject: any, index: number, context: ExecutionContext) => of(context.contextId).pipe(
+                    afterEach: (_userObject: any, index: number, context: ExecutionContext<any>) => of(context.contextId).pipe(
                         tap((contextId) => {
                             console.log(`[${contextId}] after sending ${index+1} email`);
                         }),

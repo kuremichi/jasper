@@ -72,11 +72,7 @@
 							<li><a href="#operator">Operator</a></li>
 						</ul>
 					</li>
-					<li><a href="#5-recipe">5. Recipe</a><ul>
-							<li><a href="#process-engine">Process Engine</a></li>
-							<li><a href="#validation-engine">Validation Engine</a></li>
-						</ul>
-					</li>
+					<li><a href="#5-recipe">5. Recipe</a></li>
 					<li><a href="#6-lifecycle-hooks">6. Lifecycle Hooks</a><ul>
 							<li><a href="#for-rule">For Rule</a></li>
 							<li><a href="#for-simple-dependency">For Simple Dependency</a></li>
@@ -97,138 +93,296 @@
 					<h1>2. Quickstart</h1>
 				</a>
 				<pre><code><span style="color: #000000">  </span><span style="color: #001080">To</span><span style="color: #000000"> </span><span style="color: #001080">get</span><span style="color: #000000"> </span><span style="color: #001080">started</span><span style="color: #000000">  </span>
-<span style="color: #000000">  </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> --</span><span style="color: #001080">save</span><span style="color: #000000"> </span><span style="color: #001080">jasper</span><span style="color: #000000">-</span><span style="color: #001080">engine</span><span style="color: #000000"> </span><span style="color: #001080">rxjs</span><span style="color: #000000"> </span><span style="color: #001080">jsonata</span>
+<span style="color: #000000">  </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> --</span><span style="color: #001080">save</span><span style="color: #000000"> @</span><span style="color: #001080">kuremichi</span><span style="color: #000000">/</span><span style="color: #001080">jasper</span>
+
+<span style="color: #000000">  </span><span style="color: #001080">Also</span><span style="color: #000000">, </span><span style="color: #001080">you</span><span style="color: #000000"> </span><span style="color: #001080">might</span><span style="color: #000000"> </span><span style="color: #001080">want</span><span style="color: #000000"> </span><span style="color: #001080">to</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> </span><span style="color: #001080">rxjs</span><span style="color: #000000"> </span><span style="color: #AF00DB">as</span><span style="color: #000000"> </span><span style="color: #267F99">Jasper</span><span style="color: #000000"> </span><span style="color: #267F99">Rule</span><span style="color: #000000"> </span><span style="color: #267F99">Engine</span><span style="color: #000000"> </span><span style="color: #267F99">heavily</span><span style="color: #000000"> </span><span style="color: #267F99">depends</span><span style="color: #000000"> </span><span style="color: #267F99">on</span><span style="color: #000000"> </span><span style="color: #267F99">Observable</span><span style="color: #000000">  </span>
+<span style="color: #000000">  </span><span style="color: #001080">to</span><span style="color: #000000"> </span><span style="color: #001080">configure</span><span style="color: #000000"> </span><span style="color: #001080">its</span><span style="color: #000000"> </span><span style="color: #001080">rule</span><span style="color: #000000">.</span>
+<span style="color: #000000">  </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> --</span><span style="color: #001080">save</span><span style="color: #000000"> </span><span style="color: #001080">rxjs</span>
 </code></pre>
-				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">Rule</span><span style="color: #000000">, </span><span style="color: #001080">JasperEngine</span><span style="color: #000000">, </span><span style="color: #001080">SimpleRuleStore</span><span style="color: #000000">, </span><span style="color: #001080">Operator</span><span style="color: #000000">, </span><span style="color: #001080">ExecutionOrder</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;jasper-engine&#039;</span><span style="color: #000000">;</span>
-<span style="color: #008000">/*</span>
-<span style="color: #008000">  Define your rules</span>
-<span style="color: #008000">*/</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isJasper</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
-<span style="color: #000000">    </span><span style="color: #008000">// the name of the rule</span>
-<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isJasper&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    </span><span style="color: #008000">// a description for your rule. (documentation purpose only)</span>
-<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;a rule to check if the dog is named Jasper&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    </span><span style="color: #008000">// a jsonata expression to test if rule is true/false</span>
-<span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;name = &quot;Jasper&quot;&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">};</span>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EngineRecipe</span><span style="color: #000000">, </span><span style="color: #001080">JasperEngine</span><span style="color: #000000">, </span><span style="color: #001080">Rule</span><span style="color: #000000">, </span><span style="color: #001080">SimpleRuleStore</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@kuremichi/jasper&quot;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">iif</span><span style="color: #000000">, </span><span style="color: #001080">of</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;rxjs&quot;</span><span style="color: #000000">;</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isSamoyed</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
-<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isSamoyed&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;a rule to check if the dog is of breed samoyed&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;breed = &quot;Samoyed&quot;&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">};</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isMyDog</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
-<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isMyDog&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;a rule to check if the dog is my dog&#039;</span><span style="color: #000000">,</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_21YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol at the age of 21+&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;age &gt;= 21&#039;</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_18YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol at the age of 18+&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;age &gt;= 18&#039;</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_19YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol at the age of 19+&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;age &gt;= 19&#039;</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">canadaAlcoholRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol in Canada&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol in Canada&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">dependencies:</span><span style="color: #000000"> {</span>
-<span style="color: #000000">        </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;my dog is a samoyed named Jasper&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">        </span><span style="color: #001080">operator:</span><span style="color: #000000"> </span><span style="color: #001080">Operator</span><span style="color: #000000">.</span><span style="color: #0070C1">AND</span><span style="color: #000000">,</span>
-<span style="color: #000000">        </span><span style="color: #001080">executionOrder:</span><span style="color: #000000"> </span><span style="color: #001080">ExecutionOrder</span><span style="color: #000000">.</span><span style="color: #001080">Parallel</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">        </span><span style="color: #001080">rules:</span><span style="color: #000000"> [</span>
 <span style="color: #000000">            {</span>
-<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;name should be jasper&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Alberta, Manitoba, Quebec&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">_18YoRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
 <span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">isJasper</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #008000">// if string is provided, it will be evaluated using jsonata</span>
+<span style="color: #000000">                </span><span style="color: #008000">// https://try.jsonata.org/</span>
+<span style="color: #000000">                </span><span style="color: #001080">when:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;currentLocation.stateOrProvince in [&quot;QC&quot;, &quot;MB&quot;, &quot;AB&quot;]&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">            },</span>
 <span style="color: #000000">            {</span>
-<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;breed should be samoyed&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Other provinces&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">_19YoRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
 <span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">isSamoyed</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #008000">// otherwise, for more complicated scenarios, it takes a function that will return an Observable&lt;boolean&gt;</span>
+<span style="color: #000000">                </span><span style="color: #795E26">when</span><span style="color: #001080">:</span><span style="color: #000000"> (</span><span style="color: #001080">context</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span>
+<span style="color: #000000">                    </span><span style="color: #795E26">iif</span><span style="color: #000000">(</span>
+<span style="color: #000000">                        () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> [</span><span style="color: #A31515">&#039;QC&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;MB&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;AB&#039;</span><span style="color: #000000">].</span><span style="color: #795E26">indexOf</span><span style="color: #000000">(</span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">currentLocation</span><span style="color: #000000">.</span><span style="color: #001080">stateOrProvince</span><span style="color: #000000">) === -</span><span style="color: #098658">1</span><span style="color: #000000">,</span>
+<span style="color: #000000">                        </span><span style="color: #795E26">of</span><span style="color: #000000">(</span><span style="color: #0000FF">true</span><span style="color: #000000">),</span>
+<span style="color: #000000">                        </span><span style="color: #795E26">of</span><span style="color: #000000">(</span><span style="color: #0000FF">false</span><span style="color: #000000">),</span>
+<span style="color: #000000">                    ),</span>
+<span style="color: #000000">            }</span>
+<span style="color: #000000">        ]</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">alcoholRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol in the current location&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">dependencies:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;alcohol rule world wide&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">rules:</span><span style="color: #000000"> [</span>
+<span style="color: #000000">            {</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;US Alcohol Rule&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">_21YoRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">when:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;currentLocation.country = &quot;United States&quot;&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">            },</span>
-<span style="color: #000000">        ],</span>
-<span style="color: #000000">    },</span>
-<span style="color: #000000">};</span>
+<span style="color: #000000">            {</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Canada Alcohol Rule&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">canadaAlcoholRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">when:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;currentLocation.country = &quot;Canada&quot;&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">            }</span>
+<span style="color: #000000">            </span><span style="color: #008000">// rules for other countries omitted</span>
+<span style="color: #000000">        ]</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
 
-<span style="color: #008000">/*</span>
-<span style="color: #008000">  compile your rules</span>
-<span style="color: #008000">*/</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ruleStore</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">SimpleRuleStore</span><span style="color: #000000">(</span><span style="color: #001080">isJasper</span><span style="color: #000000">, </span><span style="color: #001080">isSamoyed</span><span style="color: #000000">, </span><span style="color: #001080">isMyDog</span><span style="color: #000000">);</span>
-
-<span style="color: #008000">/*</span>
-<span style="color: #008000">* execute to figure out if the dog is Jasper.</span>
-<span style="color: #008000">*/</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ruleStore</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">SimpleRuleStore</span><span style="color: #000000">(</span><span style="color: #001080">_18YoRule</span><span style="color: #000000">, </span><span style="color: #001080">_19YoRule</span><span style="color: #000000">, </span><span style="color: #001080">_21YoRule</span><span style="color: #000000">, </span><span style="color: #001080">alcoholRule</span><span style="color: #000000">, </span><span style="color: #001080">canadaAlcoholRule</span><span style="color: #000000">);</span>
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">engine</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">JasperEngine</span><span style="color: #000000">({</span>
 <span style="color: #000000">    </span><span style="color: #001080">ruleStore</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">options:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">        </span><span style="color: #001080">recipe:</span><span style="color: #000000"> </span><span style="color: #001080">EngineRecipe</span><span style="color: #000000">.</span><span style="color: #001080">ValidationRuleEngine</span><span style="color: #000000">,</span>
-<span style="color: #000000">    }</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">    </span><span style="color: #001080">logger:</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">,</span>
 <span style="color: #000000">});</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">dog</span><span style="color: #000000"> = {</span>
-<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Jasper&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    </span><span style="color: #001080">breed:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Samoyed&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">};</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">person</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">    </span><span style="color: #001080">age:</span><span style="color: #000000"> </span><span style="color: #098658">18</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Dave&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    </span><span style="color: #001080">currentLocation:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">country:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Canada&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">stateOrProvince:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;BC&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
 
-<span style="color: #001080">engine</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">subscription</span><span style="color: #000000"> = </span><span style="color: #001080">engine</span>
 <span style="color: #000000">    .</span><span style="color: #795E26">run</span><span style="color: #000000">({</span>
-<span style="color: #000000">        </span><span style="color: #001080">root:</span><span style="color: #000000"> </span><span style="color: #001080">dog</span><span style="color: #000000">,</span>
-<span style="color: #000000">        </span><span style="color: #001080">ruleName:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;isMyDog&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">root:</span><span style="color: #000000"> </span><span style="color: #001080">person</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">ruleName:</span><span style="color: #000000"> </span><span style="color: #001080">alcoholRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
 <span style="color: #000000">    })</span>
-<span style="color: #000000">    .</span><span style="color: #795E26">subscribe</span><span style="color: #000000">({</span>
-<span style="color: #000000">        </span><span style="color: #795E26">next</span><span style="color: #001080">:</span><span style="color: #000000"> (</span><span style="color: #001080">response</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">            </span><span style="color: #008000">//expect(response.isSuccessful).toBe(true);</span>
-<span style="color: #000000">        },</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">subscribe</span><span style="color: #000000">((</span><span style="color: #001080">response</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// true for AB, Canada, false for BC, Canada</span>
+<span style="color: #000000">        </span><span style="color: #008000">// false for WA, US</span>
+<span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">`</span><span style="color: #0000FF">${</span><span style="color: #001080">person</span><span style="color: #000000FF">.</span><span style="color: #001080">name</span><span style="color: #0000FF">}</span><span style="color: #A31515"> can</span><span style="color: #0000FF">${</span><span style="color: #001080">response</span><span style="color: #000000FF">.</span><span style="color: #001080">isSuccessful</span><span style="color: #000000FF"> </span><span style="color: #000000">?</span><span style="color: #000000FF"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000FF"> </span><span style="color: #000000">:</span><span style="color: #000000FF"> </span><span style="color: #A31515">&#039;not&#039;</span><span style="color: #0000FF">}</span><span style="color: #A31515"> buy alcohol in </span><span style="color: #0000FF">${</span><span style="color: #001080">person</span><span style="color: #000000FF">.</span><span style="color: #001080">currentLocation</span><span style="color: #000000FF">.</span><span style="color: #001080">stateOrProvince</span><span style="color: #0000FF">}</span><span style="color: #A31515">, </span><span style="color: #0000FF">${</span><span style="color: #001080">person</span><span style="color: #000000FF">.</span><span style="color: #001080">currentLocation</span><span style="color: #000000FF">.</span><span style="color: #001080">country</span><span style="color: #0000FF">}</span><span style="color: #A31515">`</span><span style="color: #000000">);</span>
 <span style="color: #000000">    });</span>
+
+<span style="color: #001080">subscription</span><span style="color: #000000">.</span><span style="color: #795E26">unsubscribe</span><span style="color: #000000">();</span>
+
 
 </code></pre>
 				<a href="#3-rule" id="3-rule" style="color: inherit; text-decoration: none;">
 					<h1>3. Rule</h1>
 				</a>
+				<p>A rule is a simple piece of logic. It could be a validation logic, a workflow process, a http request. A simple rule could look like below.</p>
+				<pre><code class="language-typescript">
+
+</code></pre>
 				<a href="#4-dependencies" id="4-dependencies" style="color: inherit; text-decoration: none;">
 					<h1>4. Dependencies</h1>
 				</a>
 				<a href="#simple-dependency" id="simple-dependency" style="color: inherit; text-decoration: none;">
-					<h2>Simple Dependency</h2>
+					<h3>Simple Dependency</h3>
 				</a>
+				<p>A simple dependency is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.</p>
 				<a href="#composite-dependency" id="composite-dependency" style="color: inherit; text-decoration: none;">
-					<h2>Composite Dependency</h2>
+					<h3>Composite Dependency</h3>
 				</a>
+				<p>As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.</p>
 				<a href="#executionorder" id="executionorder" style="color: inherit; text-decoration: none;">
-					<h2>ExecutionOrder</h2>
+					<h3>ExecutionOrder</h3>
 				</a>
+				<p>When it comes to execute dependency tasks. Jasper Engine supports two Execution, Parallel and Sequential.  </p>
+				<ul>
+					<li>For Composite Dependency, this means each dependency configured in the rules array will be executed in parallel or in order.</li>
+					<li>For Simple Dependency, this means the results (an array) returned by the <strong>Path</strong> expression will be executed in parallel or in order.</li>
+				</ul>
+				<p>The default is <strong>Parallel</strong>.</p>
 				<a href="#operator" id="operator" style="color: inherit; text-decoration: none;">
-					<h2>Operator</h2>
+					<h3>Operator</h3>
 				</a>
+				<p>When determining if the dependency execution is successful, you can specify <strong>AND</strong> or <strong>OR</strong>. </p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>AND</th>
+							<th>OR</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>Composite Dependency</td>
+							<td>all dependencies defined under rules have to be successful.</td>
+							<td>at least one dependency defined under rules needs to be successful.</td>
+						</tr>
+						<tr>
+							<td>Simple Dependency</td>
+							<td>executions against all object returned by <strong>PATH</strong> need to successful</td>
+							<td>Not Supported</td>
+						</tr>
+				</tbody></table>
+				<p>The default is <strong>AND</strong>.</p>
 				<a href="#5-recipe" id="5-recipe" style="color: inherit; text-decoration: none;">
 					<h1>5. Recipe</h1>
 				</a>
-				<a href="#process-engine" id="process-engine" style="color: inherit; text-decoration: none;">
-					<h2>Process Engine</h2>
-				</a>
-				<a href="#validation-engine" id="validation-engine" style="color: inherit; text-decoration: none;">
-					<h2>Validation Engine</h2>
-				</a>
+				<p>Jasper Engine provides two modes where you can specify the time of instantiating the engine. They are in general very similar with some small differences.</p>
+				<ul>
+					<li><p>Process Engine<br>  Process Engine consider a rule execution to be successful when the rule action does not throw an exception. It does not care about the result returned by the action.</p>
+					</li>
+					<li><p>Validation Engine<br>  Validation Engine consider a rule execution to be successful when the rule action does not throw an exception AND the result returned by the action has to equal to boolean value true</p>
+					</li>
+				</ul>
+				<p>The default is Process Engine.</p>
 				<a href="#6-lifecycle-hooks" id="6-lifecycle-hooks" style="color: inherit; text-decoration: none;">
 					<h1>6. Lifecycle Hooks</h1>
 				</a>
+				<p>Jasper engine provides many extension points during the rule and dependency execution cycle.</p>
 				<a href="#for-rule" id="for-rule" style="color: inherit; text-decoration: none;">
 					<h2>For Rule</h2>
 				</a>
-				<ul>
-					<li>beforeAction</li>
+				<table>
+					<thead>
+						<tr>
+							<th>Hook</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>beforeAction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+							<td>task to run before the rule action starts. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						</tr>
+						<tr>
+							<td>afterAction</td>
+							<td>task to run after the rule action starts.</td>
+						</tr>
+						<tr>
+							<td>onError</td>
+							<td>task to run when error occurs</td>
+						</tr>
+				</tbody></table>
+				<p>The sequence is  </p>
+				<ol>
+					<li>beforeAction </li>
+					<li>action</li>
+					<li>dependency</li>
 					<li>afterAction</li>
-					<li>onError</li>
-				</ul>
+					<li>onError(if not caught before)</li>
+				</ol>
 				<a href="#for-simple-dependency" id="for-simple-dependency" style="color: inherit; text-decoration: none;">
 					<h2>For Simple Dependency</h2>
 				</a>
-				<ul>
+				<table>
+					<thead>
+						<tr>
+							<th>Hook</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>beforeDependency</td>
+							<td>task to run before the execution of the simple dependency starts.</td>
+						</tr>
+						<tr>
+							<td>beforeEach</td>
+							<td>task to run before the execution for each of the path object starts.</td>
+						</tr>
+						<tr>
+							<td>afterEach</td>
+							<td>task to run after the execution for each of the path object end.</td>
+						</tr>
+						<tr>
+							<td>onEachError</td>
+							<td>task to run when error occur for each of the path object execution.</td>
+						</tr>
+						<tr>
+							<td>afterDependency</td>
+							<td>task to run after all path objects have completed execution.</td>
+						</tr>
+						<tr>
+							<td>onDependencyError</td>
+							<td>task to run before the dependency rule fail and not caught.</td>
+						</tr>
+				</tbody></table>
+				<p>The sequence is</p>
+				<ol>
+					<li>WhenExpress (default true)</li>
 					<li>beforeDependency</li>
-					<li>beforeEach</li>
-					<li>afterEach</li>
-					<li>onEachError</li>
+					<li>PathExpression</li>
+					<li>execute rule against each object returned by PathExpression<ol>
+							<li>beforeEach</li>
+							<li>ruleExecution</li>
+							<li>afterEach</li>
+							<li>onEachError</li>
+						</ol>
+					</li>
 					<li>afterDependency</li>
-					<li>onDependencyError</li>
-				</ul>
+					<li>onDependencyError (if not caught before)</li>
+				</ol>
 				<a href="#for-compositive-dependency" id="for-compositive-dependency" style="color: inherit; text-decoration: none;">
 					<h2>For Compositive Dependency</h2>
 				</a>
-				<ul>
-					<li>beforeDependency</li>
+				<table>
+					<thead>
+						<tr>
+							<th>Hook</th>
+							<th>Description</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>beforeDependency</td>
+							<td>task to run before the composite dependency starts. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+						</tr>
+						<tr>
+							<td>afterDependency</td>
+							<td>task to run after the composite dependency end.</td>
+						</tr>
+						<tr>
+							<td>onDependencyError</td>
+							<td>task to run when error occurs</td>
+						</tr>
+				</tbody></table>
+				<p>The sequence is  </p>
+				<ol>
+					<li>beforeDependency </li>
 					<li>afterDependency</li>
 					<li>onDependencyError</li>
-				</ul>
+				</ol>
 				<a href="#7-execution-context" id="7-execution-context" style="color: inherit; text-decoration: none;">
 					<h1>7. Execution Context</h1>
 				</a>
@@ -259,7 +413,7 @@
 					<li class=" tsd-kind-class">
 						<a href="classes/simplerulestore.html" class="tsd-kind-icon">Simple<wbr>Rule<wbr>Store</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/compositedependency.html" class="tsd-kind-icon">Composite<wbr>Dependency</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -271,7 +425,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/engineoptions.html" class="tsd-kind-icon">Engine<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/executioncontext.html" class="tsd-kind-icon">Execution<wbr>Context</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -283,10 +437,10 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/irulestore.html" class="tsd-kind-icon">IRule<wbr>Store</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/rule.html" class="tsd-kind-icon">Rule</a>
 					</li>
-					<li class=" tsd-kind-interface">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/simpledependency.html" class="tsd-kind-icon">Simple<wbr>Dependency</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -323,7 +477,6 @@
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 		</div>
 	</div>

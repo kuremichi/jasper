@@ -3,13 +3,11 @@
 - [2. Quickstart](#2-quickstart)
 - [3. Rule](#3-rule)
 - [4. Dependencies](#4-dependencies)
-  - [Simple Dependency](#simple-dependency)
-  - [Composite Dependency](#composite-dependency)
-  - [ExecutionOrder](#executionorder)
-  - [Operator](#operator)
+    - [Simple Dependency](#simple-dependency)
+    - [Composite Dependency](#composite-dependency)
+    - [ExecutionOrder](#executionorder)
+    - [Operator](#operator)
 - [5. Recipe](#5-recipe)
-  - [Process Engine](#process-engine)
-  - [Validation Engine](#validation-engine)
 - [6. Lifecycle Hooks](#6-lifecycle-hooks)
   - [For Rule](#for-rule)
   - [For Simple Dependency](#for-simple-dependency)
@@ -162,38 +160,97 @@ const validateCreditCard: rule
 ```
 
 # 4. Dependencies
-## Simple Dependency
+### Simple Dependency
 A simple dependency is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.
 
-## Composite Dependency
+### Composite Dependency
 As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.
 
-## ExecutionOrder
+### ExecutionOrder
+When it comes to execute dependency tasks. Jasper Engine supports two Execution, Parallel and Sequential.  
+* For Composite Dependency, this means each dependency configured in the rules array will be executed in parallel or in order.
+* For Simple Dependency, this means the results (an array) returned by the **Path** expression will be executed in parallel or in order.
 
-## Operator
+The default is **Parallel**.
+
+### Operator
+When determining if the dependency execution is successful, you can specify **AND** or **OR**. 
+
+|  Type   | AND  | OR   |
+| ------- | ---- | ---- |
+| Composite Dependency | all dependencies defined under rules have to be successful. | at least one dependency defined under rules needs to be successful. |
+| Simple Dependency    | executions against all object returned by **PATH** need to successful | Not Supported |
+
+
+The default is **AND**.
 
 # 5. Recipe
-## Process Engine
-## Validation Engine
+
+Jasper Engine provides two modes where you can specify the time of instantiating the engine. They are in general very similar with some small differences.
+
+* Process Engine  
+    Process Engine consider a rule execution to be successful when the rule action does not throw an exception. It does not care about the result returned by the action.
+
+* Validation Engine  
+    Validation Engine consider a rule execution to be successful when the rule action does not throw an exception AND the result returned by the action has to equal to boolean value true
+
+The default is Process Engine.
 
 # 6. Lifecycle Hooks
+
+Jasper engine provides many extension points during the rule and dependency execution cycle.
+
 ## For Rule
-* beforeAction
-* afterAction
-* onError
+
+|  Hook   | Description  | 
+| ------- | ---- | 
+| beforeAction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | task to run before the rule action starts. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| afterAction | task to run after the rule action starts. |
+| onError | task to run when error occurs |
+
+The sequence is  
+1. beforeAction 
+2. action
+3. dependency
+4. afterAction
+5. onError(if not caught before)
 
 ## For Simple Dependency
-* beforeDependency
-* beforeEach
-* afterEach
-* onEachError
-* afterDependency
-* onDependencyError
+
+|  Hook   | Description  | 
+| ------- | ---- | 
+| beforeDependency | task to run before the execution of the simple dependency starts. |
+| beforeEach | task to run before the execution for each of the path object starts. |
+| afterEach | task to run after the execution for each of the path object end. |
+| onEachError | task to run when error occur for each of the path object execution. |
+| afterDependency | task to run after all path objects have completed execution. |
+| onDependencyError | task to run before the dependency rule fail and not caught. |
+
+The sequence is
+1. WhenExpress (default true)
+2. beforeDependency
+3. PathExpression
+4. execute rule against each object returned by PathExpression
+   1. beforeEach
+   2. ruleExecution
+   3. afterEach
+   4. onEachError
+5. afterDependency
+6. onDependencyError (if not caught before)
 
 ## For Compositive Dependency
-* beforeDependency
-* afterDependency
-* onDependencyError
+
+|  Hook   | Description  |
+| ------- | ---- |
+| beforeDependency | task to run before the composite dependency starts. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|
+| afterDependency | task to run after the composite dependency end. |
+| onDependencyError | task to run when error occurs |
+
+The sequence is  
+1. beforeDependency 
+2. afterDependency
+3. onDependencyError
 
 # 7. Execution Context
+
 
