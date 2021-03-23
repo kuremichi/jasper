@@ -2,7 +2,7 @@ import { Rule } from '../../rule';
 import { SimpleRuleStore } from '../../store/simple.rule.store';
 
 it('should throw exception if rule exists already', () => {
-    const rule: Rule = {
+    const rule: Rule<any> = {
         name: 'mockRule',
         description: 'description for mock rule',
     };
@@ -15,7 +15,7 @@ it('should throw exception if rule exists already', () => {
 });
 
 it('should not throw exception if rule exists already but set to override', () => {
-    const rule: Rule = {
+    const rule: Rule<any> = {
         name: 'mockRule',
         description: 'description for mock rule',
     };
@@ -28,12 +28,12 @@ it('should not throw exception if rule exists already but set to override', () =
 });
 
 it('should register rules if provided as a dictionary', (done) => {
-    const rule1: Rule = {
+    const rule1: Rule<any> = {
         name: 'rule1',
         description: 'description for mock rule',
     };
 
-    const rule2: Rule = {
+    const rule2: Rule<any> = {
         name: 'rule2',
         description: 'description for mock rule',
     };

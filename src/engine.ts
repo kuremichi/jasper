@@ -18,7 +18,7 @@ import { IRuleStore, RuleNotFoundException } from './store/rule.store.interfafce
 import { ILogger, DummyLogger } from './ILogger';
 
 export class JasperEngine {
-    private contextStore: Record<string, ExecutionContext>;
+    private contextStore: Record<string, ExecutionContext<any>>;
     private ruleStore: IRuleStore;
     private readonly options: EngineOptions;
     private logger: ILogger;
@@ -50,9 +50,9 @@ export class JasperEngine {
      * @example observable
      * executeAction((context) => of(1), context)
      */
-    private executeAction(params: {
-        action: string | ((context: ExecutionContext) => Observable<any>);
-        context: ExecutionContext;
+    private executeAction<T>(params: {
+        action: string | ((context: ExecutionContext<T>) => Observable<any>);
+        context: ExecutionContext<T>;
     }): Observable<any> {
         if (typeof params.action === 'string' || params.action instanceof String) {
             const expression = jsonata(params.action as string);
@@ -84,9 +84,9 @@ export class JasperEngine {
      * @example
      * processExpression(of(true), context);
      */
-    private processExpression(
-        expression: string | ((context: ExecutionContext) => Observable<any>),
-        context: ExecutionContext
+    private processExpression<T>(
+        expression: string | ((context: ExecutionContext<T>) => Observable<any>),
+        context: ExecutionContext<T>
     ): Observable<any[]> {
         if (typeof expression === 'string') {
             const jsonataExpression = jsonata(expression as string);
@@ -122,9 +122,9 @@ export class JasperEngine {
      * @returns
      * the execution response for the composite dependency
      */
-    private processCompositeDependency(
-        compositeDependency: CompositeDependency,
-        context: ExecutionContext
+    private processCompositeDependency<T>(
+        compositeDependency: CompositeDependency<T>,
+        context: ExecutionContext<T>
     ): Observable<CompositeDependencyResponse> {
         const operator = compositeDependency.operator || Operator.AND;
         const executionOrder = compositeDependency.executionOrder || ExecutionOrder.Parallel;
@@ -241,9 +241,9 @@ export class JasperEngine {
      * @param context the current execution context
      * @returns
      */
-    private processSimpleDependency(
-        simpleDependency: SimpleDependency,
-        context: ExecutionContext
+    private processSimpleDependency<T>(
+        simpleDependency: SimpleDependency<T>,
+        context: ExecutionContext<T>
     ): Observable<SimpleDependencyResponse> {
         const dependencyResponse: SimpleDependencyResponse = {
             name: `${simpleDependency.name}`,
@@ -434,10 +434,10 @@ export class JasperEngine {
      * @param params.ruleName the rule name to evaluate against
      * @param params.parentExecutionContext [parent execution context] the parent context of current context
      */
-    private execute(params: {
-        root: any;
+    private execute<T>(params: {
+        root: T;
         ruleName: string;
-        parentExecutionContext?: ExecutionContext;
+        parentExecutionContext?: ExecutionContext<T>;
     }): Observable<ExecutionResponse> {
         const debugContext = this.options.debug
             ? /* istanbul ignore next */
@@ -461,7 +461,7 @@ export class JasperEngine {
                 response.error = err;
                 return of(undefined);
             }),
-            switchMap((rule: Rule | undefined) => {
+            switchMap((rule: Rule<T> | undefined) => {
                 if (!rule) {
                     response.error = response.error || new RuleNotFoundException(params.ruleName);
                     response.hasError = true;
@@ -469,7 +469,7 @@ export class JasperEngine {
                     return of(response);
                 }
                 return of(rule).pipe(
-                    switchMap((rule: Rule) => {
+                    switchMap((rule: Rule<T>) => {
                         const ruleHash = hash(params.ruleName);
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const objectHash = hash(rule!.uniqueBy ? rule!.uniqueBy(params.root) : params.root);
@@ -478,7 +478,7 @@ export class JasperEngine {
                         const dedupId = this.options.suppressDuplicateTasks ? '' : `-${_.random(0, 10000)}`;
                         const contextId = `${contextHash}${dedupId}`;
 
-                        let context: ExecutionContext = this.contextStore[contextId];
+                        let context: ExecutionContext<T> = this.contextStore[contextId];
 
                         if (!context || this.options.suppressDuplicateTasks !== true) {
                             response.metadata = rule.metadata;
@@ -613,7 +613,8 @@ export class JasperEngine {
                                                         `onError executed for rule ${rule.name} - context ${context.contextId}`
                                                     );
                                                 }
-                                            })
+                                            }),
+                                            switchMapTo(of(context.response))
                                         );
                                     }
 
@@ -643,7 +644,7 @@ export class JasperEngine {
      * @param params.root the object to evaluate
      * @param params.ruleName the rule name to evaluate against
      */
-    run(params: { root: any; ruleName: string }): Observable<ExecutionResponse> {
+    run<T>(params: { root: T; ruleName: string }): Observable<ExecutionResponse> {
         return this.execute({ root: params.root, ruleName: params.ruleName });
     }
 }

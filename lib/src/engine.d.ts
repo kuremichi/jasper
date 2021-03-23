@@ -18,8 +18,8 @@ export declare class JasperEngine {
     private processCompositeDependency;
     private processSimpleDependency;
     private execute;
-    run(params: {
-        root: any;
+    run<T>(params: {
+        root: T;
         ruleName: string;
     }): Observable<ExecutionResponse>;
 }
