@@ -34,33 +34,41 @@
 import { EngineRecipe, JasperEngine, Rule, SimpleRuleStore } from "@kuremichi/jasper";
 import { iif, of } from "rxjs";
 
+interface Person {
+    age: number;
+    name: string;
+    currentLocation: {
+        country: string;
+        stateOrProvince: string;
+    }
+}
 
-const _21YoRule: Rule = {
+const _21YoRule: Rule<Person> = {
     name: 'can buy alcohol at the age of 21+',
     description: 'check if a person has reached the legal age to buy an alcohol',
     action: 'age >= 21'
 }
 
-const _18YoRule: Rule = {
+const _18YoRule: Rule<Person> = {
     name: 'can buy alcohol at the age of 18+',
     description: 'check if a person has reached the legal age to buy an alcohol',
     action: 'age >= 18'
 }
 
-const _19YoRule: Rule = {
+const _19YoRule: Rule<Person> = {
     name: 'can buy alcohol at the age of 19+',
     description: 'check if a person has reached the legal age to buy an alcohol',
     action: 'age >= 19'
 }
 
-const canadaAlcoholRule: Rule = {
+const canadaAlcoholRule: Rule<Person> = {
     name: 'can buy alcohol in Canada',
     description: 'check if a person has reached the legal age to buy an alcohol in Canada',
     dependencies: {
         name: '',
         rules: [
             {
-                name: 'Alberta, Manitoba, Quebec',
+                name: 'Quebec, Manitoba, Alberta',
                 rule: _18YoRule.name,
                 path: '$',
                 // if string is provided, it will be evaluated using jsonata
@@ -68,10 +76,10 @@ const canadaAlcoholRule: Rule = {
                 when: 'currentLocation.stateOrProvince in ["QC", "MB", "AB"]',
             },
             {
-                name: 'Other provinces',
+                name: 'Quebec, Manitoba, Alberta',
                 rule: _19YoRule.name,
                 path: '$',
-                // otherwise, for more complicated scenarios, it takes a function that will return an Observable<boolean>
+                // otherwise, it takes a function that will return an Observable<boolean>
                 when: (context) => 
                     iif(
                         () => ['QC', 'MB', 'AB'].indexOf(context.root.currentLocation.stateOrProvince) === -1,
@@ -83,7 +91,7 @@ const canadaAlcoholRule: Rule = {
     }
 }
 
-const alcoholRule: Rule = {
+const alcoholRule: Rule<Person> = {
     name: 'can buy alcohol',
     description: 'check if a person has reached the legal age to buy an alcohol in the current location',
     dependencies: {
@@ -115,16 +123,16 @@ const engine = new JasperEngine({
     logger: console,
 });
 
-const person = {
+const person: Person = {
     age: 18,
     name: 'Dave',
     currentLocation: {
         country: 'Canada',
-        stateOrProvince: 'BC',
+        stateOrProvince: 'AB',
     }
 }
 
-const subscription = engine
+engine
     .run({
         root: person,
         ruleName: alcoholRule.name,
@@ -135,15 +143,18 @@ const subscription = engine
         console.log(`${person.name} can${response.isSuccessful ? '' : 'not'} buy alcohol in ${person.currentLocation.stateOrProvince}, ${person.currentLocation.country}`);
     });
 
-subscription.unsubscribe();
 
 
 ```
 
 # 3. Rule
-A rule is a simple piece of logic. It could be a validation logic, a workflow process, a http request. A simple rule could look like below.
+A rule is a unit of work. It could be a validation logic, a workflow process, a http request, or combinatation of the above and nested in multiple levels.
 
+
+A simple rule could look like below.
 ```typescript
+
+const validateCreditCard: rule
 
 
 ```
