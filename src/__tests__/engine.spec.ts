@@ -1691,7 +1691,7 @@ describe('execute', () => {
             onError: (_err, context) => {
                 errorMock();
                 context.response.result = 'replaced';
-                return of(context.response);
+                return of(null);
             },
         };
 

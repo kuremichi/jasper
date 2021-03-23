@@ -9,7 +9,7 @@ export interface Rule {
     beforeAction?: (context: ExecutionContext) => Observable<any>;
     action?: string | ((context: ExecutionContext) => Observable<unknown>);
     afterAction?: (context: ExecutionContext) => Observable<ExecutionResponse>;
-    onError?: string | ((error: any, context: ExecutionContext) => Observable<ExecutionResponse>);
+    onError?: string | ((error: any, context: ExecutionContext) => Observable<any>);
     dependencies?: CompositeDependency | undefined;
     metadata?: Record<string, any>;
 }

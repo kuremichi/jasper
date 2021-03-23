@@ -613,7 +613,8 @@ export class JasperEngine {
                                                         `onError executed for rule ${rule.name} - context ${context.contextId}`
                                                     );
                                                 }
-                                            })
+                                            }),
+                                            switchMapTo(of(context.response)),
                                         );
                                     }
 
