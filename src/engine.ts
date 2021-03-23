@@ -124,7 +124,7 @@ export class JasperEngine {
      */
     private processCompositeDependency<T>(
         compositeDependency: CompositeDependency<T>,
-        context: ExecutionContext<T>,
+        context: ExecutionContext<T>
     ): Observable<CompositeDependencyResponse> {
         const operator = compositeDependency.operator || Operator.AND;
         const executionOrder = compositeDependency.executionOrder || ExecutionOrder.Parallel;
@@ -614,7 +614,7 @@ export class JasperEngine {
                                                     );
                                                 }
                                             }),
-                                            switchMapTo(of(context.response)),
+                                            switchMapTo(of(context.response))
                                         );
                                     }
 
