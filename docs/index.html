@@ -68,7 +68,10 @@
 					<li><a href="#4-dependencies">4. Dependencies</a><ul>
 							<li><a href="#simple-dependency">Simple Dependency</a></li>
 							<li><a href="#composite-dependency">Composite Dependency</a></li>
-							<li><a href="#executionorder">ExecutionOrder</a></li>
+							<li><a href="#executionorder">ExecutionOrder</a><ul>
+									<li><a href="#concurrency">Concurrency</a></li>
+								</ul>
+							</li>
 							<li><a href="#operator">Operator</a></li>
 						</ul>
 					</li>
@@ -102,33 +105,41 @@
 				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EngineRecipe</span><span style="color: #000000">, </span><span style="color: #001080">JasperEngine</span><span style="color: #000000">, </span><span style="color: #001080">Rule</span><span style="color: #000000">, </span><span style="color: #001080">SimpleRuleStore</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@kuremichi/jasper&quot;</span><span style="color: #000000">;</span>
 <span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">iif</span><span style="color: #000000">, </span><span style="color: #001080">of</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;rxjs&quot;</span><span style="color: #000000">;</span>
 
+<span style="color: #0000FF">interface</span><span style="color: #000000"> </span><span style="color: #267F99">Person</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">age</span><span style="color: #000000">: </span><span style="color: #267F99">number</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">name</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">currentLocation</span><span style="color: #000000">: {</span>
+<span style="color: #000000">        </span><span style="color: #001080">country</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">        </span><span style="color: #001080">stateOrProvince</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_21YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_21YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">Person</span><span style="color: #000000">&gt; = {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol at the age of 21+&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;age &gt;= 21&#039;</span>
 <span style="color: #000000">}</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_18YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_18YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">Person</span><span style="color: #000000">&gt; = {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol at the age of 18+&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;age &gt;= 18&#039;</span>
 <span style="color: #000000">}</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_19YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">_19YoRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">Person</span><span style="color: #000000">&gt; = {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol at the age of 19+&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">action:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;age &gt;= 19&#039;</span>
 <span style="color: #000000">}</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">canadaAlcoholRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">canadaAlcoholRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">Person</span><span style="color: #000000">&gt; = {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol in Canada&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol in Canada&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">dependencies:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">        </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">        </span><span style="color: #001080">rules:</span><span style="color: #000000"> [</span>
 <span style="color: #000000">            {</span>
-<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Alberta, Manitoba, Quebec&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Quebec, Manitoba, Alberta&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">_18YoRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
 <span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">                </span><span style="color: #008000">// if string is provided, it will be evaluated using jsonata</span>
@@ -136,10 +147,10 @@
 <span style="color: #000000">                </span><span style="color: #001080">when:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;currentLocation.stateOrProvince in [&quot;QC&quot;, &quot;MB&quot;, &quot;AB&quot;]&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">            },</span>
 <span style="color: #000000">            {</span>
-<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Other provinces&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Quebec, Manitoba, Alberta&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">_19YoRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
 <span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">                </span><span style="color: #008000">// otherwise, for more complicated scenarios, it takes a function that will return an Observable&lt;boolean&gt;</span>
+<span style="color: #000000">                </span><span style="color: #008000">// otherwise, it takes a function that will return an Observable&lt;boolean&gt;</span>
 <span style="color: #000000">                </span><span style="color: #795E26">when</span><span style="color: #001080">:</span><span style="color: #000000"> (</span><span style="color: #001080">context</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span>
 <span style="color: #000000">                    </span><span style="color: #795E26">iif</span><span style="color: #000000">(</span>
 <span style="color: #000000">                        () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> [</span><span style="color: #A31515">&#039;QC&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;MB&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;AB&#039;</span><span style="color: #000000">].</span><span style="color: #795E26">indexOf</span><span style="color: #000000">(</span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">currentLocation</span><span style="color: #000000">.</span><span style="color: #001080">stateOrProvince</span><span style="color: #000000">) === -</span><span style="color: #098658">1</span><span style="color: #000000">,</span>
@@ -151,7 +162,7 @@
 <span style="color: #000000">    }</span>
 <span style="color: #000000">}</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">alcoholRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000"> = {</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">alcoholRule</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">Person</span><span style="color: #000000">&gt; = {</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;can buy alcohol&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">description:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;check if a person has reached the legal age to buy an alcohol in the current location&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">dependencies:</span><span style="color: #000000"> {</span>
@@ -183,16 +194,16 @@
 <span style="color: #000000">    </span><span style="color: #001080">logger:</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">,</span>
 <span style="color: #000000">});</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">person</span><span style="color: #000000"> = {</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">person</span><span style="color: #000000">: </span><span style="color: #267F99">Person</span><span style="color: #000000"> = {</span>
 <span style="color: #000000">    </span><span style="color: #001080">age:</span><span style="color: #000000"> </span><span style="color: #098658">18</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Dave&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    </span><span style="color: #001080">currentLocation:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">        </span><span style="color: #001080">country:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;Canada&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">        </span><span style="color: #001080">stateOrProvince:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;BC&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">stateOrProvince:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;AB&#039;</span><span style="color: #000000">,</span>
 <span style="color: #000000">    }</span>
 <span style="color: #000000">}</span>
 
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">subscription</span><span style="color: #000000"> = </span><span style="color: #001080">engine</span>
+<span style="color: #001080">engine</span>
 <span style="color: #000000">    .</span><span style="color: #795E26">run</span><span style="color: #000000">({</span>
 <span style="color: #000000">        </span><span style="color: #001080">root:</span><span style="color: #000000"> </span><span style="color: #001080">person</span><span style="color: #000000">,</span>
 <span style="color: #000000">        </span><span style="color: #001080">ruleName:</span><span style="color: #000000"> </span><span style="color: #001080">alcoholRule</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
@@ -203,15 +214,66 @@
 <span style="color: #000000">        </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">`</span><span style="color: #0000FF">${</span><span style="color: #001080">person</span><span style="color: #000000FF">.</span><span style="color: #001080">name</span><span style="color: #0000FF">}</span><span style="color: #A31515"> can</span><span style="color: #0000FF">${</span><span style="color: #001080">response</span><span style="color: #000000FF">.</span><span style="color: #001080">isSuccessful</span><span style="color: #000000FF"> </span><span style="color: #000000">?</span><span style="color: #000000FF"> </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000FF"> </span><span style="color: #000000">:</span><span style="color: #000000FF"> </span><span style="color: #A31515">&#039;not&#039;</span><span style="color: #0000FF">}</span><span style="color: #A31515"> buy alcohol in </span><span style="color: #0000FF">${</span><span style="color: #001080">person</span><span style="color: #000000FF">.</span><span style="color: #001080">currentLocation</span><span style="color: #000000FF">.</span><span style="color: #001080">stateOrProvince</span><span style="color: #0000FF">}</span><span style="color: #A31515">, </span><span style="color: #0000FF">${</span><span style="color: #001080">person</span><span style="color: #000000FF">.</span><span style="color: #001080">currentLocation</span><span style="color: #000000FF">.</span><span style="color: #001080">country</span><span style="color: #0000FF">}</span><span style="color: #A31515">`</span><span style="color: #000000">);</span>
 <span style="color: #000000">    });</span>
 
-<span style="color: #001080">subscription</span><span style="color: #000000">.</span><span style="color: #795E26">unsubscribe</span><span style="color: #000000">();</span>
 
 
 </code></pre>
 				<a href="#3-rule" id="3-rule" style="color: inherit; text-decoration: none;">
 					<h1>3. Rule</h1>
 				</a>
-				<p>A rule is a simple piece of logic. It could be a validation logic, a workflow process, a http request. A simple rule could look like below.</p>
+				<p>A rule is a simple piece of logic.<br>It could be a validation logic, a workflow process, a http request.  </p>
+				<p>The rule is an generic interface of type T, where T represents the type of data this rule is supposed to process. For intellisense, this tells typescript that context.root should be of type T and you can get the type support when writting method in action and other hooks (see later sections). If you don&#39;t care about the type, just provide any, i.e. Rule<code>&lt;any</code>&gt;.</p>
+				<p>Below is an example for two simple rules and a rule with dependencies.</p>
 				<pre><code class="language-typescript">
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">validateVisaCreditCard</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">YourClassOrInterfaceForPayment</span><span style="color: #000000">&gt; {</span>
+<span style="color: #000000">    name: </span><span style="color: #A31515">&#039;is Visa card valid&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    description: </span><span style="color: #A31515">&#039;check if a credit card is a valid Visa card&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    action: (</span><span style="color: #001080">context</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// some basic validation because we send it to Visa for payment processing</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isValid</span><span style="color: #000000"> = </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cardNumber</span><span style="color: #000000"> </span>
+<span style="color: #000000">                    &amp;&amp; </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cardNumber</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000"> === </span><span style="color: #098658">16</span>
+<span style="color: #000000">                    &amp;&amp; </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cvv</span><span style="color: #000000"> &amp;&amp; </span>
+<span style="color: #000000">                    &amp;&amp; </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cvv</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000"> === </span><span style="color: #098658">3</span><span style="color: #000000">;</span>
+
+<span style="color: #000000">        </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #795E26">of</span><span style="color: #000000">(</span><span style="color: #001080">isValid</span><span style="color: #000000">);</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">validateAmexCreditCard</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">YourClassOrInterfaceForPayment</span><span style="color: #000000">&gt; {</span>
+<span style="color: #000000">    name: </span><span style="color: #A31515">&#039;is American Express card valid&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    description: </span><span style="color: #A31515">&#039;check if a credit card is a valid American Express card&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    action: (</span><span style="color: #001080">context</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// some basic validation because we send it to Amex for payment processing</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isValid</span><span style="color: #000000"> = </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cardNumber</span><span style="color: #000000"> </span>
+<span style="color: #000000">                    &amp;&amp; </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cardNumber</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000"> === </span><span style="color: #098658">16</span>
+<span style="color: #000000">                    &amp;&amp; </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cvv</span><span style="color: #000000"> &amp;&amp; </span>
+<span style="color: #000000">                    &amp;&amp; </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">root</span><span style="color: #000000">.</span><span style="color: #001080">cvv</span><span style="color: #000000">.</span><span style="color: #001080">length</span><span style="color: #000000"> === </span><span style="color: #098658">4</span><span style="color: #000000">;</span>
+
+<span style="color: #000000">        </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #795E26">of</span><span style="color: #000000">(</span><span style="color: #001080">isValid</span><span style="color: #000000">);</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">isValidCreditCard</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">YourClassOrInterfaceForPayment</span><span style="color: #000000">&gt; {</span>
+<span style="color: #000000">    name: </span><span style="color: #A31515">&#039;is credit card valid&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    description: </span><span style="color: #A31515">&#039;check if a credit card is a valid&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    dependencies: {</span>
+<span style="color: #000000">        name: </span><span style="color: #A31515">&#039;Validate Credit Card Based on issuer&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        rules: [</span>
+<span style="color: #000000">            {</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;validate visa&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">validateVisaCreditCard</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">when:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;paymentType = &quot;Visa&quot;&#039;</span>
+<span style="color: #000000">            },</span>
+<span style="color: #000000">            {</span>
+<span style="color: #000000">                </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;validate amex&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;$&#039;</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">rule:</span><span style="color: #000000"> </span><span style="color: #001080">validateAmexCreditCard</span><span style="color: #000000">.</span><span style="color: #001080">name</span><span style="color: #000000">,</span>
+<span style="color: #000000">                </span><span style="color: #001080">when:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;paymentType = &quot;Amex&quot;&#039;</span>
+<span style="color: #000000">            },</span>
+<span style="color: #000000">        ]</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+
 
 </code></pre>
 				<a href="#4-dependencies" id="4-dependencies" style="color: inherit; text-decoration: none;">
@@ -224,7 +286,7 @@
 				<a href="#composite-dependency" id="composite-dependency" style="color: inherit; text-decoration: none;">
 					<h3>Composite Dependency</h3>
 				</a>
-				<p>As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.</p>
+				<p>As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.<br>When specifying the dependencies for composite dependency, if the execution of the dependency is conditional, you could provide a <strong>when</strong> expresion. As you can tell from the alcohol rule example above, you can either provide an expression in string or a method that will return an Observable<boolean>. When a dependency is skipped, it will be deemed as successful.</p>
 				<a href="#executionorder" id="executionorder" style="color: inherit; text-decoration: none;">
 					<h3>ExecutionOrder</h3>
 				</a>
@@ -233,7 +295,27 @@
 					<li>For Composite Dependency, this means each dependency configured in the rules array will be executed in parallel or in order.</li>
 					<li>For Simple Dependency, this means the results (an array) returned by the <strong>Path</strong> expression will be executed in parallel or in order.</li>
 				</ul>
-				<p>The default is <strong>Parallel</strong>.</p>
+				<a href="#concurrency" id="concurrency" style="color: inherit; text-decoration: none;">
+					<h4>Concurrency</h4>
+				</a>
+				<p>When executing a dependency <strong>in parallel</strong>, you might want to limit the number of dependencies to be executed at the same time. You can do so by specifying the maxConcurrency on the dependency config.</p>
+				<table>
+					<thead>
+						<tr>
+							<th>Type</th>
+							<th>Note</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>Composite Dependency</td>
+							<td>all dependencies defined will be executed in parallel but not more than <strong>N</strong> at a time.</td>
+						</tr>
+						<tr>
+							<td>Simple Dependency</td>
+							<td>executions against all object returned by <strong>PATH</strong> will be executed in parallel but not more than <strong>N</strong> at a time.</td>
+						</tr>
+				</tbody></table>
+				<p>** N is the value set for maxConcurrency.</p>
 				<a href="#operator" id="operator" style="color: inherit; text-decoration: none;">
 					<h3>Operator</h3>
 				</a>
@@ -254,7 +336,7 @@
 						<tr>
 							<td>Simple Dependency</td>
 							<td>executions against all object returned by <strong>PATH</strong> need to successful</td>
-							<td>Not Supported</td>
+							<td>At least one execution agaist the pathObject is successful</td>
 						</tr>
 				</tbody></table>
 				<p>The default is <strong>AND</strong>.</p>

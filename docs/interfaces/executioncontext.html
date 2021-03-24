@@ -65,6 +65,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>the context for current rule execution</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-type-parameters">
 				<h3>Type parameters</h3>
 				<ul class="tsd-type-parameters">
@@ -110,9 +117,14 @@
 					<div class="tsd-signature tsd-kind-icon">_process$<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L12">execution.context.ts:12</a></li>
+							<li>Defined in execution.context.ts:40</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the actual processing logic of the execution context</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="childrencontexts" class="tsd-anchor"></a>
@@ -120,9 +132,14 @@
 					<div class="tsd-signature tsd-kind-icon">children<wbr>Contexts<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L11">execution.context.ts:11</a></li>
+							<li>Defined in execution.context.ts:35</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>child execution contexts</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="complete" class="tsd-anchor"></a>
@@ -130,7 +147,7 @@
 					<div class="tsd-signature tsd-kind-icon">complete<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L13">execution.context.ts:13</a></li>
+							<li>Defined in execution.context.ts:45</li>
 						</ul>
 					</aside>
 				</section>
@@ -140,9 +157,14 @@
 					<div class="tsd-signature tsd-kind-icon">context<wbr>Data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L14">execution.context.ts:14</a></li>
+							<li>Defined in execution.context.ts:50</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>this is where you could store some temp data to be shared between different lifecycle hook if needed.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="contextid" class="tsd-anchor"></a>
@@ -150,9 +172,16 @@
 					<div class="tsd-signature tsd-kind-icon">context<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L7">execution.context.ts:7</a></li>
+							<li>Defined in execution.context.ts:15</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>a unique id computed based on the rule and root object of the rule
+								if suppressDuplicateTask mode is true, two paths in the rule that result in the same
+							rule evaluation against the same object should have same contextId</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="parentcontext" class="tsd-anchor"></a>
@@ -160,9 +189,14 @@
 					<div class="tsd-signature tsd-kind-icon">parent<wbr>Context<span class="tsd-signature-symbol">:</span> <a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L10">execution.context.ts:10</a></li>
+							<li>Defined in execution.context.ts:30</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>parent execution context</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="response" class="tsd-anchor"></a>
@@ -170,9 +204,14 @@
 					<div class="tsd-signature tsd-kind-icon">response<span class="tsd-signature-symbol">:</span> <a href="executionresponse.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionResponse</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L15">execution.context.ts:15</a></li>
+							<li>Defined in execution.context.ts:55</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the execution response</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="root" class="tsd-anchor"></a>
@@ -180,9 +219,14 @@
 					<div class="tsd-signature tsd-kind-icon">root<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L8">execution.context.ts:8</a></li>
+							<li>Defined in execution.context.ts:20</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the object passed to a rule as the root object</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="rule" class="tsd-anchor"></a>
@@ -190,9 +234,14 @@
 					<div class="tsd-signature tsd-kind-icon">rule<span class="tsd-signature-symbol">:</span> <a href="rule.html" class="tsd-signature-type" data-tsd-kind="Interface">Rule</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/execution.context.ts#L9">execution.context.ts:9</a></li>
+							<li>Defined in execution.context.ts:25</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the associated rule</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>

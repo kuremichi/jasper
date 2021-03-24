@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { ExecutionOrder } from '../enum';
+import { ExecutionOrder, Operator } from '../enum';
 import { ExecutionContext } from '../execution.context';
 import { SimpleDependencyExecutionResponse } from './simple.dependency.execution.response';
 import { SimpleDependencyResponse } from './simple.dependency.response';
@@ -8,7 +8,7 @@ export interface SimpleDependency<T> {
     /**
      * a name or description for a dependency
      */
-    name: string;
+    name?: string;
 
     /**
      * path to locate the child element for evaluation
@@ -39,7 +39,14 @@ export interface SimpleDependency<T> {
     executionOrder?: ExecutionOrder;
 
     /**
-     *
+     * the operator to use when determining if this simple dependency is successful.
+     * AND: all execution against objects returned by path should be successful.
+     * OR: execution against any of the object returned by path should be successful.
+     */
+    operator?: Operator;
+
+    /**
+     * error handler for when this dependency execution had issue
      */
     onDependencyError?: (
         error: any,
@@ -58,7 +65,7 @@ export interface SimpleDependency<T> {
     beforeEach?: (pathObject: any, index: number, context: ExecutionContext<T>) => Observable<any>;
 
     /**
-     *
+     * error handler for each execution against path object
      */
     onEachError?: (
         error: any,
@@ -78,14 +85,9 @@ export interface SimpleDependency<T> {
 
     /**
      * the maximum current execution to run for matches.
-     * Default is -1 unlimited
+     * Default is unlimited
      */
     maxConcurrency?: number;
-
-    /**
-     * TODO: to implement
-     */
-    retry?: number;
 }
 
 export function isSimpleDependency(object: any): object is SimpleDependency<any> {
