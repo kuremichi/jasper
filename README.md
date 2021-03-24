@@ -152,10 +152,60 @@ engine
 A rule is a simple piece of logic.  
 It could be a validation logic, a workflow process, a http request.  
 
-A simple rule could look like below.
+The rule is an generic interface of type T, where T represents the type of data this rule is supposed to process. For intellisense, this tells typescript that context.root should be of type T and you can get the type support when writting method in action and other hooks (see later sections). If you don't care about the type, just provide any, i.e. Rule`<any`>.
+
+Below is an example for two simple rules and a rule with dependencies.
 ```typescript
 
-const validateCreditCard: rule
+const validateVisaCreditCard: Rule<YourClassOrInterfaceForPayment> {
+    name: 'is Visa card valid',
+    description: 'check if a credit card is a valid Visa card',
+    action: (context) => {
+        // some basic validation because we send it to Visa for payment processing
+        const isValid = context.root.cardNumber 
+                    && context.root.cardNumber.length === 16
+                    && context.root.cvv && 
+                    && context.root.cvv.length === 3;
+
+        return of(isValid);
+    }
+}
+
+const validateAmexCreditCard: Rule<YourClassOrInterfaceForPayment> {
+    name: 'is American Express card valid',
+    description: 'check if a credit card is a valid American Express card',
+    action: (context) => {
+        // some basic validation because we send it to Amex for payment processing
+        const isValid = context.root.cardNumber 
+                    && context.root.cardNumber.length === 16
+                    && context.root.cvv && 
+                    && context.root.cvv.length === 4;
+
+        return of(isValid);
+    }
+}
+
+const isValidCreditCard: Rule<YourClassOrInterfaceForPayment> {
+    name: 'is credit card valid',
+    description: 'check if a credit card is a valid',
+    dependencies: {
+        name: 'Validate Credit Card Based on issuer',
+        rules: [
+            {
+                name: 'validate visa',
+                path: '$',
+                rule: validateVisaCreditCard.name,
+                when: 'paymentType = "Visa"'
+            },
+            {
+                name: 'validate amex',
+                path: '$',
+                rule: validateAmexCreditCard.name,
+                when: 'paymentType = "Amex"'
+            },
+        ]
+    }
+}
 
 
 ```
@@ -165,7 +215,8 @@ const validateCreditCard: rule
 A simple dependency is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.
 
 ### **Composite Dependency**
-As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.
+As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.  
+When specifying the dependencies for composite dependency, if the execution of the dependency is conditional, you could provide a **when** expresion. As you can tell from the alcohol rule example above, you can either provide an expression in string or a method that will return an Observable<boolean>. When a dependency is skipped, it will be deemed as successful.
 
 ### **ExecutionOrder**
 When it comes to execute dependency tasks. Jasper Engine supports two Execution, Parallel and Sequential.  
