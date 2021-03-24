@@ -41,8 +41,8 @@ export class SimpleRuleStore implements IRuleStore {
      */
     registerRuleDictionary(dictionary: Record<string, Rule<any>>, overrideIfExists = false): void {
         const configs = _.entries(dictionary);
-        _.each(configs, ([ruleName, rule]: [string, Rule<any>]) => {
-            this.register(rule, overrideIfExists, ruleName);
+        _.each(configs, ([, rule]: [string, Rule<any>]) => {
+            this.register(rule, overrideIfExists, rule.name);
         });
     }
 

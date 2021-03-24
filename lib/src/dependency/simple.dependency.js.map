@@ -1,1 +1,1 @@
-{"version":3,"file":"simple.dependency.js","sourceRoot":"","sources":["../../../src/dependency/simple.dependency.ts"],"names":[],"mappings":";;;AA0FA,SAAgB,kBAAkB,CAAC,MAAW;IAC1C,OAAO,MAAM,IAAI,MAAM,IAAI,MAAM,IAAI,MAAM,IAAI,MAAM,IAAI,MAAM,CAAC;AACpE,CAAC;AAFD,gDAEC"}
+{"version":3,"file":"simple.dependency.js","sourceRoot":"","sources":["../../../src/dependency/simple.dependency.ts"],"names":[],"mappings":";;;AA4FA,SAAgB,kBAAkB,CAAC,MAAW;IAC1C,OAAO,MAAM,IAAI,MAAM,IAAI,MAAM,IAAI,MAAM,IAAI,MAAM,IAAI,MAAM,CAAC;AACpE,CAAC;AAFD,gDAEC"}

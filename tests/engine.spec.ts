@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { JasperEngine } from '../engine';
+import { JasperEngine } from '../src/engine';
 
 import { Observable, of, empty, throwError } from 'rxjs';
 import _ from 'lodash';
 import { switchMap, tap } from 'rxjs/operators';
 
-import { Rule } from '../rule';
-import { ExecutionContext } from '../execution.context';
-import { ExecutionOrder, EngineRecipe, Operator } from '../enum';
-import { SimpleDependency } from '../dependency/simple.dependency';
-import { CompositeDependency } from '../dependency/composite.dependency';
-import { CompositeDependencyResponse } from '../dependency/composite.dependency.response';
-import { ExecutionResponse } from '../execution.response';
-import { SimpleDependencyResponse } from '../dependency/simple.dependency.response';
-import { SimpleRuleStore } from '../store/simple.rule.store';
-import { RuleNotFoundException } from '../store/rule.store.interfafce';
+import { Rule } from '../src/rule';
+import { ExecutionContext } from '../src/execution.context';
+import { ExecutionOrder, EngineRecipe, Operator } from '../src/enum';
+import { SimpleDependency } from '../src/dependency/simple.dependency';
+import { CompositeDependency } from '../src/dependency/composite.dependency';
+import { CompositeDependencyResponse } from '../src/dependency/composite.dependency.response';
+import { ExecutionResponse } from '../src/execution.response';
+import { SimpleDependencyResponse } from '../src/dependency/simple.dependency.response';
+import { SimpleRuleStore } from '../src/store/simple.rule.store';
+import { RuleNotFoundException } from '../src/store/rule.store.interfafce';
 
 describe('processExpression', () => {
     const mockRule: Rule<any> = {
@@ -771,6 +771,260 @@ describe('processSimpleDependency', () => {
         });
 
         subscription.unsubscribe();
+    });
+
+    describe('Operator OR', () => {
+        it('consider simple compendency to be successful if either dependency task is successful', (done) => {
+            const mockFn = jest.fn().mockImplementation(() => { throw new Error('error'); })
+                                .mockReturnValueOnce(1);
+
+            const mockRule: Rule<any> = {
+                name: 'mockRule',
+                description: 'description for mock rule',
+                action: () => {
+                    mockFn();
+                    return of(1);
+                },
+            };
+    
+            const ruleStore = new SimpleRuleStore(mockRule);
+            const engine = new JasperEngine({ ruleStore });
+            const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
+    
+            const simpleDependency: SimpleDependency<any> = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+                executionOrder: ExecutionOrder.Sequential,
+                operator: Operator.OR,
+            };
+    
+            const context: ExecutionContext<any> = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                        { id: 3, text: 'child3' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+                simpleDependency,
+                context
+            );
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processSimpleDependencySpy).toBeCalledTimes(1);
+                    expect(mockFn).toBeCalledTimes(3);
+                    expect(dependencyResponse.isSkipped).toBe(false);
+                    expect(dependencyResponse.isSuccessful).toBe(true);
+                    expect(dependencyResponse.matches).toHaveLength(3);
+                    expect(dependencyResponse.matches[0].isSuccessful).toBe(true);
+                    expect(dependencyResponse.matches[1].isSuccessful).toBe(false);
+                    expect(dependencyResponse.matches[2].isSuccessful).toBe(false);
+                    done();
+                },
+            });
+    
+            subscription.unsubscribe();
+        });
+
+        it('consider simple compendency to be unsuccessful if all dependency task are unsuccessful', (done) => {
+            const mockFn = jest.fn().mockImplementation(() => { throw new Error('error'); });
+
+            const mockRule: Rule<any> = {
+                name: 'mockRule',
+                description: 'description for mock rule',
+                action: () => {
+                    mockFn();
+                    return of(1);
+                },
+            };
+    
+            const ruleStore = new SimpleRuleStore(mockRule);
+            const engine = new JasperEngine({ ruleStore });
+            const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
+    
+            const simpleDependency: SimpleDependency<any> = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+                executionOrder: ExecutionOrder.Sequential,
+                operator: Operator.OR,
+            };
+    
+            const context: ExecutionContext<any> = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                        { id: 3, text: 'child3' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+                simpleDependency,
+                context
+            );
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processSimpleDependencySpy).toBeCalledTimes(1);
+                    expect(mockFn).toBeCalledTimes(3);
+                    expect(dependencyResponse.isSkipped).toBe(false);
+                    expect(dependencyResponse.isSuccessful).toBe(false);
+                    expect(dependencyResponse.matches).toHaveLength(3);
+                    expect(dependencyResponse.matches[0].isSuccessful).toBe(false);
+                    expect(dependencyResponse.matches[1].isSuccessful).toBe(false);
+                    expect(dependencyResponse.matches[2].isSuccessful).toBe(false);
+                    done();
+                },
+            });
+    
+            subscription.unsubscribe();
+        });
+    });
+
+    describe('Operator AND', () => {
+        it('consider simple compendency to be successful if all dependency task are successful', (done) => {
+            const mockFn = jest.fn().mockReturnValue(1);
+
+            const mockRule: Rule<any> = {
+                name: 'mockRule',
+                description: 'description for mock rule',
+                action: () => {
+                    mockFn();
+                    return of(1);
+                },
+            };
+    
+            const ruleStore = new SimpleRuleStore(mockRule);
+            const engine = new JasperEngine({ ruleStore });
+            const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
+    
+            const simpleDependency: SimpleDependency<any> = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+                executionOrder: ExecutionOrder.Parallel,
+                operator: Operator.AND,
+            };
+    
+            const context: ExecutionContext<any> = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                        { id: 3, text: 'child3' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+                simpleDependency,
+                context
+            );
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processSimpleDependencySpy).toBeCalledTimes(1);
+                    expect(mockFn).toBeCalledTimes(3);
+                    expect(dependencyResponse.isSkipped).toBe(false);
+                    expect(dependencyResponse.isSuccessful).toBe(true);
+                    expect(dependencyResponse.matches).toHaveLength(3);
+                    expect(dependencyResponse.matches[0].isSuccessful).toBe(true);
+                    expect(dependencyResponse.matches[1].isSuccessful).toBe(true);
+                    expect(dependencyResponse.matches[2].isSuccessful).toBe(true);
+                    done();
+                },
+            });
+    
+            subscription.unsubscribe();
+        });
+
+        it('consider simple compendency to be unsuccessful if any dependency task is unsuccessful', (done) => {
+            const mockFn = jest.fn().mockReturnValue(1)
+                .mockImplementationOnce(() => { throw new Error('error'); });
+
+            const mockRule: Rule<any> = {
+                name: 'mockRule',
+                description: 'description for mock rule',
+                action: () => {
+                    mockFn();
+                    return of(1);
+                },
+            };
+    
+            const ruleStore = new SimpleRuleStore(mockRule);
+            const engine = new JasperEngine({ ruleStore });
+            const processSimpleDependencySpy = jest.spyOn(engine as any, 'processSimpleDependency');
+    
+            const simpleDependency: SimpleDependency<any> = {
+                name: 'test simple dependency',
+                path: 'children',
+                rule: mockRule.name,
+                executionOrder: ExecutionOrder.Sequential,
+                operator: Operator.AND,
+            };
+    
+            const context: ExecutionContext<any> = {
+                contextId: '1',
+                root: {
+                    children: [
+                        { id: 1, text: 'child1' },
+                        { id: 2, text: 'child2' },
+                        { id: 3, text: 'child3' },
+                    ],
+                },
+                rule: mockRule,
+                _process$: of(),
+                contextData: {},
+                complete: false,
+                response,
+            };
+    
+            const task: Observable<SimpleDependencyResponse> = (engine as any).processSimpleDependency(
+                simpleDependency,
+                context
+            );
+    
+            const subscription = task.subscribe({
+                next: (dependencyResponse) => {
+                    expect(processSimpleDependencySpy).toBeCalledTimes(1);
+                    expect(mockFn).toBeCalledTimes(3);
+                    expect(dependencyResponse.isSkipped).toBe(false);
+                    expect(dependencyResponse.isSuccessful).toBe(false);
+                    expect(dependencyResponse.matches).toHaveLength(3);
+                    expect(dependencyResponse.matches[0].isSuccessful).toBe(false);
+                    expect(dependencyResponse.matches[1].isSuccessful).toBe(true);
+                    expect(dependencyResponse.matches[2].isSuccessful).toBe(true);
+                    done();
+                },
+            });
+    
+            subscription.unsubscribe();
+        });
     });
 });
 

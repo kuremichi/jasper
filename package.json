@@ -1,11 +1,11 @@
 {
   "name": "@kuremichi/jasper",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "description": "Jasper Rule Engine",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
   "scripts": {
-    "test": "jest --config jest.config.json --testPathPattern \"(/__tests__/.*\\.(test|spec))\\.(jsx?|tsx?)$\"",
+    "test": "jest --config jest.config.json --testPathPattern \"((tests|examples)/.*\\.(test|spec))\\.(jsx?|tsx?)$\"",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "npx eslint .",
     "build": "tsc",

@@ -91,7 +91,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#afterdependency" class="tsd-kind-icon">after<wbr>Dependency</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#beforedependency" class="tsd-kind-icon">before<wbr>Dependency</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#executionorder" class="tsd-kind-icon">execution<wbr>Order</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#maxConcurrency" class="tsd-kind-icon">max<wbr>Currency</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#maxconcurrency" class="tsd-kind-icon">max<wbr>Concurrency</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#name" class="tsd-kind-icon">name</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#ondependencyerror" class="tsd-kind-icon">on<wbr>Dependency<wbr>Error</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="compositedependency.html#operator" class="tsd-kind-icon">operator</a></li>
@@ -111,7 +111,7 @@
 					<div class="tsd-signature tsd-kind-icon">after<wbr>Dependency<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L61">dependency/composite.dependency.ts:61</a></li>
+							<li>Defined in dependency/composite.dependency.ts:66</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -147,7 +147,7 @@
 					<div class="tsd-signature tsd-kind-icon">before<wbr>Dependency<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L56">dependency/composite.dependency.ts:56</a></li>
+							<li>Defined in dependency/composite.dependency.ts:61</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -183,7 +183,7 @@
 					<div class="tsd-signature tsd-kind-icon">execution<wbr>Order<span class="tsd-signature-symbol">:</span> <a href="../enums/executionorder.html" class="tsd-signature-type" data-tsd-kind="Enumeration">ExecutionOrder</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L22">dependency/composite.dependency.ts:22</a></li>
+							<li>Defined in dependency/composite.dependency.ts:22</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -194,29 +194,35 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="maxConcurrency" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> max<wbr>Currency</h3>
-					<div class="tsd-signature tsd-kind-icon">max<wbr>Currency<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="maxconcurrency" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> max<wbr>Concurrency</h3>
+					<div class="tsd-signature tsd-kind-icon">max<wbr>Concurrency<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L66">dependency/composite.dependency.ts:66</a></li>
+							<li>Defined in dependency/composite.dependency.ts:72</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>the max number of direct dependencies to be evaluate at a time</p>
+							<p>the max number of direct dependencies to be evaluate at a time
+							default is unlimited</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> name</h3>
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L16">dependency/composite.dependency.ts:16</a></li>
+							<li>Defined in dependency/composite.dependency.ts:16</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>a name for this dependency</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="ondependencyerror" class="tsd-anchor"></a>
@@ -224,7 +230,7 @@
 					<div class="tsd-signature tsd-kind-icon">on<wbr>Dependency<wbr>Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>error<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, response<span class="tsd-signature-symbol">: </span><a href="compositedependencyresponse.html" class="tsd-signature-type" data-tsd-kind="Interface">CompositeDependencyResponse</a>, context<span class="tsd-signature-symbol">: </span><a href="executioncontext.html" class="tsd-signature-type" data-tsd-kind="Interface">ExecutionContext</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><a href="compositedependencyresponse.html" class="tsd-signature-type" data-tsd-kind="Interface">CompositeDependencyResponse</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L47">dependency/composite.dependency.ts:47</a></li>
+							<li>Defined in dependency/composite.dependency.ts:52</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -266,19 +272,31 @@
 					<div class="tsd-signature tsd-kind-icon">operator<span class="tsd-signature-symbol">:</span> <a href="../enums/operator.html" class="tsd-signature-type" data-tsd-kind="Enumeration">Operator</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L27">dependency/composite.dependency.ts:27</a></li>
+							<li>Defined in dependency/composite.dependency.ts:29</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the operator to use when determining if this composite dependency is successful.
+								AND: all dependencies under rules should be successful.
+							OR: any of the dependency under ruls should be successful.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="rules" class="tsd-anchor"></a>
 					<h3>rules</h3>
-					<div class="tsd-signature tsd-kind-icon">rules<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ArrayOneOrMore</span><span class="tsd-signature-symbol">&lt;</span><a href="compositedependency.html" class="tsd-signature-type" data-tsd-kind="Interface">CompositeDependency</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="simpledependency.html" class="tsd-signature-type" data-tsd-kind="Interface">SimpleDependency</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">rules<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ArrayOneOrMore</span><span class="tsd-signature-symbol">&lt;</span><a href="compositedependency.html" class="tsd-signature-type" data-tsd-kind="Interface">CompositeDependency</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="simpledependency.html" class="tsd-signature-type" data-tsd-kind="Interface">SimpleDependency</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L32">dependency/composite.dependency.ts:32</a></li>
+							<li>Defined in dependency/composite.dependency.ts:34</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>the composite dependency</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="when" class="tsd-anchor"></a>
@@ -286,9 +304,17 @@
 					<div class="tsd-signature tsd-kind-icon">when<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Observable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L37">dependency/composite.dependency.ts:37</a></li>
+							<li>Defined in dependency/composite.dependency.ts:42</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>an expression to determine if this dependency should run
+								either a string or function that returns an observable<boolean> is expected.
+									if string is provided, it will be evaluated using jsonata against the root object
+							of current execution context</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="whendescription" class="tsd-anchor"></a>
@@ -296,9 +322,14 @@
 					<div class="tsd-signature tsd-kind-icon">when<wbr>Description<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/kuremichi/jasper/blob/4f7db4b/src/dependency/composite.dependency.ts#L42">dependency/composite.dependency.ts:42</a></li>
+							<li>Defined in dependency/composite.dependency.ts:47</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>a description for when condition descript the scenario</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -342,7 +373,7 @@
 								<a href="compositedependency.html#executionorder" class="tsd-kind-icon">execution<wbr>Order</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="compositedependency.html#maxConcurrency" class="tsd-kind-icon">max<wbr>Currency</a>
+								<a href="compositedependency.html#maxconcurrency" class="tsd-kind-icon">max<wbr>Concurrency</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="compositedependency.html#name" class="tsd-kind-icon">name</a>

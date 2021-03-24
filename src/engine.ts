@@ -188,9 +188,10 @@ export class JasperEngine {
                         });
 
                         return (executionOrder == ExecutionOrder.Sequential
-                            ? concat(...tasks).pipe(toArray())
-                            : from(tasks).pipe(mergeAll(compositeDependency.maxConcurrency), toArray())
+                            ? concat(...tasks)
+                            : from(tasks).pipe(mergeAll(compositeDependency.maxConcurrency))
                         ).pipe(
+                            toArray(),
                             switchMap((responses: (SimpleDependencyResponse | CompositeDependencyResponse)[]) => {
                                 dependencyResponse.rules = responses;
                                 return of(dependencyResponse);
@@ -365,9 +366,10 @@ export class JasperEngine {
                                 });
 
                                 return executeOrder == ExecutionOrder.Sequential
-                                    ? concat(...tasks).pipe(toArray())
-                                    : from(tasks).pipe(mergeAll(simpleDependency.maxConcurrency), toArray());
+                                    ? concat(...tasks)
+                                    : from(tasks).pipe(mergeAll(simpleDependency.maxConcurrency));
                             }),
+                            toArray(),
                             switchMap((responses: SimpleDependencyExecutionResponse[]) => {
                                 return (simpleDependency.afterDependency
                                     ? simpleDependency.afterDependency(context).pipe(
@@ -380,6 +382,19 @@ export class JasperEngine {
                                 ).pipe(
                                     switchMap((responses: SimpleDependencyExecutionResponse[]) => {
                                         dependencyResponse.completeTime = new Date();
+
+                                        const operator = simpleDependency.operator || Operator.AND;
+                                        dependencyResponse.isSuccessful =
+                                            operator === Operator.AND
+                                                ? _.every(
+                                                      responses,
+                                                      (result: SimpleDependencyExecutionResponse) => result.isSuccessful
+                                                  )
+                                                : _.some(
+                                                      responses,
+                                                      (result: SimpleDependencyExecutionResponse) => result.isSuccessful
+                                                  );
+
                                         const executionErrors = _.chain(responses)
                                             .filter((response) => response.hasError && response.error)
                                             .map((response) => response.error)
@@ -390,16 +405,13 @@ export class JasperEngine {
                                             executionErrors
                                         );
                                         dependencyResponse.hasError = dependencyResponse.errors.length > 0;
-                                        dependencyResponse.isSuccessful = _.every(
-                                            responses,
-                                            (response) => response.isSuccessful
-                                        );
 
                                         dependencyResponse.matches = _.orderBy(
                                             dependencyResponse.matches,
                                             ['index'],
                                             ['asc']
                                         );
+
                                         return of(dependencyResponse);
                                     })
                                 );

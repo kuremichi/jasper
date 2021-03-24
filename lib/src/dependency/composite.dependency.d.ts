@@ -7,10 +7,10 @@ declare type ArrayOneOrMore<T> = {
     0: T;
 } & Array<T>;
 export interface CompositeDependency<T> {
-    name: string;
+    name?: string;
     executionOrder?: ExecutionOrder;
     operator?: Operator;
-    rules: ArrayOneOrMore<CompositeDependency<any> | SimpleDependency<any>>;
+    rules: ArrayOneOrMore<CompositeDependency<T> | SimpleDependency<any>>;
     when?: string | (() => Observable<boolean>);
     whenDescription?: string;
     onDependencyError?: (error: any, response: CompositeDependencyResponse, context: ExecutionContext<T>) => Observable<CompositeDependencyResponse>;

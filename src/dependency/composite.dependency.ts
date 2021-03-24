@@ -11,9 +11,9 @@ type ArrayOneOrMore<T> = {
 
 export interface CompositeDependency<T> {
     /**
-     *
+     * a name for this dependency
      */
-    name: string;
+    name?: string;
 
     /**
      * whether the children rule should be evaluated in parallel or sequentially
@@ -22,22 +22,27 @@ export interface CompositeDependency<T> {
     executionOrder?: ExecutionOrder;
 
     /**
-     *
+     * the operator to use when determining if this composite dependency is successful.
+     * AND: all dependencies under rules should be successful.
+     * OR: any of the dependency under ruls should be successful.
      */
     operator?: Operator;
 
     /**
-     *
+     * the composite dependency
      */
-    rules: ArrayOneOrMore<CompositeDependency<any> | SimpleDependency<any>>;
+    rules: ArrayOneOrMore<CompositeDependency<T> | SimpleDependency<any>>;
 
     /**
-     *
+     * an expression to determine if this dependency should run
+     * either a string or function that returns an observable<boolean> is expected.
+     * if string is provided, it will be evaluated using jsonata against the root object
+     * of current execution context
      */
     when?: string | (() => Observable<boolean>);
 
     /**
-     *
+     * a description for when condition descript the scenario
      */
     whenDescription?: string;
 
@@ -62,6 +67,7 @@ export interface CompositeDependency<T> {
 
     /**
      * the max number of direct dependencies to be evaluate at a time
+     * default is unlimited
      */
     maxConcurrency?: number;
 }

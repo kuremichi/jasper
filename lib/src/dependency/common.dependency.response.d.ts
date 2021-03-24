@@ -1,6 +1,6 @@
 import { DebugContext } from '../execution.context';
 export interface CommonDependencyResponse {
-    name: string;
+    name?: string;
     isSkipped: boolean;
     beforeDependencyResponse?: any;
     afterDependencyResponse?: any;
