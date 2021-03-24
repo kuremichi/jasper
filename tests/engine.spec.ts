@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { JasperEngine } from '../engine';
+import { JasperEngine } from '../src/engine';
 
 import { Observable, of, empty, throwError } from 'rxjs';
 import _ from 'lodash';
 import { switchMap, tap } from 'rxjs/operators';
 
-import { Rule } from '../rule';
-import { ExecutionContext } from '../execution.context';
-import { ExecutionOrder, EngineRecipe, Operator } from '../enum';
-import { SimpleDependency } from '../dependency/simple.dependency';
-import { CompositeDependency } from '../dependency/composite.dependency';
-import { CompositeDependencyResponse } from '../dependency/composite.dependency.response';
-import { ExecutionResponse } from '../execution.response';
-import { SimpleDependencyResponse } from '../dependency/simple.dependency.response';
-import { SimpleRuleStore } from '../store/simple.rule.store';
-import { RuleNotFoundException } from '../store/rule.store.interfafce';
+import { Rule } from '../src/rule';
+import { ExecutionContext } from '../src/execution.context';
+import { ExecutionOrder, EngineRecipe, Operator } from '../src/enum';
+import { SimpleDependency } from '../src/dependency/simple.dependency';
+import { CompositeDependency } from '../src/dependency/composite.dependency';
+import { CompositeDependencyResponse } from '../src/dependency/composite.dependency.response';
+import { ExecutionResponse } from '../src/execution.response';
+import { SimpleDependencyResponse } from '../src/dependency/simple.dependency.response';
+import { SimpleRuleStore } from '../src/store/simple.rule.store';
+import { RuleNotFoundException } from '../src/store/rule.store.interfafce';
 
 describe('processExpression', () => {
     const mockRule: Rule<any> = {
