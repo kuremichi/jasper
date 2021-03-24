@@ -16,7 +16,7 @@ export interface CompositeDependency<T> {
     onDependencyError?: (error: any, response: CompositeDependencyResponse, context: ExecutionContext<T>) => Observable<CompositeDependencyResponse>;
     beforeDependency?: (context: ExecutionContext<T>) => Observable<any>;
     afterDependency?: (context: ExecutionContext<T>) => Observable<any>;
-    maxCurrency?: number;
+    maxConcurrency?: number;
 }
 export declare function isCompositeDependency(object: any): object is CompositeDependency<any>;
 export {};

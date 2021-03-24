@@ -189,7 +189,7 @@ export class JasperEngine {
 
                         return (executionOrder == ExecutionOrder.Sequential
                             ? concat(...tasks).pipe(toArray())
-                            : from(tasks).pipe(mergeAll(compositeDependency.maxCurrency), toArray())
+                            : from(tasks).pipe(mergeAll(compositeDependency.maxConcurrency), toArray())
                         ).pipe(
                             switchMap((responses: (SimpleDependencyResponse | CompositeDependencyResponse)[]) => {
                                 dependencyResponse.rules = responses;
@@ -366,7 +366,7 @@ export class JasperEngine {
 
                                 return executeOrder == ExecutionOrder.Sequential
                                     ? concat(...tasks).pipe(toArray())
-                                    : from(tasks).pipe(mergeAll(simpleDependency.maxCurrency), toArray());
+                                    : from(tasks).pipe(mergeAll(simpleDependency.maxConcurrency), toArray());
                             }),
                             switchMap((responses: SimpleDependencyExecutionResponse[]) => {
                                 return (simpleDependency.afterDependency
