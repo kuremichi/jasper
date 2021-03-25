@@ -16,8 +16,14 @@ export interface Rule<T> {
 
     /**
      *
-     * by default Jasper Workflow Engine will hash the root object provided to the rule to determine its uniqueness
+     * by default Jasper Workflow Engine will hash the root object provided to the rule to determine its uniqueness  
      * if you don't want the entire object to be considered and want to provide your own uniqueness algorithm, use this extension
+     *
+     * @example students are the same if the studentId is the same
+     * uniqueBy: (root: Stduent) => root.studentId
+     * 
+     * @example two apples are identical if the variety and weight are the same
+     * uniqueBy: (root: Apple) => ({ variety: root.variety, weight: root.weight })
      */
     uniqueBy?: (root: T) => any;
 
@@ -27,15 +33,15 @@ export interface Rule<T> {
     beforeAction?: (context: ExecutionContext<T>) => Observable<any>;
 
     /**
-     * the action to run
+     * the action to run  
      * if the action is a string, it will be interpreted as a jsonata expression
      */
-    action?: string | ((context: ExecutionContext<T>) => Observable<unknown>);
+    action?: string | ((context: ExecutionContext<T>) => Observable<any>);
 
     /**
      * lifecycle hook after the action has been executing executed
      */
-    afterAction?: (context: ExecutionContext<T>) => Observable<ExecutionResponse>;
+    afterAction?: (context: ExecutionContext<T>) => Observable<any>;
 
     /**
      * lifecycle hook after the action has error
