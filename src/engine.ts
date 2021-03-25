@@ -585,7 +585,8 @@ export class JasperEngine {
                                                         `after action executed for rule ${rule.name} - context ${context.contextId}`
                                                     );
                                                 }
-                                            })
+                                            }),
+                                            switchMapTo(of(response)),
                                         );
                                     }
                                     return of(response);

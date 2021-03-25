@@ -12,7 +12,7 @@
 - [6. Lifecycle Hooks](#6-lifecycle-hooks)
   - [For Rule](#for-rule)
   - [For Simple Dependency](#for-simple-dependency)
-  - [For Compositive Dependency](#for-compositive-dependency)
+  - [For Composite Dependency](#for-composite-dependency)
 - [7. Execution Context](#7-execution-context)
 
 
@@ -149,8 +149,11 @@ engine
 ```
 
 # 3. Rule
-A rule is a simple piece of logic.  
+A rule is a unit of work.
 It could be a validation logic, a workflow process, a http request.  
+It could also be a more complicated logic that composed by other unit of work (dependencies)
+
+For example, the logic to check if a VISA card is valid is a unit of work. The logic to process an order is also a unit of work that has a dependnecy on the credit card validation.
 
 The rule is an generic interface of type T, where T represents the type of data this rule is supposed to process. For intellisense, this tells typescript that context.root should be of type T and you can get the type support when writting method in action and other hooks (see later sections). If you don't care about the type, just provide any, i.e. Rule`<any`>.
 
@@ -243,7 +246,6 @@ When determining if the dependency execution is successful, you can specify **AN
 | Simple Dependency    | executions against all object returned by **PATH** need to successful | At least one execution agaist the pathObject is successful |
 
 
-
 The default is **AND**.
 
 # 5. Recipe
@@ -260,7 +262,8 @@ The default is Process Engine.
 
 # 6. Lifecycle Hooks
 
-Jasper engine provides many extension points during the rule and dependency execution cycle.
+Jasper engine provides many extension points during the rule and dependency execution cycle.  
+Here is an [example](https://github.com/kuremichi/jasper/blob/master/examples/process%20flow/execution.order.example.test.ts) that shows the execution order for these hooks.
 
 ## For Rule
 
@@ -300,7 +303,7 @@ The sequence is
 5. afterDependency
 6. onDependencyError (if not caught before)
 
-## For Compositive Dependency
+## For Composite Dependency
 
 |  Hook   | Description  |
 | ------- | ---- |
@@ -314,5 +317,15 @@ The sequence is
 3. onDependencyError
 
 # 7. Execution Context
+Each rule execution contains a [context](https://kuremichi.github.io/jasper/interfaces/executioncontext.html) from where you can find relevant information about current rule execution.  
+If you use any of the hooks mentioned above, the context will be provided to you. 
 
+|  Field   | Description  |
+| ------- | ---- |
+| root | this is the object that is passed to rule for evaluation |
+| rule | this is the reference to current rule being executed|
+| contextData | this is a dictionary<string, any> that you could use to store some temp variable if needed when you use hooks | 
+| parentContext | this will give you the ability to traverse the dependency execution and find the parent root if needed. |
+| childrenContexts | an array of execution context for dependency rules execution started from current rule |
 
+** Personally I believe each rule is a unit of work and the logic should be self-contained so you shouldn't need to access the parentContext, but ultimately it is your code and you decide what makes sense for you.
