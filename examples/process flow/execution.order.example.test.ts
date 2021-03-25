@@ -2,7 +2,7 @@ import { JasperEngine } from '../../src/engine';
 import { EngineOptions } from '../../src/engine.option';
 import { EngineRecipe } from '../../src/enum';
 import { ExecutionResponse } from '../../src/execution.response';
-import { ruleStore } from './concurrency.example.rules';
+import { ruleStore } from './execution.order.example.rules';
 jest.setTimeout(15000);
 
 it('should run', (done) => {
