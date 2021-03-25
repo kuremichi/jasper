@@ -79,7 +79,7 @@
 					<li><a href="#6-lifecycle-hooks">6. Lifecycle Hooks</a><ul>
 							<li><a href="#for-rule">For Rule</a></li>
 							<li><a href="#for-simple-dependency">For Simple Dependency</a></li>
-							<li><a href="#for-compositive-dependency">For Compositive Dependency</a></li>
+							<li><a href="#for-composite-dependency">For Composite Dependency</a></li>
 						</ul>
 					</li>
 					<li><a href="#7-execution-context">7. Execution Context</a></li>
@@ -356,7 +356,7 @@
 				<a href="#6-lifecycle-hooks" id="6-lifecycle-hooks" style="color: inherit; text-decoration: none;">
 					<h1>6. Lifecycle Hooks</h1>
 				</a>
-				<p>Jasper engine provides many extension points during the rule and dependency execution cycle.</p>
+				<p>Jasper engine provides many extension points during the rule and dependency execution cycle.<br>Here is an <a href="https://github.com/kuremichi/jasper/blob/master/examples/process%20flow/execution.order.example.test.ts">example</a> that shows the execution order for these hooks.</p>
 				<a href="#for-rule" id="for-rule" style="color: inherit; text-decoration: none;">
 					<h2>For Rule</h2>
 				</a>
@@ -438,8 +438,8 @@
 					<li>afterDependency</li>
 					<li>onDependencyError (if not caught before)</li>
 				</ol>
-				<a href="#for-compositive-dependency" id="for-compositive-dependency" style="color: inherit; text-decoration: none;">
-					<h2>For Compositive Dependency</h2>
+				<a href="#for-composite-dependency" id="for-composite-dependency" style="color: inherit; text-decoration: none;">
+					<h2>For Composite Dependency</h2>
 				</a>
 				<table>
 					<thead>
