@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { CompositeDependency } from './dependency/composite.dependency';
+import { Direction } from './enum';
 import { ExecutionContext } from './execution.context';
-import { ExecutionResponse } from './execution.response';
 
 export interface Rule<T> {
     /**
@@ -16,12 +16,12 @@ export interface Rule<T> {
 
     /**
      *
-     * by default Jasper Workflow Engine will hash the root object provided to the rule to determine its uniqueness  
+     * by default Jasper Workflow Engine will hash the root object provided to the rule to determine its uniqueness
      * if you don't want the entire object to be considered and want to provide your own uniqueness algorithm, use this extension
      *
      * @example students are the same if the studentId is the same
      * uniqueBy: (root: Stduent) => root.studentId
-     * 
+     *
      * @example two apples are identical if the variety and weight are the same
      * uniqueBy: (root: Apple) => ({ variety: root.variety, weight: root.weight })
      */
@@ -33,7 +33,7 @@ export interface Rule<T> {
     beforeAction?: (context: ExecutionContext<T>) => Observable<any>;
 
     /**
-     * the action to run  
+     * the action to run
      * if the action is a string, it will be interpreted as a jsonata expression
      */
     action?: string | ((context: ExecutionContext<T>) => Observable<any>);
@@ -57,6 +57,13 @@ export interface Rule<T> {
      * custom meta data defined by user
      */
     metadata?: Record<string, any>;
+
+    /**
+     * whether dependency should be evaluated before action
+     * Direction.OutsideIn: rule will run first before its dependency
+     * Direction.InsideOut: rule will run first after its dependency
+     */
+    direction?: Direction;
 }
 
 // export function isRule(object: any): object is Rule {

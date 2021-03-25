@@ -1,4 +1,4 @@
-import { Observable, of, from, concat } from 'rxjs';
+import { Observable, of, from, concat, defer } from 'rxjs';
 import { switchMap, tap, toArray, share, catchError, shareReplay, map, switchMapTo, mergeAll } from 'rxjs/operators';
 import jsonata from 'jsonata';
 import hash from 'object-hash';
@@ -8,7 +8,7 @@ import { ExecutionContext } from './execution.context';
 import { Rule } from './rule';
 import { DefaultEngineOptions, EngineOptions } from './engine.option';
 import { isSimpleDependency, SimpleDependency } from './dependency/simple.dependency';
-import { ExecutionOrder, EngineRecipe, Operator } from './enum';
+import { ExecutionOrder, EngineRecipe, Operator, Direction } from './enum';
 import { CompositeDependency } from './dependency/composite.dependency';
 import { SimpleDependencyResponse } from './dependency/simple.dependency.response';
 import { CompositeDependencyResponse } from './dependency/composite.dependency.response';
@@ -497,6 +497,9 @@ export class JasperEngine {
                             if (debugContext) {
                                 debugContext.contextId = contextId;
                             }
+
+                            const direction = rule.direction || Direction.OutsideIn;
+
                             context = {
                                 contextId,
                                 rule,
@@ -518,6 +521,37 @@ export class JasperEngine {
                                     params.parentExecutionContext.childrenContexts || {})[context.contextId] = context;
                             }
 
+                            const action = defer(() => {
+                                if (rule.action) {
+                                    return this.executeAction({
+                                        action: rule.action,
+                                        context,
+                                    });
+                                }
+
+                                return this.options.recipe === EngineRecipe.BusinessProcessEngine ? of(null) : of(true);
+                            }).pipe(
+                                tap((result) => {
+                                    context.complete = true;
+                                    context.response.isSuccessful = true;
+                                    context.response.result = result;
+                                    context.response.completeTime = new Date();
+                                })
+                            );
+
+                            const dependency = defer(() => {
+                                return rule.dependencies
+                                    ? this.processCompositeDependency(rule.dependencies, context).pipe(
+                                          tap((dependencyResponse: CompositeDependencyResponse) => {
+                                              context.response.dependency = dependencyResponse;
+                                              context.response.isSuccessful =
+                                                  context.response.isSuccessful && dependencyResponse.isSuccessful;
+                                          }),
+                                          switchMapTo(of(context.response))
+                                      )
+                                    : of(context.response);
+                            });
+
                             context._process$ = of(true).pipe(
                                 // call beforeAction
                                 switchMap(() => {
@@ -538,38 +572,14 @@ export class JasperEngine {
                                 }),
                                 // execute the main action
                                 switchMap(() => {
-                                    if (rule.action) {
-                                        return this.executeAction({
-                                            action: rule.action,
-                                            context,
-                                        });
-                                    }
-
-                                    return this.options.recipe === EngineRecipe.BusinessProcessEngine
-                                        ? of(null)
-                                        : of(true);
-                                }),
-                                tap((result) => {
-                                    context.complete = true;
-                                    context.response.isSuccessful = true;
-                                    context.response.result = result;
-                                    context.response.completeTime = new Date();
+                                    return direction === Direction.OutsideIn ? action : dependency;
                                 }),
                                 // call dependency rules
                                 switchMap(() => {
-                                    return rule.dependencies
-                                        ? this.processCompositeDependency(rule.dependencies, context).pipe(
-                                              tap((dependencyResponse: CompositeDependencyResponse) => {
-                                                  context.response.dependency = dependencyResponse;
-                                                  context.response.isSuccessful =
-                                                      context.response.isSuccessful && dependencyResponse.isSuccessful;
-                                              }),
-                                              switchMapTo(of(context.response))
-                                          )
-                                        : of(context.response);
+                                    return direction === Direction.OutsideIn ? dependency : action;
                                 }),
                                 // call afterAction
-                                switchMap((response) => {
+                                switchMap(() => {
                                     // validation recipe expect the result for the rule to be boolean
                                     // and in order for the rule to be valid, the result needs to true
                                     if (this.options.recipe === EngineRecipe.ValidationRuleEngine) {
@@ -586,7 +596,7 @@ export class JasperEngine {
                                                     );
                                                 }
                                             }),
-                                            switchMapTo(of(response)),
+                                            switchMapTo(of(response))
                                         );
                                     }
                                     return of(response);

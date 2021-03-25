@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { CompositeDependency } from './dependency/composite.dependency';
+import { Direction } from './enum';
 import { ExecutionContext } from './execution.context';
 export interface Rule<T> {
     name: string;
@@ -11,4 +12,5 @@ export interface Rule<T> {
     onError?: string | ((error: any, context: ExecutionContext<T>) => Observable<any>);
     dependencies?: CompositeDependency<T> | undefined;
     metadata?: Record<string, any>;
+    direction?: Direction;
 }

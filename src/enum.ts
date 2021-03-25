@@ -19,3 +19,8 @@ export enum EngineRecipe {
     */
     BusinessProcessEngine,
 }
+
+export enum Direction {
+    OutsideIn = 'OutsideIn',
+    InsideOut = 'InsideOut',
+}
