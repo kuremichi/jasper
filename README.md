@@ -1,5 +1,4 @@
 - [1. Description](#1-description)
-  - [Jasper Rule Engine](#jasper-rule-engine)
 - [2. Quickstart](#2-quickstart)
 - [3. Rule](#3-rule)
     - [Direction](#direction)
@@ -18,19 +17,14 @@
 
 
 # 1. Description
-  ## Jasper Rule Engine
   Are you building an application that contains a lot of validation rules ?   
   Are you building an application that contains a lot of business workflow process ?   
   
   Here comes Jasper Rule Engine.
 
 # 2. Quickstart
-      To get started  
-      npm install --save @kuremichi/jasper
-
-      Also, you might want to install rxjs as Jasper Rule Engine heavily depends on Observable  
-      to configure its rule.
-      npm install --save rxjs
+    To get started  
+    npm install --save @kuremichi/jasper rxjs
 
 ```typescript
 import { EngineRecipe, JasperEngine, Rule, SimpleRuleStore } from "@kuremichi/jasper";
@@ -116,6 +110,7 @@ const alcoholRule: Rule<Person> = {
     }
 }
 
+// create a store that knows about your rules
 const ruleStore = new SimpleRuleStore(_18YoRule, _19YoRule, _21YoRule, alcoholRule, canadaAlcoholRule);
 const engine = new JasperEngine({
     ruleStore,
@@ -140,7 +135,8 @@ engine
         ruleName: alcoholRule.name,
     })
     .subscribe((response) => {
-        // true for AB, Canada, false for BC, Canada
+        // true for AB, Canada
+        // false for BC, Canada
         // false for WA, US
         console.log(`${person.name} can${response.isSuccessful ? '' : 'not'} buy alcohol in ${person.currentLocation.stateOrProvince}, ${person.currentLocation.country}`);
     });
@@ -152,7 +148,7 @@ engine
 # 3. Rule
 A [rule](https://kuremichi.github.io/jasper/interfaces/rule.html) is a unit of work.
 It could be a validation logic, a workflow process, a http request.  
-It could also be a more complicated logic that composed by other unit of work (dependencies)
+It could also be a more complicated logic that is built on top of other unit of work (dependencies)
 
 For example, the logic to check if a VISA card is valid is a unit of work. The logic to process an order is also a unit of work that has a dependnecy on the credit card validation.
 
@@ -160,11 +156,16 @@ The rule is an generic interface of type T, where T represents the type of data 
 
 ### Direction
 Rule supports two [directions](https://kuremichi.github.io/jasper/enums/direction.html). OutsideIn (default) and InsideOut  
-The difference is dependency for a rule should run before a rule or not.   
-OutsideIn: Before Action -> Action -> Dependency -> After Action  
-InsideOut: Before Action -> -> Dependency -> Action -> After Action
+The difference is the order that dependency and rule action will be executed.  
+<br/>
+OutsideIn: Run rule first before running its dependencies  
+Before Action -> Action -> Dependency -> After Action  
+<br/>
+InsideOut: Run dependencies first before running the rule  
+Before Action -> Dependency -> Action -> After Action
 
-Below is an example for two simple rules and a rule with dependencies.
+Below is an example for two simple rules and a rule with dependencies. 
+
 ```typescript
 
 const validateVisaCreditCard: Rule<YourClassOrInterfaceForPayment> {
@@ -333,6 +334,7 @@ If you use any of the hooks mentioned above, the context will be provided to you
 | ------- | ---- |
 | root | this is the object that is passed to rule for evaluation |
 | rule | this is the reference to current rule being executed|
+| contextId | an identifier for the execution context. When suppressDuplicateTask is on, two executions for the same objects processed by the same rule will have the same contextId |
 | contextData | this is a dictionary<string, any> that you could use to store some temp variable if needed when you use hooks | 
 | parentContext | this will give you the ability to traverse the dependency execution and find the parent root if needed. |
 | childrenContexts | an array of execution context for dependency rules execution started from current rule |

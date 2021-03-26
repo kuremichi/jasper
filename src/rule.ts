@@ -54,7 +54,7 @@ export interface Rule<T> {
     dependencies?: CompositeDependency<T> | undefined;
 
     /**
-     * custom meta data defined by user
+     * custom metadata defined by user that will be returned on execution response
      */
     metadata?: Record<string, any>;
 
