@@ -152,7 +152,7 @@ It could also be a more complicated logic that is built on top of other unit of 
 
 For example, the logic to check if a VISA card is valid is a unit of work. The logic to process an order is also a unit of work that has a dependnecy on the credit card validation.
 
-The rule is an generic interface of type T, where T represents the type of data this rule is supposed to process. For intellisense, this tells typescript that context.root should be of type T and you can get the type support when writting method in action and other hooks (see later sections). If you don't care about the type, just provide any, i.e. Rule`<any`>.
+The rule is an generic interface of type T, where T represents the type of data this rule is supposed to process. For intellisense, this tells typescript that context.root should be of type T and you can get the type support when writting method in action and other hooks (see later sections). If you don't care about the type, just provide any, i.e. Rule\<any\>.
 
 ### Direction
 Rule supports two [directions](https://kuremichi.github.io/jasper/enums/direction.html). OutsideIn (default) and InsideOut  
@@ -172,7 +172,7 @@ const validateVisaCreditCard: Rule<YourClassOrInterfaceForPayment> {
     name: 'is Visa card valid',
     description: 'check if a credit card is a valid Visa card',
     action: (context) => {
-        // some basic validation because we send it to Visa for payment processing
+        // some basic validation before we send it to Visa for payment processing
         const isValid = context.root.cardNumber 
                     && context.root.cardNumber.length === 16
                     && context.root.cvv && 
@@ -186,7 +186,7 @@ const validateAmexCreditCard: Rule<YourClassOrInterfaceForPayment> {
     name: 'is American Express card valid',
     description: 'check if a credit card is a valid American Express card',
     action: (context) => {
-        // some basic validation because we send it to Amex for payment processing
+        // some basic validation before we send it to Amex for payment processing
         const isValid = context.root.cardNumber 
                     && context.root.cardNumber.length === 16
                     && context.root.cvv && 
