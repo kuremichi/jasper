@@ -234,7 +234,11 @@ export class JasperEngine {
                 dependencyResponse.isSuccessful = false;
 
                 return compositeDependency.onDependencyError
-                    ? compositeDependency.onDependencyError(err, dependencyResponse, context)
+                    ? compositeDependency.onDependencyError(err, dependencyResponse, context).pipe(
+                          tap(() => {
+                              dependencyResponse.completeTime = new Date();
+                          })
+                      )
                     : of(dependencyResponse);
             })
         );
@@ -342,11 +346,13 @@ export class JasperEngine {
                                                 executionResponse.error &&
                                                 simpleDependency.onEachError
                                             ) {
-                                                return simpleDependency.onEachError(
-                                                    response.error,
-                                                    executionResponse,
-                                                    context
-                                                );
+                                                return simpleDependency
+                                                    .onEachError(response.error, executionResponse, context)
+                                                    .pipe(
+                                                        tap(() => {
+                                                            executionResponse.completeTime = new Date();
+                                                        })
+                                                    );
                                             }
 
                                             return of(dependencyResponse);
@@ -435,7 +441,11 @@ export class JasperEngine {
                 dependencyResponse.completeTime = new Date();
 
                 return simpleDependency.onDependencyError
-                    ? simpleDependency.onDependencyError(err, dependencyResponse, context)
+                    ? simpleDependency.onDependencyError(err, dependencyResponse, context).pipe(
+                          tap(() => {
+                              dependencyResponse.completeTime = new Date();
+                          })
+                      )
                     : of(dependencyResponse).pipe(
                           tap((dependencyResponse) => {
                               // push the error by default
@@ -544,7 +554,6 @@ export class JasperEngine {
                                     context.complete = true;
                                     context.response.isSuccessful = true;
                                     context.response.result = result;
-                                    context.response.completeTime = new Date();
                                 })
                             );
 
@@ -610,6 +619,9 @@ export class JasperEngine {
                                     }
                                     return of(response);
                                 }),
+                                tap(() => {
+                                    context.response.completeTime = new Date();
+                                }),
                                 catchError((err) => {
                                     context.response.isSuccessful = false;
                                     context.response.hasError = true;
@@ -646,7 +658,10 @@ export class JasperEngine {
                                                     );
                                                 }
                                             }),
-                                            switchMapTo(of(context.response))
+                                            switchMap(() => {
+                                                context.response.completeTime = new Date();
+                                                return of(context.response);
+                                            })
                                         );
                                     }
 
