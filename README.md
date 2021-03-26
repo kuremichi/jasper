@@ -2,6 +2,7 @@
   - [Jasper Rule Engine](#jasper-rule-engine)
 - [2. Quickstart](#2-quickstart)
 - [3. Rule](#3-rule)
+    - [Direction](#direction)
 - [4. Dependencies](#4-dependencies)
     - [Simple Dependency](#simple-dependency)
     - [Composite Dependency](#composite-dependency)
@@ -149,13 +150,19 @@ engine
 ```
 
 # 3. Rule
-A rule is a unit of work.
+A [rule](https://kuremichi.github.io/jasper/interfaces/rule.html) is a unit of work.
 It could be a validation logic, a workflow process, a http request.  
 It could also be a more complicated logic that composed by other unit of work (dependencies)
 
 For example, the logic to check if a VISA card is valid is a unit of work. The logic to process an order is also a unit of work that has a dependnecy on the credit card validation.
 
 The rule is an generic interface of type T, where T represents the type of data this rule is supposed to process. For intellisense, this tells typescript that context.root should be of type T and you can get the type support when writting method in action and other hooks (see later sections). If you don't care about the type, just provide any, i.e. Rule`<any`>.
+
+### Direction
+Rule supports two [directions](https://kuremichi.github.io/jasper/enums/direction.html). OutsideIn (default) and InsideOut  
+The difference is dependency for a rule should run before a rule or not.   
+OutsideIn: Before Action -> Action -> Dependency -> After Action  
+InsideOut: Before Action -> -> Dependency -> Action -> After Action
 
 Below is an example for two simple rules and a rule with dependencies.
 ```typescript
@@ -215,10 +222,10 @@ const isValidCreditCard: Rule<YourClassOrInterfaceForPayment> {
 
 # 4. Dependencies
 ### Simple Dependency
-A simple dependency is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.
+A [simple dependency](https://kuremichi.github.io/jasper/interfaces/simpledependency.html) is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.
 
 ### Composite Dependency
-As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.  
+As the name suggests, a [composite dependency](https://kuremichi.github.io/jasper/interfaces/compositedependency.html) is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.  
 When specifying the dependencies for composite dependency, if the execution of the dependency is conditional, you could provide a **when** expresion. As you can tell from the alcohol rule example above, you can either provide an expression in string or a method that will return an Observable<boolean>. When a dependency is skipped, it will be deemed as successful.
 
 ### ExecutionOrder
@@ -270,15 +277,17 @@ Here is an [example](https://github.com/kuremichi/jasper/blob/master/examples/pr
 |  Hook   | Description  | 
 | ------- | ---- | 
 | beforeAction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | task to run before the rule action starts. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-| afterAction | task to run after the rule action starts. |
+| afterAction | task to run after the rule action ends. |
 | onError | task to run when error occurs |
 
 The sequence is  
 1. beforeAction 
-2. action
-3. dependency
+2. ** action/dependency
+3. ** dependency/action
 4. afterAction
-5. onError(if not caught before)
+5. onError(if not caught before)  
+
+**  depending on the direction. 
 
 ## For Simple Dependency
 

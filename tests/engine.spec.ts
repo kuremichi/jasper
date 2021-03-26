@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { JasperEngine } from '../src/engine';
 
-import { Observable, of, empty, throwError } from 'rxjs';
+import { Observable, of, empty, throwError, timer } from 'rxjs';
 import _ from 'lodash';
-import { switchMap, tap } from 'rxjs/operators';
+import { mapTo, switchMap, take, tap, timeout } from 'rxjs/operators';
 
 import { Rule } from '../src/rule';
 import { ExecutionContext } from '../src/execution.context';
-import { ExecutionOrder, EngineRecipe, Operator } from '../src/enum';
+import { ExecutionOrder, EngineRecipe, Operator, Direction } from '../src/enum';
 import { SimpleDependency } from '../src/dependency/simple.dependency';
 import { CompositeDependency } from '../src/dependency/composite.dependency';
 import { CompositeDependencyResponse } from '../src/dependency/composite.dependency.response';
@@ -2248,6 +2248,81 @@ describe('execute', () => {
 
         (engine as any).execute({ root, ruleName: parentRule.name }).subscribe({
             next: (response: ExecutionResponse) => {
+                expect(actionMock).toBeCalledTimes(1);
+                expect(actionMock2).toBeCalledTimes(1);
+                expect(executeSpy).toBeCalledTimes(3);
+                expect(response.result).toBe(1);
+                expect(response.isSuccessful).toBe(true);
+                expect(response!.dependency!.isSuccessful).toBe(true);
+                expect(response!.dependency!.rules[0]!.isSuccessful).toBe(true);
+                done();
+            },
+        });
+    });
+
+    it('should execute dependency first before action', (done) => {
+        let mockRuleCalledTime: any;
+        let parentRuleCalledTime: any;
+
+        const actionMock2 = jest.fn().mockReturnValue(1);
+
+        const mockRule: Rule<any> = {
+            name: 'mockRule',
+            description: 'description for mock rule',
+            uniqueBy: (root) => ({ name: root.name }),
+            action: () => {
+                mockRuleCalledTime = new Date();
+                return timer(2000, 1000).pipe(
+                    take(1),
+                    mapTo(actionMock2()),
+                )
+            },
+        };
+
+        const simpleDependency: SimpleDependency<any> = {
+            name: 'test simple dependency',
+            path: 'children',
+            rule: mockRule.name,
+        };
+
+        const compositeDependency: CompositeDependency<any> = {
+            name: 'test composite dependency',
+            rules: [simpleDependency],
+        };
+
+        const actionMock = jest.fn().mockReturnValue(1);
+        const parentRule: Rule<any> = {
+            name: 'parentRule',
+            description: 'description for mock rule',
+            action: () => {
+                parentRuleCalledTime = new Date();
+                return of(actionMock());
+            },
+            direction: Direction.InsideOut,
+            dependencies: compositeDependency,
+        };
+
+        const ruleStore = new SimpleRuleStore(mockRule, parentRule);
+        const engine = new JasperEngine({
+            ruleStore,
+            options: {
+                recipe: EngineRecipe.BusinessProcessEngine,
+                suppressDuplicateTasks: true,
+            },
+        });
+
+        const executeSpy = jest.spyOn(engine as any, 'execute');
+
+        const root = {
+            children: [
+                { id: 1, text: 'child1' },
+                { id: 2, text: 'child1' },
+            ],
+        };
+
+        (engine as any).execute({ root, ruleName: parentRule.name }).subscribe({
+            next: (response: ExecutionResponse) => {
+                expect((parentRuleCalledTime - mockRuleCalledTime)).toBeGreaterThanOrEqual(2000);
                 expect(actionMock).toBeCalledTimes(1);
                 expect(actionMock2).toBeCalledTimes(1);
                 expect(executeSpy).toBeCalledTimes(3);

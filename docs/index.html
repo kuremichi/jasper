@@ -64,7 +64,10 @@
 						</ul>
 					</li>
 					<li><a href="#2-quickstart">2. Quickstart</a></li>
-					<li><a href="#3-rule">3. Rule</a></li>
+					<li><a href="#3-rule">3. Rule</a><ul>
+							<li><a href="#direction">Direction</a></li>
+						</ul>
+					</li>
 					<li><a href="#4-dependencies">4. Dependencies</a><ul>
 							<li><a href="#simple-dependency">Simple Dependency</a></li>
 							<li><a href="#composite-dependency">Composite Dependency</a></li>
@@ -79,7 +82,7 @@
 					<li><a href="#6-lifecycle-hooks">6. Lifecycle Hooks</a><ul>
 							<li><a href="#for-rule">For Rule</a></li>
 							<li><a href="#for-simple-dependency">For Simple Dependency</a></li>
-							<li><a href="#for-compositive-dependency">For Compositive Dependency</a></li>
+							<li><a href="#for-composite-dependency">For Composite Dependency</a></li>
 						</ul>
 					</li>
 					<li><a href="#7-execution-context">7. Execution Context</a></li>
@@ -220,10 +223,14 @@
 				<a href="#3-rule" id="3-rule" style="color: inherit; text-decoration: none;">
 					<h1>3. Rule</h1>
 				</a>
-				<p>A rule is a unit of work.
+				<p>A <a href="https://kuremichi.github.io/jasper/interfaces/rule.html">rule</a> is a unit of work.
 				It could be a validation logic, a workflow process, a http request.<br>It could also be a more complicated logic that composed by other unit of work (dependencies)</p>
 				<p>For example, the logic to check if a VISA card is valid is a unit of work. The logic to process an order is also a unit of work that has a dependnecy on the credit card validation.</p>
 				<p>The rule is an generic interface of type T, where T represents the type of data this rule is supposed to process. For intellisense, this tells typescript that context.root should be of type T and you can get the type support when writting method in action and other hooks (see later sections). If you don&#39;t care about the type, just provide any, i.e. Rule<code>&lt;any</code>&gt;.</p>
+				<a href="#direction" id="direction" style="color: inherit; text-decoration: none;">
+					<h3>Direction</h3>
+				</a>
+				<p>Rule supports two <a href="https://kuremichi.github.io/jasper/enums/direction.html">directions</a>. OutsideIn (default) and InsideOut<br>The difference is dependency for a rule should run before a rule or not.<br>OutsideIn: Before Action -&gt; Action -&gt; Dependency -&gt; After Action<br>InsideOut: Before Action -&gt; -&gt; Dependency -&gt; Action -&gt; After Action</p>
 				<p>Below is an example for two simple rules and a rule with dependencies.</p>
 				<pre><code class="language-typescript">
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">validateVisaCreditCard</span><span style="color: #000000">: </span><span style="color: #267F99">Rule</span><span style="color: #000000">&lt;</span><span style="color: #267F99">YourClassOrInterfaceForPayment</span><span style="color: #000000">&gt; {</span>
@@ -284,11 +291,11 @@
 				<a href="#simple-dependency" id="simple-dependency" style="color: inherit; text-decoration: none;">
 					<h3>Simple Dependency</h3>
 				</a>
-				<p>A simple dependency is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.</p>
+				<p>A <a href="https://kuremichi.github.io/jasper/interfaces/simpledependency.html">simple dependency</a> is a dependency on a particular rule. The rule that is depended on could have its own dependencies (and then nested dependencies). That being said, a simple dependency is only simple in the sense of its configuration syntax.</p>
 				<a href="#composite-dependency" id="composite-dependency" style="color: inherit; text-decoration: none;">
 					<h3>Composite Dependency</h3>
 				</a>
-				<p>As the name suggests, a composite dependency is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.<br>When specifying the dependencies for composite dependency, if the execution of the dependency is conditional, you could provide a <strong>when</strong> expresion. As you can tell from the alcohol rule example above, you can either provide an expression in string or a method that will return an Observable<boolean>. When a dependency is skipped, it will be deemed as successful.</p>
+				<p>As the name suggests, a <a href="https://kuremichi.github.io/jasper/interfaces/compositedependency.html">composite dependency</a> is a dependency on one or more rules. A composite dependency could depend on Simple Dependencies and/or Composite Dependencies.<br>When specifying the dependencies for composite dependency, if the execution of the dependency is conditional, you could provide a <strong>when</strong> expresion. As you can tell from the alcohol rule example above, you can either provide an expression in string or a method that will return an Observable<boolean>. When a dependency is skipped, it will be deemed as successful.</p>
 				<a href="#executionorder" id="executionorder" style="color: inherit; text-decoration: none;">
 					<h3>ExecutionOrder</h3>
 				</a>
@@ -356,7 +363,7 @@
 				<a href="#6-lifecycle-hooks" id="6-lifecycle-hooks" style="color: inherit; text-decoration: none;">
 					<h1>6. Lifecycle Hooks</h1>
 				</a>
-				<p>Jasper engine provides many extension points during the rule and dependency execution cycle.</p>
+				<p>Jasper engine provides many extension points during the rule and dependency execution cycle.<br>Here is an <a href="https://github.com/kuremichi/jasper/blob/master/examples/process%20flow/execution.order.example.test.ts">example</a> that shows the execution order for these hooks.</p>
 				<a href="#for-rule" id="for-rule" style="color: inherit; text-decoration: none;">
 					<h2>For Rule</h2>
 				</a>
@@ -373,7 +380,7 @@
 						</tr>
 						<tr>
 							<td>afterAction</td>
-							<td>task to run after the rule action starts.</td>
+							<td>task to run after the rule action ends.</td>
 						</tr>
 						<tr>
 							<td>onError</td>
@@ -383,11 +390,12 @@
 				<p>The sequence is  </p>
 				<ol>
 					<li>beforeAction </li>
-					<li>action</li>
-					<li>dependency</li>
+					<li>** action/dependency</li>
+					<li>** dependency/action</li>
 					<li>afterAction</li>
-					<li>onError(if not caught before)</li>
+					<li>onError(if not caught before)  </li>
 				</ol>
+				<p>**  depending on the direction. </p>
 				<a href="#for-simple-dependency" id="for-simple-dependency" style="color: inherit; text-decoration: none;">
 					<h2>For Simple Dependency</h2>
 				</a>
@@ -438,8 +446,8 @@
 					<li>afterDependency</li>
 					<li>onDependencyError (if not caught before)</li>
 				</ol>
-				<a href="#for-compositive-dependency" id="for-compositive-dependency" style="color: inherit; text-decoration: none;">
-					<h2>For Compositive Dependency</h2>
+				<a href="#for-composite-dependency" id="for-composite-dependency" style="color: inherit; text-decoration: none;">
+					<h2>For Composite Dependency</h2>
 				</a>
 				<table>
 					<thead>
