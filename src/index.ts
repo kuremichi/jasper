@@ -1,6 +1,6 @@
 export { JasperEngine } from './engine';
 export { DefaultEngineOptions, EngineOptions } from './engine.option';
-export { ExecutionOrder, EngineRecipe, Operator } from './enum';
+export { ExecutionOrder, EngineRecipe, Operator, Direction } from './enum';
 export { DebugContext, ExecutionContext } from './execution.context';
 export { ExecutionResponse } from './execution.response';
 export { Rule } from './rule';
