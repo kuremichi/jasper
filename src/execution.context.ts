@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { Rule } from './rule';
-import { Operator, ExecutionOrder, Direction } from './enum';
+import { Operator, ExecutionOrder } from './enum';
 import { ExecutionResponse } from './execution.response';
 
 /**
