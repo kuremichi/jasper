@@ -3,7 +3,7 @@ import { JasperEngine } from '../src/engine';
 
 import { Observable, of, empty, throwError, timer } from 'rxjs';
 import _ from 'lodash';
-import { mapTo, switchMap, take, tap, timeout } from 'rxjs/operators';
+import { mapTo, switchMap, take, tap } from 'rxjs/operators';
 
 import { Rule } from '../src/rule';
 import { ExecutionContext } from '../src/execution.context';

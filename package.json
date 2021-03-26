@@ -1,6 +1,6 @@
 {
   "name": "@kuremichi/jasper",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Jasper Rule Engine",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
@@ -9,8 +9,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "npx eslint .",
     "build": "tsc",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
+    "prepare": "npm run build ",
+    "prepublishOnly": "npm test && npm run lint && npx typedoc ./src/index.ts",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"

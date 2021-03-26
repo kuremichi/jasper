@@ -136,7 +136,6 @@ export class JasperEngine {
             isSkipped: false,
             isSuccessful: true,
             rules: [],
-            startTime: new Date(),
         };
 
         /* istanbul ignore next */
@@ -148,15 +147,18 @@ export class JasperEngine {
             };
         }
 
-        return (compositeDependency.when
-            ? this.processExpression(compositeDependency.when, context).pipe(
-                  switchMap((whenResult) => {
-                      const w: boolean = _.get(whenResult, '[0]', false);
-                      return of(w);
-                  })
-              )
-            : of(true)
-        ).pipe(
+        return of(1).pipe(
+            switchMap(() => {
+                dependencyResponse.startTime = new Date();
+                return compositeDependency.when
+                    ? this.processExpression(compositeDependency.when, context).pipe(
+                          switchMap((whenResult) => {
+                              const w: boolean = _.get(whenResult, '[0]', false);
+                              return of(w);
+                          })
+                      )
+                    : of(true);
+            }),
             switchMap((run: boolean) => {
                 dependencyResponse.isSkipped = !run;
                 if (dependencyResponse.isSkipped) {
@@ -168,6 +170,7 @@ export class JasperEngine {
                         };
                     }
 
+                    dependencyResponse.completeTime = new Date();
                     return of(dependencyResponse);
                 }
 
@@ -206,6 +209,7 @@ export class JasperEngine {
                     }),
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     switchMap((afterDependencyResult) => {
+                        dependencyResponse.completeTime = new Date();
                         dependencyResponse.isSuccessful =
                             operator === Operator.AND
                                 ? _.every(
@@ -224,6 +228,7 @@ export class JasperEngine {
                 );
             }),
             catchError((err) => {
+                dependencyResponse.completeTime = new Date();
                 dependencyResponse.hasError = true;
                 dependencyResponse.errors.push(err);
                 dependencyResponse.isSuccessful = false;
@@ -256,15 +261,18 @@ export class JasperEngine {
             matches: [],
         };
 
-        return (simpleDependency.when
-            ? this.processExpression(simpleDependency.when, context).pipe(
-                  switchMap((whenResult) => {
-                      const w: boolean = _.get(whenResult, '[0]', false);
-                      return of(w);
-                  })
-              )
-            : of(true)
-        ).pipe(
+        return of(true).pipe(
+            switchMap(() => {
+                dependencyResponse.startTime = new Date();
+                return simpleDependency.when
+                    ? this.processExpression(simpleDependency.when, context).pipe(
+                          switchMap((whenResult) => {
+                              const w: boolean = _.get(whenResult, '[0]', false);
+                              return of(w);
+                          })
+                      )
+                    : of(true);
+            }),
             switchMap((run) => {
                 dependencyResponse.isSkipped = !run;
                 if (dependencyResponse.isSkipped) {
@@ -276,6 +284,7 @@ export class JasperEngine {
                         };
                     }
 
+                    dependencyResponse.completeTime = new Date();
                     return of(dependencyResponse);
                 }
 
